@@ -352,6 +352,40 @@
                 overflow-x: auto;
             }
         }
+
+        /* Add these new styles */
+        .status-select {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .status-select.status-applied {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-select.status-interview {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-select.status-offered {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-select.status-rejected {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
     </style>
 </head>
 <body>
@@ -619,7 +653,14 @@
                     </td>
                     <td>${app.role}</td>
                     <td>${formatDate(app.dateApplied)}</td>
-                    <td><span class="status-badge ${getStatusClass(app.status)}">${app.status}</span></td>
+                    <td>
+                        <select class="status-select ${getStatusClass(app.status)}" data-id="${app.id}">
+                            <option value="Applied" ${app.status === 'Applied' ? 'selected' : ''}>Applied</option>
+                            <option value="Interview" ${app.status === 'Interview' ? 'selected' : ''}>Interview</option>
+                            <option value="Offered" ${app.status === 'Offered' ? 'selected' : ''}>Offered</option>
+                            <option value="Rejected" ${app.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                        </select>
+                    </td>
                     <td>${formatDate(app.lastUpdated)}</td>
                     <td class="action-cell">
                         <button class="icon-btn edit-btn" data-id="${app.id}">
@@ -657,6 +698,20 @@
             
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', () => deleteApplication(btn.dataset.id));
+            });
+
+            // Add this after adding event listeners in renderApplications()
+            document.querySelectorAll('.status-select').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const applicationId = e.target.dataset.id;
+                    const newStatus = e.target.value;
+                    
+                    // Update status classes
+                    e.target.className = `status-select ${getStatusClass(newStatus)}`;
+                    
+                    // Update application
+                    updateApplication(applicationId, { status: newStatus });
+                });
             });
         }
 
