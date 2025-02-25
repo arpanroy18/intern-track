@@ -1,7 +1,7 @@
-
 import tkinter as tk
 from tkinter import scrolledtext
-import google.generativeai as genai
+import os
+from openai import OpenAI
 
 def process_job_posting():
     job_posting = input_text.get(1.0, tk.END)
@@ -9,48 +9,43 @@ def process_job_posting():
     root.update()
     
     try:
-        # Configure with API key
-        genai.configure(api_key="AIzaSyBicqwQfKK737X1N3JbupTydFR-LElT7dg")
-
-        # Create the model
-        generation_config = {
-            "temperature": 1,
-            "top_p": 0.95,
-            "top_k": 40,
-            "max_output_tokens": 8192,
-        }
-
-        model = genai.GenerativeModel(
-            model_name="gemini-pro",
-            generation_config=generation_config,
+        # Initialize OpenRouter client
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key="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",
         )
 
-        # Create chat with specific system prompt
-        chat_session = model.start_chat(
-            history=[
+        # Create chat completion
+        completion = client.chat.completions.create(
+            extra_headers={
+                "HTTP-Referer": "localhost",  # Local development
+                "X-Title": "Job Parser",      # Application name
+            },
+            model="meta-llama/llama-3.3-70b-instruct:free",
+            messages=[
                 {
-                    "role": "user",
-                    "parts": ["You are a job posting parser. When I give you a job posting text, extract the following information and return it in JSON format: Company, Role, Location, and Job Description. Only return the JSON object, nothing else."],
+                    "role": "system",
+                    "content": "You are a job posting parser. Extract and return ONLY a JSON object with no markdown formatting, code blocks, or additional text. Use this exact format:\n{\n  \"company\": \"Company Name\",\n  \"role\": \"Job Title\",\n  \"location\": \"City, State/Province\",\n  \"description\": \"Brief job description\"\n}\n\nEnsure all values are properly escaped JSON strings."
                 },
                 {
-                    "role": "model",
-                    "parts": ["I understand. I will parse job postings and return a JSON object containing the Company, Role, Location, and Job Description. I will only return the JSON object without any additional text."],
+                    "role": "user",
+                    "content": job_posting
                 }
             ]
         )
-
-        # Send the job posting text for processing
-        response = chat_session.send_message(job_posting)
         
-        # Clean and display the response
-        cleaned_response = response.text.strip()
-        if cleaned_response.startswith("```json"):
-            cleaned_response = cleaned_response[7:]  # Remove ```json
-        if cleaned_response.endswith("```"):
-            cleaned_response = cleaned_response[:-3]  # Remove ```
+        # Get the response and handle markdown code blocks
+        response = completion.choices[0].message.content.strip()
         
+        # Remove markdown code blocks if present
+        if response.startswith('```'):
+            # Remove starting ```json or ``` and ending ```
+            lines = response.split('\n')
+            if len(lines) > 2:  # At least 3 lines: opening ```, content, closing ```
+                response = '\n'.join(lines[1:-1])  # Take everything between the ``` markers
+            
         output_text.delete(1.0, tk.END)
-        output_text.insert(tk.END, cleaned_response)
+        output_text.insert(tk.END, response)
         status_label.config(text="Processing complete!")
     
     except Exception as e:
