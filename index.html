@@ -590,51 +590,107 @@
     </div>
 
     <script>
+        // API URLs
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
         // Data storage functions
-        function saveApplications(applications) {
-            localStorage.setItem('internship-applications', JSON.stringify(applications));
-            updateStats();
+        async function getApplications() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/applications`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const applications = await response.json();
+                return applications;
+            } catch (error) {
+                console.error('Error fetching applications:', error);
+                alert('Error fetching applications. Check if the server is running.');
+                return [];
+            }
         }
 
-        function getApplications() {
-            const applications = localStorage.getItem('internship-applications');
-            return applications ? JSON.parse(applications) : [];
-        }
-
-        function clearAllData() {
+        async function clearAllData() {
             if (confirm('Are you sure you want to clear all application data? This cannot be undone.')) {
-                localStorage.removeItem('internship-applications');
-                renderApplications();
-                updateStats();
+                try {
+                    const response = await fetch(`${API_BASE_URL}/applications`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    await renderApplications();
+                    updateStats();
+                } catch (error) {
+                    console.error('Error clearing data:', error);
+                    alert('Error clearing data: ' + error.message);
+                }
             }
         }
 
         // Application CRUD operations
-        function addApplication(application) {
-            const applications = getApplications();
-            application.id = Date.now().toString();
-            application.lastUpdated = new Date().toISOString();
-            applications.push(application);
-            saveApplications(applications);
-            renderApplications();
-        }
-
-        function updateApplication(id, updatedApplication) {
-            const applications = getApplications();
-            const index = applications.findIndex(app => app.id === id);
-            if (index !== -1) {
-                updatedApplication.lastUpdated = new Date().toISOString();
-                applications[index] = { ...applications[index], ...updatedApplication };
-                saveApplications(applications);
-                renderApplications();
+        async function addApplication(application) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/applications`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(application)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                await renderApplications();
+                updateStats();
+            } catch (error) {
+                console.error('Error adding application:', error);
+                alert('Error adding application: ' + error.message);
             }
         }
 
-        function deleteApplication(id) {
+        async function updateApplication(id, updatedApplication) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/applications/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedApplication)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                await renderApplications();
+                updateStats();
+            } catch (error) {
+                console.error('Error updating application:', error);
+                alert('Error updating application: ' + error.message);
+            }
+        }
+
+        async function deleteApplication(id) {
             if (confirm('Are you sure you want to delete this application?')) {
-                const applications = getApplications().filter(app => app.id !== id);
-                saveApplications(applications);
-                renderApplications();
+                try {
+                    const response = await fetch(`${API_BASE_URL}/applications/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    await renderApplications();
+                    updateStats();
+                } catch (error) {
+                    console.error('Error deleting application:', error);
+                    alert('Error deleting application: ' + error.message);
+                }
             }
         }
 
@@ -654,10 +710,10 @@
             }
         }
 
-        function renderApplications() {
+        async function renderApplications() {
             const applicationsTable = document.getElementById('applications-table');
             const emptyState = document.getElementById('empty-state');
-            const applications = getApplications();
+            const applications = await getApplications();
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
             
@@ -754,7 +810,7 @@
                 btn.addEventListener('click', () => deleteApplication(btn.dataset.id));
             });
 
-            // Add this after adding event listeners in renderApplications()
+            // Add status select event listeners
             document.querySelectorAll('.status-select').forEach(select => {
                 select.addEventListener('change', (e) => {
                     const applicationId = e.target.dataset.id;
@@ -769,8 +825,8 @@
             });
         }
 
-        function updateStats() {
-            const applications = getApplications();
+        async function updateStats() {
+            const applications = await getApplications();
             const totalApplications = applications.length;
             const totalInterviews = applications.filter(app => app.status === 'Interview' || app.status === 'Offered').length;
             const totalOffers = applications.filter(app => app.status === 'Offered').length;
@@ -793,8 +849,8 @@
             document.getElementById('application-form').reset();
         }
 
-        function editApplication(id) {
-            const applications = getApplications();
+        async function editApplication(id) {
+            const applications = await getApplications();
             const application = applications.find(app => app.id === id);
             
             if (application) {
@@ -808,6 +864,22 @@
                 document.getElementById('notes').value = application.notes || '';
                 
                 openModal('Edit Application');
+            }
+        }
+
+        // Migration function to move data from localStorage to IndexedDB
+        async function migrateFromLocalStorage() {
+            const localData = localStorage.getItem('internship-applications');
+            if (localData && db) {
+                try {
+                    const applications = JSON.parse(localData);
+                    if (applications.length > 0) {
+                        await saveApplications(applications);
+                        console.log('Data migrated from localStorage to IndexedDB');
+                    }
+                } catch (err) {
+                    console.error('Error migrating data:', err);
+                }
             }
         }
 
@@ -901,8 +973,8 @@
         }
 
         // Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            renderApplications();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await renderApplications();
             updateStats();
             
             // Add application button
@@ -924,7 +996,7 @@
             });
             
             // Form submission
-            document.getElementById('application-form').addEventListener('submit', (e) => {
+            document.getElementById('application-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const applicationId = document.getElementById('application-id').value;
@@ -939,9 +1011,9 @@
                 };
                 
                 if (applicationId) {
-                    updateApplication(applicationId, application);
+                    await updateApplication(applicationId, application);
                 } else {
-                    addApplication(application);
+                    await addApplication(application);
                 }
                 
                 closeModal();
