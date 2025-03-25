@@ -901,15 +901,31 @@
 
             // Add status select event listeners
             document.querySelectorAll('.status-select').forEach(select => {
-                select.addEventListener('change', (e) => {
+                select.addEventListener('change', async (e) => {
                     const applicationId = e.target.dataset.id;
                     const newStatus = e.target.value;
                     
                     // Update status classes
                     e.target.className = `status-select ${getStatusClass(newStatus)}`;
                     
-                    // Update application
-                    updateApplication(applicationId, { status: newStatus });
+                    try {
+                        // Get the full application data first
+                        const applications = await getApplications();
+                        const currentApp = applications.find(app => app.id === applicationId);
+                        
+                        if (currentApp) {
+                            // Only update the status field, preserving all other data
+                            await updateApplication(applicationId, { 
+                                ...currentApp,
+                                status: newStatus 
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error updating status:', error);
+                        alert('Error updating status: ' + error.message);
+                        // Revert the UI to previous status
+                        renderApplications();
+                    }
                 });
             });
         }

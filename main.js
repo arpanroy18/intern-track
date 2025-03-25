@@ -97,46 +97,66 @@ expressApp.put('/api/applications/:id', (req, res) => {
   const application = req.body;
   application.lastUpdated = new Date().toISOString();
   
-  const sql = `
-    UPDATE applications SET
-      company = ?,
-      role = ?,
-      dateApplied = ?,
-      location = ?,
-      applicationLink = ?,
-      status = ?,
-      notes = ?,
-      lastUpdated = ?
-    WHERE id = ?
-  `;
-  
-  db.run(
-    sql,
-    [
-      application.company || '',
-      application.role || '',
-      application.dateApplied || '',
-      application.location || '',
-      application.applicationLink || '',
-      application.status || '',
-      application.notes || '',
-      application.lastUpdated,
-      id
-    ],
-    function(err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      
-      if (this.changes === 0) {
-        res.status(404).json({ error: 'Application not found' });
-        return;
-      }
-      
-      res.json({ ...application, id });
+  // First, get the existing application
+  db.get('SELECT * FROM applications WHERE id = ?', [id], (err, existingApp) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
     }
-  );
+    
+    if (!existingApp) {
+      res.status(404).json({ error: 'Application not found' });
+      return;
+    }
+    
+    // Merge existing data with updates, preserving fields that weren't sent
+    const updatedApp = {
+      ...existingApp,
+      ...application,
+      lastUpdated: application.lastUpdated
+    };
+    
+    const sql = `
+      UPDATE applications SET
+        company = ?,
+        role = ?,
+        dateApplied = ?,
+        location = ?,
+        applicationLink = ?,
+        status = ?,
+        notes = ?,
+        lastUpdated = ?
+      WHERE id = ?
+    `;
+    
+    db.run(
+      sql,
+      [
+        updatedApp.company,
+        updatedApp.role,
+        updatedApp.dateApplied,
+        updatedApp.location || '',
+        updatedApp.applicationLink || '',
+        updatedApp.status,
+        updatedApp.notes || '',
+        updatedApp.lastUpdated,
+        id
+      ],
+      function(err) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        
+        if (this.changes === 0) {
+          res.status(404).json({ error: 'Application not found' });
+          return;
+        }
+        
+        res.json(updatedApp);
+      }
+    );
+  });
 });
 
 // DELETE application
