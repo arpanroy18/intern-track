@@ -529,7 +529,7 @@
                 <p id="total-offers">0</p>
             </div>
             <div class="stat-card">
-                <h3>Response Rate</h3>
+                <h3>Interview Rate</h3>
                 <p id="response-rate">0%</p>
             </div>
         </div>
@@ -933,10 +933,19 @@
         async function updateStats() {
             const applications = await getApplications();
             const totalApplications = applications.length;
+            
+            // Count applications that are currently in Interview or Offered status
             const totalInterviews = applications.filter(app => app.status === 'Interview' || app.status === 'Offered').length;
+            
+            // Count applications with Offered status
             const totalOffers = applications.filter(app => app.status === 'Offered').length;
+            
+            // Count applications that ever had an interview (using hadInterview flag)
+            const totalResponses = applications.filter(app => app.hadInterview === 1).length;
+            
+            // Calculate response rate based on applications that ever had an interview
             const responseRate = totalApplications > 0 ? 
-                Math.round((totalInterviews / totalApplications) * 100) : 0;
+                Math.round((totalResponses / totalApplications) * 100) : 0;
             
             document.getElementById('total-applications').textContent = totalApplications;
             document.getElementById('total-interviews').textContent = totalInterviews;

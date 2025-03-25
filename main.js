@@ -29,6 +29,7 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
         location TEXT,
         applicationLink TEXT,
         status TEXT NOT NULL,
+        hadInterview INTEGER DEFAULT 0,
         notes TEXT,
         lastUpdated TEXT NOT NULL
       )
@@ -60,9 +61,12 @@ expressApp.post('/api/applications', (req, res) => {
   const sql = `
     INSERT INTO applications (
       id, company, role, dateApplied, location, 
-      applicationLink, status, notes, lastUpdated
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      applicationLink, status, hadInterview, notes, lastUpdated
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
+  
+  // Set hadInterview flag if initial status is Interview or Offered
+  const hadInterview = (application.status === 'Interview' || application.status === 'Offered') ? 1 : 0;
   
   db.run(
     sql, 
@@ -74,6 +78,7 @@ expressApp.post('/api/applications', (req, res) => {
       application.location || '',
       application.applicationLink || '',
       application.status,
+      hadInterview,
       application.notes || '',
       application.lastUpdated
     ],
@@ -109,10 +114,19 @@ expressApp.put('/api/applications/:id', (req, res) => {
       return;
     }
     
+    // Check if this update should set hadInterview flag
+    let hadInterview = existingApp.hadInterview || 0; // Use existing flag value
+    
+    // If current status is Interview/Offered or changing to Interview/Offered, set hadInterview to 1
+    if (application.status === 'Interview' || application.status === 'Offered') {
+      hadInterview = 1;
+    }
+    
     // Merge existing data with updates, preserving fields that weren't sent
     const updatedApp = {
       ...existingApp,
       ...application,
+      hadInterview: hadInterview,
       lastUpdated: application.lastUpdated
     };
     
@@ -124,6 +138,7 @@ expressApp.put('/api/applications/:id', (req, res) => {
         location = ?,
         applicationLink = ?,
         status = ?,
+        hadInterview = ?,
         notes = ?,
         lastUpdated = ?
       WHERE id = ?
@@ -138,6 +153,7 @@ expressApp.put('/api/applications/:id', (req, res) => {
         updatedApp.location || '',
         updatedApp.applicationLink || '',
         updatedApp.status,
+        hadInterview,
         updatedApp.notes || '',
         updatedApp.lastUpdated,
         id
