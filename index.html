@@ -663,18 +663,16 @@
             <div class="form-group">
                 <label for="job-posting-text">Paste Job Posting Text</label>
                 <textarea id="job-posting-text" class="form-control" rows="10" placeholder="Paste the complete job posting text here..." spellcheck="false"></textarea>
-                <div class="actions" style="text-align: left; margin-top: 0.5rem;">
-                    <button id="clear-posting-btn" class="btn btn-secondary" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">
-                        Clear
-                    </button>
-                </div>
             </div>
             <div id="parse-result" class="form-group" style="display: none;">
                 <label>Raw API Response:</label>
                 <pre style="background: #f5f5f5; padding: 1rem; border-radius: 0.375rem; overflow-x: auto; white-space: pre-wrap;"></pre>
             </div>
             <div class="actions">
-                <button id="parse-posting-btn" class="btn">Parse Posting</button>
+                <div class="button-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <button id="clear-posting-btn" class="btn btn-secondary">Clear</button>
+                    <button id="parse-posting-btn" class="btn">Parse Posting</button>
+                </div>
             </div>
         </div>
     </div>
@@ -787,6 +785,21 @@
         function formatDate(dateString) {
             const options = { year: 'numeric', month: 'short', day: 'numeric' };
             return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Helper function to get current local date in YYYY-MM-DD format for the date input
+        function getCurrentLocalDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Helper function to get current ISO string in local timezone
+        function getLocalISOString() {
+            const now = new Date();
+            return now.toISOString();
         }
 
         function getStatusClass(status) {
@@ -1075,7 +1088,7 @@
                     document.getElementById('role').value = parsedData.role || '';
                     document.getElementById('location').value = parsedData.location || '';
                     document.getElementById('notes').value = parsedData.description || '';
-                    document.getElementById('date-applied').valueAsDate = new Date();
+                    document.getElementById('date-applied').value = getCurrentLocalDate();
                     
                     // Close job posting modal and open application form
                     closeJobPostingModal();
@@ -1102,7 +1115,7 @@
             document.getElementById('add-application-btn').addEventListener('click', () => {
                 document.getElementById('application-id').value = '';
                 document.getElementById('application-form').reset();
-                document.getElementById('date-applied').valueAsDate = new Date();
+                document.getElementById('date-applied').value = getCurrentLocalDate();
                 openModal('Add Application');
             });
             
@@ -1124,7 +1137,7 @@
                 const application = {
                     company: document.getElementById('company').value,
                     role: document.getElementById('role').value,
-                    dateApplied: document.getElementById('date-applied').value,
+                    dateApplied: document.getElementById('date-applied').value, // This is already in YYYY-MM-DD format
                     location: document.getElementById('location').value,
                     applicationLink: document.getElementById('application-link').value,
                     status: document.getElementById('status').value,

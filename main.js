@@ -56,6 +56,8 @@ expressApp.get('/api/applications', (req, res) => {
 expressApp.post('/api/applications', (req, res) => {
   const application = req.body;
   application.id = Date.now().toString();
+  
+  // Store the lastUpdated time in ISO format 
   application.lastUpdated = new Date().toISOString();
   
   const sql = `
