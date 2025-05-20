@@ -134,6 +134,46 @@ th {
     font-size: 0.875rem;
 }
 
+/* New table styles */
+.applications-table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.applications-table {
+    width: 100%;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.applications-table thead {
+    background-color: #f3f4f6;
+}
+
+.applications-table th {
+    font-weight: 600;
+    color: var(--text-color);
+    padding: 1rem;
+    position: relative;
+}
+
+.applications-table thead tr {
+    border-bottom: 2px solid var(--border-color);
+}
+
+.applications-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.applications-table td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+/* Keep existing hover styles */
 tbody tr:hover {
     background-color: var(--bg-color);
 }
@@ -485,3 +525,13 @@ tbody tr:hover {
         grid-template-columns: repeat(2, 1fr);
     }
 } 
+
+/* ---- Align row divider across all columns ---- */
+.applications-table tbody tr {
+    border-bottom: 1px solid var(--border-color);   /* single, full‑width line */
+}
+
+.applications-table td,
+.applications-table th {
+    border-bottom: none;                            /* kill the old per‑cell lines */
+}
