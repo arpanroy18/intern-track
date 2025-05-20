@@ -160,6 +160,12 @@ th {
     position: relative;
 }
 
+/* Make Role column take more space */
+.applications-table th:nth-child(2),
+.applications-table td:nth-child(2) {
+    width: 30%;
+}
+
 .applications-table thead tr {
     border-bottom: 2px solid var(--border-color);
 }
@@ -171,6 +177,8 @@ th {
 .applications-table td {
     padding: 1rem;
     vertical-align: middle;
+    min-height: 3.5rem; /* Ensure consistent row height */
+    height: 3.5rem;
 }
 
 /* Keep existing hover styles */
@@ -214,6 +222,8 @@ tbody tr:hover {
 .action-cell {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
+    height: 100%;
 }
 
 .icon-btn {
@@ -504,8 +514,8 @@ tbody tr:hover {
         text-overflow: ellipsis;
     }
 
-    th:nth-child(5),
-    td:nth-child(5) {
+    th:nth-child(4),
+    td:nth-child(4) {
         display: none;
     }
 }

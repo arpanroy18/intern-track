@@ -38,7 +38,7 @@ async function renderApplications() {
     if (filteredApplications.length === 0) {
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
-            <td colspan="6" style="text-align: center; padding: 2rem;">
+            <td colspan="5" style="text-align: center; padding: 2rem;">
                 No matching applications found
             </td>
         `;
@@ -55,7 +55,6 @@ async function renderApplications() {
                 ${app.location ? `<div style="color: var(--text-secondary); font-size: 0.875rem;">${app.location}</div>` : ''}
             </td>
             <td>${app.role}</td>
-            <td>${formatDate(app.dateApplied)}</td>
             <td>
                 <select class="status-select ${getStatusClass(app.status)}" data-id="${app.id}">
                     <option value="Applied" ${app.status === 'Applied' ? 'selected' : ''}>Applied</option>
