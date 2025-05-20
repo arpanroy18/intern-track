@@ -126,6 +126,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         th, td {
@@ -678,8 +679,8 @@
     </div>
 
     <script>
-        // API URLs - updated for web app
-        const API_BASE_URL = '/api';
+        // API URLs - use the fixed port for Electron app
+        const API_BASE_URL = 'http://localhost:3000/api';
         
         // Data storage functions
         async function getApplications() {

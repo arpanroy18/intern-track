@@ -59,6 +59,7 @@ app.post('/api/applications', (req, res) => {
   const application = req.body;
   application.id = Date.now().toString();
   application.lastUpdated = new Date().toISOString();
+  console.log('Received application data:', application);
   
   // Set hadInterview flag if initial status is Interview or Offered
   const hadInterview = (application.status === 'Interview' || application.status === 'Offered') ? 1 : 0;
@@ -86,6 +87,7 @@ app.post('/api/applications', (req, res) => {
     ],
     function(err) {
       if (err) {
+        console.error('Error adding application to DB:', err);
         res.status(500).json({ error: err.message });
         return;
       }
