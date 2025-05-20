@@ -13,8 +13,9 @@ app.use(cors());
 // Middleware for parsing JSON
 app.use(express.json());
 
-// Serve static files
+// Serve static files - serve both root and public directory
 app.use(express.static(path.join(__dirname)));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Connect to SQLite database
 const db = new sqlite3.Database('./interntrack.db', (err) => {

@@ -1,50 +1,80 @@
-# InternTrack - Web Application
+# InternTrack - Internship Application Tracker
 
-A web application for tracking and managing your internship applications.
+InternTrack is a web application for tracking internship applications. It helps students and job seekers manage their internship application process by keeping track of applications, interviews, and offers.
 
 ## Features
 
-- Track internship/job applications
-- Record company, role, application date, and status
-- Filter applications by status (Applied, Interview, Offered, Rejected)
-- Search applications
-- View statistics about your application process
+- Track internship applications with company, role, date applied, and status
+- Categorize applications as Applied, Interview, Offered, or Closed
+- Parse job postings to automatically extract company, role, and location information
+- Filter and search applications
+- Track interview rate statistics
+
+## Project Structure
+
+The project has been refactored to follow a modular structure:
+
+```
+InternTrack/
+├── index.html              # Main HTML file
+├── public/                 # Public assets
+│   ├── css/
+│   │   └── styles.css      # Extracted styles
+│   └── js/
+│       ├── api.js          # API and data functions
+│       ├── job-parser.js   # Job posting parser
+│       ├── main.js         # Application entry point and event handling
+│       ├── ui.js           # UI functions
+│       └── utils.js        # Utility functions
+├── server.js               # Backend server with API endpoints
+├── interntrack.db          # SQLite database
+└── package.json            # Project dependencies
+```
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- npm or yarn
+- Node.js (v14 or newer)
+- npm
 
 ### Installation
 
-1. Clone the repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/InternTrack.git
+   cd InternTrack
+   ```
+
 2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm install
-```
+3. Start the server:
+   ```bash
+   node server.js
+   ```
 
-### Running the Application
+4. Open your browser and navigate to:
+   ```
+   http://localhost:3000
+   ```
 
-Start the web server:
+## API Endpoints
 
-```bash
-npm start
-```
+- `GET /api/applications` - Retrieve all applications
+- `POST /api/applications` - Add a new application
+- `PUT /api/applications/:id` - Update an application
+- `DELETE /api/applications/:id` - Delete an application
+- `DELETE /api/applications` - Clear all applications
 
-For development with auto-restart:
+## Technologies Used
 
-```bash
-npm run dev
-```
-
-The application will be available at: http://localhost:3000
-
-## Database
-
-InternTrack uses SQLite to store your application data. The database file (interntrack.db) will be created automatically when you first run the application.
+- Frontend: HTML, CSS, JavaScript (ES6+)
+- Backend: Node.js, Express
+- Database: SQLite
+- AI Integration: OpenRouter API for job posting parsing
 
 ## License
 
