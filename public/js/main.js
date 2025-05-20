@@ -1,8 +1,11 @@
 // Main application entry point
-import { getApplications, addApplication, updateApplication, clearAllData } from './api.js';
+import { getApplications, addApplication, updateApplication, clearAllData, setUIFunctions } from './api.js';
 import { renderApplications, updateStats, openModal, closeModal, openJobPostingModal, closeJobPostingModal } from './ui.js';
 import { getCurrentLocalDate, handleWindowResize } from './utils.js';
 import { initJobParserListeners } from './job-parser.js';
+
+// Set the UI functions in api.js to avoid circular dependency issues
+setUIFunctions(renderApplications, updateStats);
 
 // Initialization function
 async function initApp() {
