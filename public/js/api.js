@@ -26,7 +26,24 @@ export function setUIFunctions(renderFunc, statsFunc) {
 }
 
 async function clearAllData() {
-    if (confirm('Are you sure you want to clear all application data? This cannot be undone.')) {
+    // Show confirmation modal
+    const confirmModal = document.getElementById('confirm-clear-modal');
+    confirmModal.style.display = 'flex';
+    
+    // Set up event listeners for confirmation
+    const confirmBtn = document.getElementById('confirm-clear-btn');
+    const cancelBtn = document.getElementById('cancel-clear-btn');
+    const closeBtn = document.getElementById('close-clear-modal');
+    
+    const closeModal = () => {
+        confirmModal.style.display = 'none';
+        // Clean up event listeners
+        confirmBtn.removeEventListener('click', handleConfirm);
+        cancelBtn.removeEventListener('click', closeModal);
+        closeBtn.removeEventListener('click', closeModal);
+    };
+    
+    const handleConfirm = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/applications`, {
                 method: 'DELETE'
@@ -38,11 +55,18 @@ async function clearAllData() {
             
             await renderApplications();
             updateStats();
+            closeModal();
         } catch (error) {
             console.error('Error clearing data:', error);
             alert('Error clearing data: ' + error.message);
+            closeModal();
         }
-    }
+    };
+    
+    // Attach event listeners
+    confirmBtn.addEventListener('click', handleConfirm);
+    cancelBtn.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal);
 }
 
 // Application CRUD operations
@@ -91,7 +115,36 @@ async function updateApplication(id, updatedApplication) {
 }
 
 async function deleteApplication(id) {
-    if (confirm('Are you sure you want to delete this application?')) {
+    // Get the application data to display in the confirmation modal
+    const applications = await getApplications();
+    const application = applications.find(app => app.id === id);
+    
+    if (!application) {
+        console.error('Application not found');
+        return;
+    }
+    
+    // Show confirmation modal
+    const confirmModal = document.getElementById('confirm-delete-modal');
+    const companyNameEl = confirmModal.querySelector('.company-name');
+    companyNameEl.textContent = `${application.company} - ${application.role}`;
+    
+    confirmModal.style.display = 'flex';
+    
+    // Set up event listeners for confirmation
+    const confirmBtn = document.getElementById('confirm-delete-btn');
+    const cancelBtn = document.getElementById('cancel-delete-btn');
+    const closeBtn = document.getElementById('close-confirm-modal');
+    
+    const closeModal = () => {
+        confirmModal.style.display = 'none';
+        // Clean up event listeners
+        confirmBtn.removeEventListener('click', handleConfirm);
+        cancelBtn.removeEventListener('click', closeModal);
+        closeBtn.removeEventListener('click', closeModal);
+    };
+    
+    const handleConfirm = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/applications/${id}`, {
                 method: 'DELETE'
@@ -103,11 +156,18 @@ async function deleteApplication(id) {
             
             await renderApplications();
             updateStats();
+            closeModal();
         } catch (error) {
             console.error('Error deleting application:', error);
             alert('Error deleting application: ' + error.message);
+            closeModal();
         }
-    }
+    };
+    
+    // Attach event listeners
+    confirmBtn.addEventListener('click', handleConfirm);
+    cancelBtn.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal);
 }
 
 // Helper function to parse job postings

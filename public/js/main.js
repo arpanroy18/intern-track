@@ -68,7 +68,20 @@ async function initApp() {
     });
 
     // Clear all data
-    document.querySelector('button[onclick="clearAllData()"]').addEventListener('click', clearAllData);
+    document.getElementById('clear-data-btn').addEventListener('click', clearAllData);
+    
+    // Close confirmation modals when clicking outside
+    document.getElementById('confirm-delete-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('confirm-delete-modal')) {
+            document.getElementById('confirm-delete-modal').style.display = 'none';
+        }
+    });
+    
+    document.getElementById('confirm-clear-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('confirm-clear-modal')) {
+            document.getElementById('confirm-clear-modal').style.display = 'none';
+        }
+    });
     
     // Job parsing modal
     document.getElementById('parse-job-btn').addEventListener('click', openJobPostingModal);
