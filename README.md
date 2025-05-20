@@ -1,60 +1,51 @@
-# InternTrack Desktop App
+# InternTrack - Web Application
 
-A cross-platform desktop application for tracking internship applications.
-
-## Development Setup
-
-1. Make sure you have Node.js installed (https://nodejs.org/)
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Start the application in development mode:
-   ```
-   npm start
-   ```
-
-## Building the Application
-
-To build the application for your current platform:
-```
-npm run package
-```
-
-To build for specific platforms:
-```
-npm run package:mac    # macOS
-npm run package:win    # Windows
-npm run package:linux  # Linux
-```
-
-The packaged applications will be available in the `dist` directory.
+A web application for tracking and managing your internship applications.
 
 ## Features
 
-- Track internship applications in a persistent SQLite database
-- Filter applications by status
-- Search applications by company, role, or notes
+- Track internship/job applications
+- Record company, role, application date, and status
+- Filter applications by status (Applied, Interview, Offered, Rejected)
+- Search applications
 - View statistics about your application process
-- Parse job postings automatically
-- Export and import application data
-- Native desktop application that works offline
 
-## Data Storage
+## Getting Started
 
-All application data is stored in a SQLite database file located in your application data directory:
+### Prerequisites
 
-- Windows: `%APPDATA%\interntrack\interntrack.db`
-- macOS: `~/Library/Application Support/interntrack/interntrack.db`
-- Linux: `~/.config/interntrack/interntrack.db`
+- Node.js (v14 or higher)
+- npm or yarn
 
-You can back up this file to preserve your data or use the Export/Import feature in the application.
+### Installation
 
-## Technologies Used
+1. Clone the repository
+2. Install dependencies:
 
-- Electron - Cross-platform desktop app framework
-- Node.js & Express - Backend server
-- SQLite - File-based database
-- HTML, CSS, JavaScript - Frontend
+```bash
+npm install
+```
+
+### Running the Application
+
+Start the web server:
+
+```bash
+npm start
+```
+
+For development with auto-restart:
+
+```bash
+npm run dev
+```
+
+The application will be available at: http://localhost:3000
+
+## Database
+
+InternTrack uses SQLite to store your application data. The database file (interntrack.db) will be created automatically when you first run the application.
+
+## License
+
+MIT

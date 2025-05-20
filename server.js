@@ -33,6 +33,7 @@ const db = new sqlite3.Database('./interntrack.db', (err) => {
         location TEXT,
         applicationLink TEXT,
         status TEXT NOT NULL,
+        hadInterview INTEGER DEFAULT 0,
         notes TEXT,
         lastUpdated TEXT NOT NULL
       )
@@ -59,11 +60,14 @@ app.post('/api/applications', (req, res) => {
   application.id = Date.now().toString();
   application.lastUpdated = new Date().toISOString();
   
+  // Set hadInterview flag if initial status is Interview or Offered
+  const hadInterview = (application.status === 'Interview' || application.status === 'Offered') ? 1 : 0;
+  
   const sql = `
     INSERT INTO applications (
       id, company, role, dateApplied, location, 
-      applicationLink, status, notes, lastUpdated
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      applicationLink, status, hadInterview, notes, lastUpdated
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   
   db.run(
@@ -76,6 +80,7 @@ app.post('/api/applications', (req, res) => {
       application.location || '',
       application.applicationLink || '',
       application.status,
+      hadInterview,
       application.notes || '',
       application.lastUpdated
     ],
@@ -99,46 +104,69 @@ app.put('/api/applications/:id', (req, res) => {
   const application = req.body;
   application.lastUpdated = new Date().toISOString();
   
-  const sql = `
-    UPDATE applications SET
-      company = ?,
-      role = ?,
-      dateApplied = ?,
-      location = ?,
-      applicationLink = ?,
-      status = ?,
-      notes = ?,
-      lastUpdated = ?
-    WHERE id = ?
-  `;
-  
-  db.run(
-    sql,
-    [
-      application.company,
-      application.role,
-      application.dateApplied,
-      application.location || '',
-      application.applicationLink || '',
-      application.status,
-      application.notes || '',
-      application.lastUpdated,
-      id
-    ],
-    function(err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      
-      if (this.changes === 0) {
-        res.status(404).json({ error: 'Application not found' });
-        return;
-      }
-      
-      res.json({ ...application, id });
+  // First, get the existing application
+  db.get('SELECT * FROM applications WHERE id = ?', [id], (err, existingApp) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
     }
-  );
+    
+    if (!existingApp) {
+      res.status(404).json({ error: 'Application not found' });
+      return;
+    }
+    
+    // Check if this update should set hadInterview flag
+    let hadInterview = existingApp.hadInterview || 0; // Use existing flag value
+    
+    // If current status is Interview/Offered or changing to Interview/Offered, set hadInterview to 1
+    if (application.status === 'Interview' || application.status === 'Offered') {
+      hadInterview = 1;
+    }
+    
+    const sql = `
+      UPDATE applications SET
+        company = ?,
+        role = ?,
+        dateApplied = ?,
+        location = ?,
+        applicationLink = ?,
+        status = ?,
+        hadInterview = ?,
+        notes = ?,
+        lastUpdated = ?
+      WHERE id = ?
+    `;
+    
+    db.run(
+      sql,
+      [
+        application.company,
+        application.role,
+        application.dateApplied,
+        application.location || '',
+        application.applicationLink || '',
+        application.status,
+        hadInterview,
+        application.notes || '',
+        application.lastUpdated,
+        id
+      ],
+      function(err) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        
+        if (this.changes === 0) {
+          res.status(404).json({ error: 'Application not found' });
+          return;
+        }
+        
+        res.json({ ...application, id });
+      }
+    );
+  });
 });
 
 // Delete application
