@@ -106,69 +106,89 @@ app.put('/api/applications/:id', (req, res) => {
   const id = req.params.id;
   const application = req.body;
   application.lastUpdated = new Date().toISOString();
-  
-  // First, get the existing application
-  db.get('SELECT * FROM applications WHERE id = ?', [id], (err, existingApp) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    
-    if (!existingApp) {
-      res.status(404).json({ error: 'Application not found' });
-      return;
-    }
-    
-    // Check if this update should set hadInterview flag
-    let hadInterview = existingApp.hadInterview || 0; // Use existing flag value
-    
-    // If current status is Interview/Offered or changing to Interview/Offered, set hadInterview to 1
-    if (application.status === 'Interview' || application.status === 'Offered') {
-      hadInterview = 1;
-    }
-    
-    const sql = `
-      UPDATE applications SET
-        company = ?,
-        role = ?,
-        dateApplied = ?,
-        location = ?,
-        applicationLink = ?,
-        status = ?,
-        hadInterview = ?,
-        notes = ?,
-        lastUpdated = ?
-      WHERE id = ?
-    `;
-    
-    db.run(
-      sql,
-      [
-        application.company,
-        application.role,
-        application.dateApplied,
-        application.location || '',
-        application.applicationLink || '',
-        application.status,
-        hadInterview,
-        application.notes || '',
-        application.lastUpdated,
-        id
-      ],
-      function(err) {
-        if (err) {
-          res.status(500).json({ error: err.message });
-          return;
-        }
-        
-        if (this.changes === 0) {
-          res.status(404).json({ error: 'Application not found' });
-          return;
-        }
-        
-        res.json({ ...application, id });
+
+  // Start a transaction for data consistency
+  db.serialize(() => {
+    db.run('BEGIN TRANSACTION');
+
+    db.get('SELECT * FROM applications WHERE id = ?', [id], (err, existingApp) => {
+      if (err) {
+        console.error('Error fetching application:', err);
+        db.run('ROLLBACK');
+        res.status(500).json({ error: 'Database error while fetching application' });
+        return;
       }
-    );
+
+      if (!existingApp) {
+        db.run('ROLLBACK');
+        res.status(404).json({ error: 'Application not found' });
+        return;
+      }
+
+      try {
+        // Determine hadInterview value
+        const hadInterview = (application.status === 'Interview' || application.status === 'Offered' || existingApp.hadInterview === 1) ? 1 : 0;
+
+        const sql = `
+          UPDATE applications SET
+            company = ?,
+            role = ?,
+            dateApplied = ?,
+            location = ?,
+            applicationLink = ?,
+            status = ?,
+            hadInterview = ?,
+            notes = ?,
+            lastUpdated = ?
+          WHERE id = ?
+        `;
+
+        db.run(
+          sql,
+          [
+            application.company,
+            application.role,
+            application.dateApplied,
+            application.location || '',
+            application.applicationLink || '',
+            application.status,
+            hadInterview,
+            application.notes || '',
+            application.lastUpdated,
+            id
+          ],
+          function(err) {
+            if (err) {
+              console.error('Error updating application:', err);
+              db.run('ROLLBACK');
+              res.status(500).json({ error: 'Database error while updating application' });
+              return;
+            }
+
+            if (this.changes === 0) {
+              db.run('ROLLBACK');
+              res.status(404).json({ error: 'Application not found' });
+              return;
+            }
+
+            db.run('COMMIT', (err) => {
+              if (err) {
+                console.error('Error committing transaction:', err);
+                db.run('ROLLBACK');
+                res.status(500).json({ error: 'Database error while committing changes' });
+                return;
+              }
+
+              res.json({ ...application, id, hadInterview });
+            });
+          }
+        );
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        db.run('ROLLBACK');
+        res.status(500).json({ error: 'Unexpected error occurred' });
+      }
+    });
   });
 });
 

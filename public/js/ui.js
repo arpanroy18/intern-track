@@ -118,10 +118,17 @@ async function renderApplications() {
                 
                 if (currentApp) {
                     // Only update the status field, preserving all other data
-                    await updateApplication(applicationId, { 
-                        ...currentApp,
-                        status: newStatus 
-                    });
+                    const updatedApp = {
+                        company: currentApp.company,
+                        role: currentApp.role,
+                        dateApplied: currentApp.dateApplied,
+                        location: currentApp.location || '',
+                        applicationLink: currentApp.applicationLink || '',
+                        status: newStatus,
+                        notes: currentApp.notes || ''
+                    };
+                    
+                    await updateApplication(applicationId, updatedApp);
                 }
             } catch (error) {
                 console.error('Error updating status:', error);
