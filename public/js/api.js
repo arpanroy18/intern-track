@@ -222,6 +222,21 @@ async function parseJobPosting(jobPostingText) {
     }
 }
 
+// Get status events for an application
+async function getStatusEvents(applicationId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/applications/${applicationId}/events`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const events = await response.json();
+        return events;
+    } catch (error) {
+        console.error('Error fetching status events:', error);
+        return [];
+    }
+}
+
 // Export functions for use in other modules
 export {
     getApplications,
@@ -229,5 +244,6 @@ export {
     addApplication,
     updateApplication,
     deleteApplication,
-    parseJobPosting
-}; 
+    parseJobPosting,
+    getStatusEvents
+};

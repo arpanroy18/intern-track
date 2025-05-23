@@ -498,6 +498,100 @@ tbody tr:hover {
     align-items: center;
 }
 
+/* Timeline styles */
+.timeline-container {
+    padding: 1rem 0;
+}
+
+.timeline {
+    position: relative;
+    padding: 1rem 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 50px;
+    margin-bottom: 1.5rem;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-point {
+    position: absolute;
+    left: 16px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    transform: translateX(-50%);
+}
+
+.timeline-point.status-applied {
+    background-color: #dbeafe;
+    border-color: #1e40af;
+}
+
+.timeline-point.status-interview {
+    background-color: #fef3c7;
+    border-color: #92400e;
+}
+
+.timeline-point.status-offered {
+    background-color: #d1fae5;
+    border-color: #065f46;
+}
+
+.timeline-point.status-closed {
+    background-color: #fee2e2;
+    border-color: #b91c1c;
+}
+
+.timeline-content {
+    background: var(--bg-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.timeline-date {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.timeline-status {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-notes {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+}
+
+.loading, .empty-timeline, .error {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+.error {
+    color: var(--danger);
+}
+
 .confirm-header h2 {
     font-size: 1.5rem;
     font-weight: 600;

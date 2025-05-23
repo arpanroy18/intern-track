@@ -66,6 +66,12 @@ async function renderApplications() {
             </td>
             <td>${formatDate(app.lastUpdated)}</td>
             <td class="action-cell">
+                <button class="icon-btn timeline-btn" data-id="${app.id}" title="View Timeline">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </button>
                 <button class="icon-btn edit-btn" data-id="${app.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -139,6 +145,9 @@ async function renderApplications() {
             }
         });
     });
+
+    // Add timeline event listeners
+    addTimelineEventListeners();
 }
 
 // Update statistics display
@@ -191,6 +200,67 @@ function closeJobPostingModal() {
     document.getElementById('parse-result').style.display = 'none';
 }
 
+// Timeline modal functions
+function openTimelineModal() {
+    document.getElementById('timeline-modal').style.display = 'flex';
+}
+
+function closeTimelineModal() {
+    document.getElementById('timeline-modal').style.display = 'none';
+    document.getElementById('timeline-content').innerHTML = '';
+}
+
+async function renderTimeline(applicationId) {
+    const timelineContent = document.getElementById('timeline-content');
+    timelineContent.innerHTML = '<div class="loading">Loading timeline...</div>';
+    
+    try {
+        const events = await getStatusEvents(applicationId);
+        if (events.length === 0) {
+            timelineContent.innerHTML = '<div class="empty-timeline">No status changes recorded</div>';
+            return;
+        }
+
+        const timeline = document.createElement('div');
+        timeline.className = 'timeline';
+
+        events.forEach((event, index) => {
+            const timelineItem = document.createElement('div');
+            timelineItem.className = 'timeline-item';
+            
+            timelineItem.innerHTML = `
+                <div class="timeline-point ${getStatusClass(event.status)}"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">${formatDate(event.timestamp)}</div>
+                    <div class="timeline-status">Status changed to: ${event.status}</div>
+                    ${event.notes ? `<div class="timeline-notes">${event.notes}</div>` : ''}
+                </div>
+            `;
+            
+            timeline.appendChild(timelineItem);
+        });
+
+        timelineContent.innerHTML = '';
+        timelineContent.appendChild(timeline);
+    } catch (error) {
+        console.error('Error rendering timeline:', error);
+        timelineContent.innerHTML = '<div class="error">Error loading timeline</div>';
+    }
+}
+
+// Add event listeners after rendering applications
+function addTimelineEventListeners() {
+    document.querySelectorAll('.timeline-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            openTimelineModal();
+            renderTimeline(btn.dataset.id);
+        });
+    });
+    
+    // Timeline modal close button
+    document.getElementById('close-timeline-modal').addEventListener('click', closeTimelineModal);
+}
+
 // Export UI functions
 export {
     renderApplications,
@@ -198,5 +268,6 @@ export {
     openModal,
     closeModal,
     openJobPostingModal,
-    closeJobPostingModal
-}; 
+    closeJobPostingModal,
+    addTimelineEventListeners
+};

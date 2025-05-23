@@ -25,6 +25,7 @@ const db = new sqlite3.Database('./interntrack.db', (err) => {
     console.log('Connected to the SQLite database');
     
     // Create applications table if it doesn't exist
+    // Create applications table
     db.run(`
       CREATE TABLE IF NOT EXISTS applications (
         id TEXT PRIMARY KEY,
@@ -39,6 +40,21 @@ const db = new sqlite3.Database('./interntrack.db', (err) => {
         lastUpdated TEXT NOT NULL
       )
     `);
+
+    // Create status_events table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS status_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        application_id TEXT NOT NULL,
+        old_status TEXT NOT NULL,
+        new_status TEXT NOT NULL,
+        timestamp TEXT NOT NULL,
+        FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Enable foreign key support
+    db.run('PRAGMA foreign_keys = ON');
   }
 });
 
@@ -128,6 +144,23 @@ app.put('/api/applications/:id', (req, res) => {
       try {
         // Determine hadInterview value
         const hadInterview = (application.status === 'Interview' || application.status === 'Offered' || existingApp.hadInterview === 1) ? 1 : 0;
+
+        // Record status change if status is different
+        if (existingApp.status !== application.status) {
+          const timestamp = new Date().toISOString();
+          db.run(
+            'INSERT INTO status_events (application_id, old_status, new_status, timestamp) VALUES (?, ?, ?, ?)',
+            [id, existingApp.status, application.status, timestamp],
+            (err) => {
+              if (err) {
+                console.error('Error recording status event:', err);
+                db.run('ROLLBACK');
+                res.status(500).json({ error: 'Database error while recording status change' });
+                return;
+              }
+            }
+          );
+        }
 
         const sql = `
           UPDATE applications SET
@@ -221,6 +254,27 @@ app.delete('/api/applications', (req, res) => {
     
     res.json({ message: 'All applications deleted successfully' });
   });
+});
+
+// Get status events for an application
+app.get('/api/applications/:id/status-events', (req, res) => {
+  const id = req.params.id;
+  
+  db.all(
+    `SELECT * FROM status_events
+     WHERE application_id = ?
+     ORDER BY timestamp DESC`,
+    [id],
+    (err, events) => {
+      if (err) {
+        console.error('Error fetching status events:', err);
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      
+      res.json(events);
+    }
+  );
 });
 
 // Start the server
