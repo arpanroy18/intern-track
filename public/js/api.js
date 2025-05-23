@@ -225,7 +225,7 @@ async function parseJobPosting(jobPostingText) {
 // Get status events for an application
 async function getStatusEvents(applicationId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/applications/${applicationId}/events`);
+        const response = await fetch(`${API_BASE_URL}/applications/${applicationId}/status-events`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

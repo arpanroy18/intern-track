@@ -1,5 +1,5 @@
 // UI Functions for InternTrack
-import { getApplications, updateApplication, deleteApplication } from './api.js';
+import { getApplications, updateApplication, deleteApplication, getStatusEvents } from './api.js';
 import { formatDate, getStatusClass } from './utils.js';
 
 // Render applications in the table
