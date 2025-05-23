@@ -530,50 +530,55 @@ tbody tr:hover {
 
 .timeline-point {
     position: absolute;
-    left: 16px;
-    width: 10px;
-    height: 10px;
+    left: 20px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    border: 2px solid var(--border-color);
+    border: 3px solid;
     background: var(--card-bg);
     transform: translateX(-50%);
+    z-index: 1;
 }
 
 .timeline-point.status-applied {
-    background-color: #dbeafe;
-    border-color: #1e40af;
+    background-color: #3b82f6;
+    border-color: #3b82f6;
 }
 
 .timeline-point.status-interview {
-    background-color: #fef3c7;
-    border-color: #92400e;
+    background-color: #f59e0b;
+    border-color: #f59e0b;
 }
 
 .timeline-point.status-offered {
-    background-color: #d1fae5;
-    border-color: #065f46;
+    background-color: #10b981;
+    border-color: #10b981;
 }
 
-.timeline-point.status-closed {
-    background-color: #fee2e2;
-    border-color: #b91c1c;
+.timeline-point.status-closed,
+.timeline-point.status-rejected {
+    background-color: #ef4444;
+    border-color: #ef4444;
 }
 
 .timeline-content {
     background: var(--bg-color);
     padding: 1rem;
     border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
 }
 
 .timeline-date {
     font-size: 0.875rem;
     color: var(--text-secondary);
     margin-bottom: 0.25rem;
+    font-weight: 500;
 }
 
 .timeline-status {
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 0.5rem;
+    color: var(--text-color);
 }
 
 .timeline-notes {

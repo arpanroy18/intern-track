@@ -215,8 +215,42 @@ async function renderTimeline(applicationId) {
     timelineContent.innerHTML = '<div class="loading">Loading timeline...</div>';
     
     try {
-        const events = await getStatusEvents(applicationId);
-        if (events.length === 0) {
+        const [events, applications] = await Promise.all([
+            getStatusEvents(applicationId),
+            getApplications()
+        ]);
+        
+        const application = applications.find(app => app.id === applicationId);
+        if (!application) {
+            timelineContent.innerHTML = '<div class="error">Application not found</div>';
+            return;
+        }
+
+        // Create events array starting with the "Applied" event
+        const timelineEvents = [];
+        
+        // Always add the initial "Applied" event using the dateApplied
+        timelineEvents.push({
+            status: 'Applied',
+            timestamp: application.dateApplied,
+            notes: null,
+            isInitial: true
+        });
+
+        // Add all status change events
+        events.forEach(event => {
+            timelineEvents.push({
+                status: event.new_status,
+                timestamp: event.timestamp,
+                notes: null,
+                isInitial: false
+            });
+        });
+
+        // Sort events chronologically (newest first for timeline display)
+        timelineEvents.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        if (timelineEvents.length === 0) {
             timelineContent.innerHTML = '<div class="empty-timeline">No status changes recorded</div>';
             return;
         }
@@ -224,15 +258,31 @@ async function renderTimeline(applicationId) {
         const timeline = document.createElement('div');
         timeline.className = 'timeline';
 
-        events.forEach((event, index) => {
+        timelineEvents.forEach((event, index) => {
             const timelineItem = document.createElement('div');
             timelineItem.className = 'timeline-item';
+            
+            // Format the date more clearly
+            const eventDate = new Date(event.timestamp);
+            const formattedDate = eventDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            // Create status text
+            let statusText;
+            if (event.isInitial) {
+                statusText = `Applied to ${application.company}`;
+            } else {
+                statusText = `Status changed to: ${event.status}`;
+            }
             
             timelineItem.innerHTML = `
                 <div class="timeline-point ${getStatusClass(event.status)}"></div>
                 <div class="timeline-content">
-                    <div class="timeline-date">${formatDate(event.timestamp)}</div>
-                    <div class="timeline-status">Status changed to: ${event.status}</div>
+                    <div class="timeline-date">${formattedDate}</div>
+                    <div class="timeline-status">${statusText}</div>
                     ${event.notes ? `<div class="timeline-notes">${event.notes}</div>` : ''}
                 </div>
             `;

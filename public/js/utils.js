@@ -28,6 +28,7 @@ function getStatusClass(status) {
         case 'Interview': return 'status-interview';
         case 'Offered': return 'status-offered';
         case 'Closed': return 'status-closed';
+        case 'Rejected': return 'status-rejected';
         default: return '';
     }
 }
