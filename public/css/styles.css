@@ -160,9 +160,20 @@ th {
     position: relative;
 }
 
+/* Row number column styles */
+.row-number-header,
+.applications-table td:first-child {
+    width: 50px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    background-color: #f9fafb;
+    border-right: 1px solid var(--border-color);
+}
+
 /* Make Role column take more space */
-.applications-table th:nth-child(2),
-.applications-table td:nth-child(2) {
+.applications-table th:nth-child(3),
+.applications-table td:nth-child(3) {
     width: 30%;
 }
 

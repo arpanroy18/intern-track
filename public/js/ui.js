@@ -47,9 +47,10 @@ async function renderApplications() {
     }
     
     // Create table rows
-    filteredApplications.forEach(app => {
+    filteredApplications.forEach((app, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
+            <td>${index + 1}</td>
             <td>
                 <strong>${app.company}</strong>
                 ${app.location ? `<div style="color: var(--text-secondary); font-size: 0.875rem;">${app.location}</div>` : ''}
