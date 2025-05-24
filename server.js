@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
@@ -6,7 +7,7 @@ const { Groq } = require('groq-sdk');
 
 // Initialize Groq client
 const groq = new Groq({
-  apiKey: 'REMOVED_GROQ_API_KEY'
+  apiKey: process.env.GROQ_API_KEY
 });
 
 // Initialize express app

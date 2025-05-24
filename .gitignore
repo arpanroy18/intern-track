@@ -1,3 +1,4 @@
 node_modules/
 interntrack.db
 interntrack.db
+.env
