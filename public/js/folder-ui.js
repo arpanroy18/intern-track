@@ -15,16 +15,26 @@ export async function renderFolders() {
     try {
         console.log('Rendering folders...');
         const folders = await getFolders();
-        const foldersContainer = document.getElementById('folders-tabs');
+        const seasonSelect = document.getElementById('season-select');
+        const editBtn = document.getElementById('edit-season-btn');
+        const deleteBtn = document.getElementById('delete-season-btn');
         let currentFolderId = getCurrentFolderId();
         
         console.log('Available folders:', folders.length);
         console.log('Current folder ID:', currentFolderId);
         
         if (folders.length === 0) {
-            foldersContainer.innerHTML = '<div class="empty-folders">No seasons created yet</div>';
+            seasonSelect.innerHTML = '<option value="">No seasons available</option>';
+            seasonSelect.disabled = true;
+            editBtn.style.display = 'none';
+            deleteBtn.style.display = 'none';
             return;
         }
+        
+        // Enable the select and show edit/delete buttons
+        seasonSelect.disabled = false;
+        editBtn.style.display = 'flex';
+        deleteBtn.style.display = 'flex';
         
         // If no current folder is set, set it to the first folder
         if (!currentFolderId && folders.length > 0) {
@@ -41,70 +51,52 @@ export async function renderFolders() {
             console.log('Current folder not found, switched to:', currentFolderId);
         }
         
-        foldersContainer.innerHTML = folders.map(folder => {
-            const isActive = folder.id === currentFolderId;
-            return `
-                <div class="folder-tab ${isActive ? 'active' : ''}" data-folder-id="${folder.id}">
-                    <span class="folder-name">${folder.name}</span>
-                    <div class="folder-actions">
-                        <button class="folder-action-btn edit-folder" data-folder-id="${folder.id}" title="Edit season">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                        </button>
-                        <button class="folder-action-btn delete-folder" data-folder-id="${folder.id}" title="Delete season">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 6h18"></path>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            `;
+        // Populate the dropdown
+        seasonSelect.innerHTML = folders.map(folder => {
+            const isSelected = folder.id === currentFolderId;
+            return `<option value="${folder.id}" ${isSelected ? 'selected' : ''}>${folder.name}</option>`;
         }).join('');
         
-        // Add event listeners for folder tabs
-        setupFolderTabListeners();
+        // Add event listener for dropdown changes
+        setupSeasonSelectListener();
         
         console.log('Folders rendered successfully, active folder:', currentFolderId);
         
     } catch (error) {
         console.error('Error rendering folders:', error);
-        document.getElementById('folders-tabs').innerHTML = '<div class="empty-folders">Error loading seasons</div>';
+        const seasonSelect = document.getElementById('season-select');
+        const editBtn = document.getElementById('edit-season-btn');
+        const deleteBtn = document.getElementById('delete-season-btn');
+        seasonSelect.innerHTML = '<option value="">Error loading seasons</option>';
+        seasonSelect.disabled = true;
+        editBtn.style.display = 'none';
+        deleteBtn.style.display = 'none';
+    }
+}
+
+// Setup event listener for season select dropdown
+function setupSeasonSelectListener() {
+    const seasonSelect = document.getElementById('season-select');
+    
+    // Remove existing listener if any
+    seasonSelect.removeEventListener('change', handleSeasonChange);
+    
+    // Add new listener
+    seasonSelect.addEventListener('change', handleSeasonChange);
+}
+
+// Handle season dropdown change
+async function handleSeasonChange(e) {
+    const folderId = e.target.value;
+    if (folderId) {
+        await switchToFolder(folderId);
     }
 }
 
 // Setup event listeners for folder tabs
 function setupFolderTabListeners() {
-    const foldersContainer = document.getElementById('folders-tabs');
-    
-    // Tab click to switch folders
-    foldersContainer.addEventListener('click', async (e) => {
-        const folderTab = e.target.closest('.folder-tab');
-        if (folderTab && !e.target.closest('.folder-actions')) {
-            const folderId = folderTab.dataset.folderId;
-            await switchToFolder(folderId);
-        }
-    });
-    
-    // Edit folder button
-    foldersContainer.addEventListener('click', async (e) => {
-        if (e.target.closest('.edit-folder')) {
-            e.stopPropagation();
-            const folderId = e.target.closest('.edit-folder').dataset.folderId;
-            await openEditFolderModal(folderId);
-        }
-    });
-    
-    // Delete folder button
-    foldersContainer.addEventListener('click', async (e) => {
-        if (e.target.closest('.delete-folder')) {
-            e.stopPropagation();
-            const folderId = e.target.closest('.delete-folder').dataset.folderId;
-            await openDeleteFolderModal(folderId);
-        }
-    });
+    // This function is now unused but kept for compatibility
+    // All folder switching is now handled by the dropdown
 }
 
 // Switch to a different folder
@@ -113,13 +105,10 @@ async function switchToFolder(folderId) {
         console.log('Switching to folder:', folderId);
         setCurrentFolderId(folderId);
         
-        // Update active tab
-        document.querySelectorAll('.folder-tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        const activeTab = document.querySelector(`[data-folder-id="${folderId}"]`);
-        if (activeTab) {
-            activeTab.classList.add('active');
+        // Update dropdown selection
+        const seasonSelect = document.getElementById('season-select');
+        if (seasonSelect) {
+            seasonSelect.value = folderId;
         }
         
         console.log('Re-rendering applications for folder:', folderId);
@@ -281,6 +270,22 @@ export async function handleFolderDeletion() {
 export function initFolderListeners() {
     // Create folder button
     document.getElementById('create-folder-btn').addEventListener('click', openCreateFolderModal);
+    
+    // Edit current season button
+    document.getElementById('edit-season-btn').addEventListener('click', () => {
+        const currentFolderId = getCurrentFolderId();
+        if (currentFolderId) {
+            openEditFolderModal(currentFolderId);
+        }
+    });
+    
+    // Delete current season button
+    document.getElementById('delete-season-btn').addEventListener('click', () => {
+        const currentFolderId = getCurrentFolderId();
+        if (currentFolderId) {
+            openDeleteFolderModal(currentFolderId);
+        }
+    });
     
     // Close folder modal
     document.getElementById('close-folder-modal').addEventListener('click', closeFolderModal);

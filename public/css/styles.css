@@ -782,6 +782,23 @@ tbody tr:hover {
         gap: 1rem;
     }
 
+    .header-right {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .seasons-selector {
+        align-self: stretch;
+        justify-content: space-between;
+        padding: 0.75rem;
+    }
+
+    .season-select {
+        flex: 1;
+        min-width: 0;
+    }
+
     .button-group {
         width: 100%;
     }
@@ -818,6 +835,21 @@ tbody tr:hover {
     .filter-btn {
         flex: 1;
         min-width: calc(50% - 0.5rem);
+        text-align: center;
+    }
+
+    .header-right {
+        gap: 0.5rem;
+    }
+
+    .seasons-selector {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    .season-label {
         text-align: center;
     }
 
@@ -871,7 +903,7 @@ tbody tr:hover {
     border-right: none;
 }
 
-/* Folders/Seasons Styles */
+/* OLD Folders/Seasons Styles - No longer needed with compact dropdown design
 .folders-container {
     background-color: var(--card-bg);
     border-radius: 0.5rem;
@@ -879,108 +911,7 @@ tbody tr:hover {
     padding: 1.5rem;
     margin-bottom: 2rem;
 }
-
-.folders-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.folders-header h3 {
-    margin: 0;
-    color: var(--text-color);
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-
-.folders-tabs {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.folder-tab {
-    display: flex;
-    align-items: center;
-    background-color: var(--bg-color);
-    border: 1px solid var(--border-color);
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    position: relative;
-    gap: 0.5rem;
-}
-
-.folder-tab:hover {
-    background-color: #f3f4f6;
-    border-color: var(--primary);
-}
-
-.folder-tab.active {
-    background-color: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
-
-.folder-tab.active:hover {
-    background-color: var(--primary-hover);
-}
-
-.folder-tab .folder-name {
-    font-weight: 500;
-}
-
-.folder-tab .folder-actions {
-    display: flex;
-    gap: 0.25rem;
-    margin-left: 0.5rem;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.folder-tab:hover .folder-actions,
-.folder-tab.active .folder-actions {
-    opacity: 1;
-}
-
-.folder-action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    border-radius: 0.25rem;
-    transition: background-color 0.2s ease;
-    color: inherit;
-}
-
-.folder-action-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.folder-tab:not(.active) .folder-action-btn:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-}
-
-.folder-action-btn svg {
-    width: 12px;
-    height: 12px;
-}
-
-.empty-folders {
-    text-align: center;
-    color: var(--text-secondary);
-    font-style: italic;
-    padding: 1rem;
-}
+*/
 
 /* Folder modal specific styles */
 .warning-text {
@@ -990,7 +921,7 @@ tbody tr:hover {
     margin-top: 0.5rem !important;
 }
 
-/* Mobile responsiveness for folders */
+/* OLD Mobile responsiveness for folders - No longer needed
 @media (max-width: 768px) {
     .folders-header {
         flex-direction: column;
@@ -1009,6 +940,67 @@ tbody tr:hover {
     }
     
     .folder-tab .folder-actions {
-        opacity: 1; /* Always show on mobile */
+        opacity: 1;
     }
+}
+*/
+
+/* Header Right Section */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Compact Seasons Selector */
+.seasons-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+}
+
+.season-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.season-select {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-color);
+    min-width: 140px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.season-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.season-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.season-btn svg {
+    width: 14px;
+    height: 14px;
 }
