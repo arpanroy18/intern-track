@@ -1,14 +1,21 @@
-// API URLs and constants
+// Import Firebase services
+import { 
+    getApplications as getFirebaseApplications,
+    addApplication as addFirebaseApplication,
+    updateApplication as updateFirebaseApplication,
+    deleteApplication as deleteFirebaseApplication,
+    clearAllApplications as clearFirebaseApplications,
+    getStatusEvents as getFirebaseStatusEvents,
+    subscribeToApplications
+} from './firebase-db.js';
+
+// Keep API base URL for job parsing (still using server)
 const API_BASE_URL = 'http://localhost:3000/api';
 
-// Data storage functions
+// Data storage functions - now using Firebase
 async function getApplications() {
     try {
-        const response = await fetch(`${API_BASE_URL}/applications`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const applications = await response.json();
+        const applications = await getFirebaseApplications();
         return applications;
     } catch (error) {
         console.error('Error fetching applications:', error);
@@ -45,14 +52,7 @@ async function clearAllData() {
     
     const handleConfirm = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/applications`, {
-                method: 'DELETE'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
+            await clearFirebaseApplications();
             await renderApplications();
             updateStats();
             closeModal();
@@ -72,18 +72,7 @@ async function clearAllData() {
 // Application CRUD operations
 async function addApplication(application) {
     try {
-        const response = await fetch(`${API_BASE_URL}/applications`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(application)
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
+        await addFirebaseApplication(application);
         await renderApplications();
         updateStats();
     } catch (error) {
@@ -94,18 +83,7 @@ async function addApplication(application) {
 
 async function updateApplication(id, updatedApplication) {
     try {
-        const response = await fetch(`${API_BASE_URL}/applications/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedApplication)
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
+        await updateFirebaseApplication(id, updatedApplication);
         await renderApplications();
         updateStats();
     } catch (error) {
@@ -146,14 +124,7 @@ async function deleteApplication(id) {
     
     const handleConfirm = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/applications/${id}`, {
-                method: 'DELETE'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
+            await deleteFirebaseApplication(id);
             await renderApplications();
             updateStats();
             closeModal();
@@ -205,11 +176,7 @@ async function parseJobPosting(jobPostingText) {
 // Get status events for an application
 async function getStatusEvents(applicationId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/applications/${applicationId}/status-events`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const events = await response.json();
+        const events = await getFirebaseStatusEvents(applicationId);
         return events;
     } catch (error) {
         console.error('Error fetching status events:', error);

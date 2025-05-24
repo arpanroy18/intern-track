@@ -3,15 +3,28 @@ import { getApplications, addApplication, updateApplication, clearAllData, setUI
 import { renderApplications, updateStats, openModal, closeModal, openJobPostingModal, closeJobPostingModal } from './ui.js';
 import { getCurrentLocalDate, handleWindowResize, getPageSizePreference, setPageSizePreference, setCurrentPage } from './utils.js';
 import { initJobParserListeners } from './job-parser.js';
+import { initAuthUI } from './auth-ui.js';
+import { onAuthStateChange } from './firebase-auth.js';
 
 // Set the UI functions in api.js to avoid circular dependency issues
 setUIFunctions(renderApplications, updateStats);
 
 // Initialization function
 async function initApp() {
-    // Initial render of applications and stats
-    await renderApplications();
-    updateStats();
+    // Initialize authentication UI
+    initAuthUI();
+    
+    // Listen for auth state changes to initialize app data
+    onAuthStateChange(async (user) => {
+        if (user) {
+            // User is signed in, load their data
+            await renderApplications();
+            updateStats();
+        } else {
+            // User is signed out, clear any displayed data
+            updateStats(); // This will show 0s
+        }
+    });
     
     // Setup page size selector
     const pageSizeSelect = document.getElementById('page-size-select');
