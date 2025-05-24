@@ -6,7 +6,8 @@ import {
     deleteApplication as deleteFirebaseApplication,
     clearAllApplications as clearFirebaseApplications,
     getStatusEvents as getFirebaseStatusEvents,
-    subscribeToApplications
+    subscribeToApplications,
+    fixApplicationDates as fixFirebaseApplicationDates
 } from './firebase-db.js';
 
 // Keep API base URL for job parsing (still using server)
@@ -184,6 +185,21 @@ async function getStatusEvents(applicationId) {
     }
 }
 
+// Fix application dates (one-time fix for timezone issues)
+async function fixApplicationDates() {
+    try {
+        const result = await fixFirebaseApplicationDates();
+        await renderApplications();
+        updateStats();
+        console.log('Application dates fixed:', result.message);
+        return result;
+    } catch (error) {
+        console.error('Error fixing application dates:', error);
+        alert('Error fixing application dates: ' + error.message);
+        throw error;
+    }
+}
+
 // Export functions for use in other modules
 export {
     getApplications,
@@ -192,5 +208,6 @@ export {
     updateApplication,
     deleteApplication,
     parseJobPosting,
-    getStatusEvents
+    getStatusEvents,
+    fixApplicationDates
 };

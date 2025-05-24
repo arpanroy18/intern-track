@@ -46,13 +46,23 @@ export async function getApplications() {
         const applications = [];
         snapshot.forEach((doc) => {
             const data = doc.data();
-            // Convert Firestore timestamps to ISO strings
-            if (data.dateApplied && data.dateApplied.toDate) {
-                data.dateApplied = data.dateApplied.toDate().toISOString().split('T')[0];
+            
+            // Handle dateApplied - support both timestamp and string formats
+            if (data.dateApplied) {
+                if (data.dateApplied.toDate) {
+                    // It's a Firestore timestamp, convert to YYYY-MM-DD
+                    data.dateApplied = data.dateApplied.toDate().toISOString().split('T')[0];
+                } else if (typeof data.dateApplied === 'string') {
+                    // It's already a string, keep as is
+                    data.dateApplied = data.dateApplied;
+                }
             }
+            
+            // Handle lastUpdated timestamp
             if (data.lastUpdated && data.lastUpdated.toDate) {
                 data.lastUpdated = data.lastUpdated.toDate().toISOString();
             }
+            
             applications.push({
                 id: doc.id,
                 ...data
@@ -80,7 +90,7 @@ export async function addApplication(application) {
         const applicationData = {
             ...application,
             userId: user.uid,
-            dateApplied: serverTimestamp(), // Use server timestamp to match createdAt
+            dateApplied: new Date().toISOString().split('T')[0], // Use current local date in YYYY-MM-DD format
             lastUpdated: serverTimestamp(),
             hadInterview: application.status === 'Interview' || application.status === 'Offer' ? true : false,
             createdAt: serverTimestamp()
@@ -301,13 +311,23 @@ export function subscribeToApplications(callback) {
         const applications = [];
         snapshot.forEach((doc) => {
             const data = doc.data();
-            // Convert Firestore timestamps to ISO strings
-            if (data.dateApplied && data.dateApplied.toDate) {
-                data.dateApplied = data.dateApplied.toDate().toISOString().split('T')[0];
+            
+            // Handle dateApplied - support both timestamp and string formats
+            if (data.dateApplied) {
+                if (data.dateApplied.toDate) {
+                    // It's a Firestore timestamp, convert to YYYY-MM-DD
+                    data.dateApplied = data.dateApplied.toDate().toISOString().split('T')[0];
+                } else if (typeof data.dateApplied === 'string') {
+                    // It's already a string, keep as is
+                    data.dateApplied = data.dateApplied;
+                }
             }
+            
+            // Handle lastUpdated timestamp
             if (data.lastUpdated && data.lastUpdated.toDate) {
                 data.lastUpdated = data.lastUpdated.toDate().toISOString();
             }
+            
             applications.push({
                 id: doc.id,
                 ...data
@@ -317,4 +337,42 @@ export function subscribeToApplications(callback) {
     }, (error) => {
         console.error('Error listening to applications:', error);
     });
+}
+
+// Fix existing applications with future dates (one-time fix)
+export async function fixApplicationDates() {
+    try {
+        const user = getCurrentUser();
+        if (!user) {
+            throw new Error('No user logged in');
+        }
+
+        const applications = await getApplications();
+        const today = new Date().toISOString().split('T')[0]; // Today's date in YYYY-MM-DD format
+        const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // Tomorrow's date
+        
+        console.log('Today:', today);
+        console.log('Tomorrow:', tomorrow);
+        
+        for (const app of applications) {
+            console.log('Checking application:', app.company, 'Date:', app.dateApplied);
+            
+            // If dateApplied is tomorrow, change it to today
+            if (app.dateApplied === tomorrow) {
+                console.log('Fixing date for application:', app.company);
+                
+                const applicationRef = doc(db, 'users', user.uid, APPLICATIONS_COLLECTION, app.id);
+                await updateDoc(applicationRef, {
+                    dateApplied: today
+                });
+                
+                console.log('Fixed date for:', app.company, 'from', tomorrow, 'to', today);
+            }
+        }
+        
+        return { success: true, message: 'Application dates fixed' };
+    } catch (error) {
+        console.error('Error fixing application dates:', error);
+        throw error;
+    }
 } 

@@ -353,10 +353,16 @@ async function renderTimeline(applicationId) {
         const timelineEvents = [];
         
         // Always add the initial "Applied" event using the dateApplied
-        // Convert date string to a proper timestamp for consistent sorting
-        const appliedTimestamp = application.dateApplied.includes('T') ? 
-            application.dateApplied : 
-            new Date(application.dateApplied + 'T00:00:00').toISOString();
+        // Create a consistent timestamp for local date without timezone issues
+        let appliedTimestamp;
+        if (application.dateApplied.includes('T')) {
+            // Already has time component
+            appliedTimestamp = application.dateApplied;
+        } else {
+            // Date-only string (YYYY-MM-DD), add local time to avoid UTC conversion
+            const localDate = new Date(application.dateApplied + 'T12:00:00');
+            appliedTimestamp = localDate.toISOString();
+        }
         
         timelineEvents.push({
             status: 'Applied',

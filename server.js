@@ -296,7 +296,7 @@ app.post('/api/parse-job-posting', async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: 'You are a job posting parser. Extract and return ONLY a JSON object with no markdown formatting, code blocks, or additional text. Use this exact format:\n{\n  "company": "Company Name",\n  "role": "Job Title",\n  "location": "City, State/Province",\n  "description": "Brief job description"\n}\n\nEnsure all values are properly escaped JSON strings.'
+          content: 'You are a job posting parser. Extract and return ONLY a JSON object with no markdown formatting, code blocks, or additional text. Use this exact format:\n{\n  "company": "Company Name",\n  "role": "Job Title",\n  "location": "City, State/Province",\n  "description": "Full job description"\n}\n\nEnsure all values are properly escaped JSON strings.'
         },
         {
           role: 'user',

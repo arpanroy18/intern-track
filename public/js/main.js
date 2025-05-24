@@ -1,5 +1,5 @@
 // Main application entry point
-import { getApplications, addApplication, updateApplication, clearAllData, setUIFunctions } from './api.js';
+import { getApplications, addApplication, updateApplication, clearAllData, setUIFunctions, fixApplicationDates } from './api.js';
 import { renderApplications, updateStats, openModal, closeModal, openJobPostingModal, closeJobPostingModal } from './ui.js';
 import { getCurrentLocalDate, handleWindowResize, getPageSizePreference, setPageSizePreference, setCurrentPage } from './utils.js';
 import { initJobParserListeners } from './job-parser.js';
@@ -182,6 +182,9 @@ async function editApplication(id) {
 
 // Make editApplication globally available
 window.editApplication = editApplication;
+
+// Make fixApplicationDates globally available for testing
+window.fixApplicationDates = fixApplicationDates;
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', initApp);
