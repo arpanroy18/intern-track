@@ -1,6 +1,6 @@
 // UI Functions for InternTrack
 import { getApplications, updateApplication, deleteApplication, getStatusEvents } from './api.js';
-import { formatDate, getStatusClass } from './utils.js';
+import { formatDate, getStatusClass, getPageSizePreference, setPageSizePreference, getCurrentPage, setCurrentPage } from './utils.js';
 
 // Render applications in the table
 async function renderApplications() {
@@ -9,6 +9,16 @@ async function renderApplications() {
     const applications = await getApplications();
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
     const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+    
+    // Get pagination settings
+    const pageSizeSelect = document.getElementById('page-size-select');
+    const pageSize = pageSizeSelect ? pageSizeSelect.value : getPageSizePreference();
+    let currentPage = getCurrentPage();
+    
+    // Set the page size select value if it exists
+    if (pageSizeSelect && pageSizeSelect.value !== pageSize) {
+        pageSizeSelect.value = pageSize;
+    }
     
     // Filter applications
     const filteredApplications = applications.filter(app => {
@@ -38,7 +48,7 @@ async function renderApplications() {
     if (filteredApplications.length === 0) {
         const noResultsRow = document.createElement('tr');
         noResultsRow.innerHTML = `
-            <td colspan="5" style="text-align: center; padding: 2rem;">
+            <td colspan="6" style="text-align: center; padding: 2rem;">
                 No matching applications found
             </td>
         `;
@@ -46,11 +56,37 @@ async function renderApplications() {
         return;
     }
     
-    // Create table rows
-    filteredApplications.forEach((app, index) => {
+    // If pageSize is "all", display all applications, otherwise paginate
+    let displayedApplications = filteredApplications;
+    let totalPages = 1;
+    
+    if (pageSize !== 'all') {
+        const pageSizeNum = parseInt(pageSize, 10);
+        totalPages = Math.ceil(filteredApplications.length / pageSizeNum);
+        
+        // Adjust currentPage if it's beyond the available pages
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+            setCurrentPage(currentPage);
+        }
+        
+        // Calculate start and end indices for the current page
+        const startIndex = (currentPage - 1) * pageSizeNum;
+        const endIndex = Math.min(startIndex + pageSizeNum, filteredApplications.length);
+        
+        // Get the applications for the current page
+        displayedApplications = filteredApplications.slice(startIndex, endIndex);
+    }
+    
+    // Create table rows for displayed applications
+    displayedApplications.forEach((app, index) => {
         const row = document.createElement('tr');
+        const displayIndex = pageSize === 'all' ? 
+            index + 1 : 
+            (currentPage - 1) * parseInt(pageSize, 10) + index + 1;
+            
         row.innerHTML = `
-            <td>${index + 1}</td>
+            <td>${displayIndex}</td>
             <td>
                 <strong>${app.company}</strong>
                 ${app.location ? `<div style="color: var(--text-secondary); font-size: 0.875rem;">${app.location}</div>` : ''}
@@ -149,6 +185,88 @@ async function renderApplications() {
 
     // Add timeline event listeners
     addTimelineEventListeners();
+    
+    // Add pagination controls if needed
+    if (pageSize !== 'all' && totalPages > 1) {
+        renderPaginationControls(filteredApplications.length, parseInt(pageSize, 10), currentPage, totalPages);
+    } else {
+        // Remove pagination controls if they exist
+        const existingControls = document.querySelector('.pagination-controls');
+        if (existingControls) {
+            existingControls.remove();
+        }
+    }
+}
+
+// Add pagination controls to the table
+function renderPaginationControls(totalItems, pageSize, currentPage, totalPages) {
+    // Remove existing pagination controls if they exist
+    const existingControls = document.querySelector('.pagination-controls');
+    if (existingControls) {
+        existingControls.remove();
+    }
+    
+    // Create pagination container
+    const paginationControls = document.createElement('div');
+    paginationControls.className = 'pagination-controls';
+    
+    // Page info text (e.g., "Showing 1-10 of 50 applications")
+    const startItem = (currentPage - 1) * pageSize + 1;
+    const endItem = Math.min(startItem + pageSize - 1, totalItems);
+    
+    const pageInfo = document.createElement('div');
+    pageInfo.className = 'page-info';
+    pageInfo.textContent = `Showing ${startItem}-${endItem} of ${totalItems} applications`;
+    
+    // Pagination buttons
+    const paginationButtons = document.createElement('div');
+    paginationButtons.className = 'pagination-buttons';
+    
+    // Previous button
+    const prevButton = document.createElement('button');
+    prevButton.className = 'page-btn';
+    prevButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Prev
+    `;
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+            renderApplications();
+        }
+    });
+    
+    // Next button
+    const nextButton = document.createElement('button');
+    nextButton.className = 'page-btn';
+    nextButton.innerHTML = `
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    `;
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+            renderApplications();
+        }
+    });
+    
+    // Add buttons to container
+    paginationButtons.appendChild(prevButton);
+    paginationButtons.appendChild(nextButton);
+    
+    // Add elements to pagination controls
+    paginationControls.appendChild(pageInfo);
+    paginationControls.appendChild(paginationButtons);
+    
+    // Add pagination controls after the table
+    const tableContainer = document.querySelector('.applications-table-container');
+    tableContainer.after(paginationControls);
 }
 
 // Update statistics display

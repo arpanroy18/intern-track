@@ -1,7 +1,7 @@
 // Main application entry point
 import { getApplications, addApplication, updateApplication, clearAllData, setUIFunctions } from './api.js';
 import { renderApplications, updateStats, openModal, closeModal, openJobPostingModal, closeJobPostingModal } from './ui.js';
-import { getCurrentLocalDate, handleWindowResize } from './utils.js';
+import { getCurrentLocalDate, handleWindowResize, getPageSizePreference, setPageSizePreference, setCurrentPage } from './utils.js';
 import { initJobParserListeners } from './job-parser.js';
 
 // Set the UI functions in api.js to avoid circular dependency issues
@@ -12,6 +12,17 @@ async function initApp() {
     // Initial render of applications and stats
     await renderApplications();
     updateStats();
+    
+    // Setup page size selector
+    const pageSizeSelect = document.getElementById('page-size-select');
+    pageSizeSelect.value = getPageSizePreference();
+    
+    pageSizeSelect.addEventListener('change', () => {
+        setPageSizePreference(pageSizeSelect.value);
+        // Reset to first page when changing page size
+        setCurrentPage(1);
+        renderApplications();
+    });
     
     // Add application button
     document.getElementById('add-application-btn').addEventListener('click', () => {
@@ -125,4 +136,4 @@ async function editApplication(id) {
 window.editApplication = editApplication;
 
 // Initialize app when DOM is loaded
-document.addEventListener('DOMContentLoaded', initApp); 
+document.addEventListener('DOMContentLoaded', initApp);

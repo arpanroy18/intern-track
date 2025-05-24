@@ -21,6 +21,26 @@ function getLocalISOString() {
     return now.toISOString();
 }
 
+// Store and retrieve page size preference
+function getPageSizePreference() {
+    const storedValue = localStorage.getItem('pageSize');
+    return storedValue || '10'; // Default to 10 if not set
+}
+
+function setPageSizePreference(size) {
+    localStorage.setItem('pageSize', size);
+}
+
+// Get current page preference
+function getCurrentPage() {
+    const storedPage = localStorage.getItem('currentPage');
+    return storedPage ? parseInt(storedPage, 10) : 1; // Default to page 1
+}
+
+function setCurrentPage(page) {
+    localStorage.setItem('currentPage', page.toString());
+}
+
 // Get CSS class for status styling
 function getStatusClass(status) {
     switch (status) {
@@ -54,6 +74,10 @@ export {
     formatDate,
     getCurrentLocalDate,
     getLocalISOString,
+    getPageSizePreference,
+    setPageSizePreference,
+    getCurrentPage,
+    setCurrentPage,
     getStatusClass,
     handleWindowResize
-}; 
+};
