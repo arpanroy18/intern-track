@@ -20,6 +20,7 @@ import {
 // Collections
 const APPLICATIONS_COLLECTION = 'applications';
 const STATUS_EVENTS_COLLECTION = 'statusEvents';
+const FOLDERS_COLLECTION = 'folders';
 
 // Get user-specific collection reference
 function getUserApplicationsRef(userId) {
@@ -30,8 +31,174 @@ function getUserStatusEventsRef(userId) {
     return collection(db, 'users', userId, STATUS_EVENTS_COLLECTION);
 }
 
-// Get all applications for current user
-export async function getApplications() {
+function getUserFoldersRef(userId) {
+    return collection(db, 'users', userId, FOLDERS_COLLECTION);
+}
+
+// Folder management functions
+export async function getFolders() {
+    try {
+        const user = getCurrentUser();
+        if (!user) {
+            console.error('No user logged in');
+            return [];
+        }
+
+        const foldersRef = getUserFoldersRef(user.uid);
+        const q = query(foldersRef, orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        
+        const folders = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            
+            // Handle timestamps
+            if (data.createdAt && data.createdAt.toDate) {
+                data.createdAt = data.createdAt.toDate().toISOString();
+            }
+            
+            folders.push({
+                id: doc.id,
+                ...data
+            });
+        });
+        
+        // If no folders exist, create a default one
+        if (folders.length === 0) {
+            const defaultFolder = await createDefaultFolder();
+            if (defaultFolder) {
+                folders.push(defaultFolder);
+            }
+        }
+        
+        return folders;
+    } catch (error) {
+        console.error('Error fetching folders:', error);
+        return [];
+    }
+}
+
+export async function createFolder(folderData) {
+    try {
+        const user = getCurrentUser();
+        if (!user) {
+            throw new Error('No user logged in');
+        }
+
+        const foldersRef = getUserFoldersRef(user.uid);
+        
+        const folder = {
+            name: folderData.name,
+            description: folderData.description || '',
+            userId: user.uid,
+            createdAt: serverTimestamp(),
+            isDefault: false
+        };
+
+        const docRef = await addDoc(foldersRef, folder);
+        
+        return {
+            success: true,
+            id: docRef.id,
+            folder: {
+                ...folder,
+                id: docRef.id
+            }
+        };
+    } catch (error) {
+        console.error('Error creating folder:', error);
+        throw error;
+    }
+}
+
+export async function updateFolder(folderId, updatedData) {
+    try {
+        const user = getCurrentUser();
+        if (!user) {
+            throw new Error('No user logged in');
+        }
+
+        const folderRef = doc(db, 'users', user.uid, FOLDERS_COLLECTION, folderId);
+        
+        const updateData = {
+            name: updatedData.name,
+            description: updatedData.description || ''
+        };
+
+        await updateDoc(folderRef, updateData);
+        
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating folder:', error);
+        throw error;
+    }
+}
+
+export async function deleteFolder(folderId) {
+    try {
+        const user = getCurrentUser();
+        if (!user) {
+            throw new Error('No user logged in');
+        }
+
+        // First, check if this folder has any applications
+        const applicationsRef = getUserApplicationsRef(user.uid);
+        const appsQuery = query(applicationsRef, where('folderId', '==', folderId));
+        const appsSnapshot = await getDocs(appsQuery);
+        
+        if (!appsSnapshot.empty) {
+            throw new Error('Cannot delete folder that contains applications. Please move or delete applications first.');
+        }
+
+        const folderRef = doc(db, 'users', user.uid, FOLDERS_COLLECTION, folderId);
+        await deleteDoc(folderRef);
+        
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting folder:', error);
+        throw error;
+    }
+}
+
+// Create default folder for new users
+async function createDefaultFolder() {
+    try {
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth();
+        
+        // Determine the season based on current month
+        let season, year;
+        if (currentMonth >= 0 && currentMonth <= 4) { // Jan-May: Spring
+            season = 'Spring';
+            year = currentYear;
+        } else if (currentMonth >= 5 && currentMonth <= 7) { // Jun-Aug: Summer
+            season = 'Summer';
+            year = currentYear;
+        } else if (currentMonth >= 8 && currentMonth <= 10) { // Sep-Nov: Fall
+            season = 'Fall';
+            year = currentYear + 1; // Fall internships are usually for next year
+        } else { // Dec: Winter
+            season = 'Winter';
+            year = currentYear + 1;
+        }
+
+        const folderData = {
+            name: `${season} ${year}`,
+            description: `${season} ${year} internship applications`,
+            isDefault: true
+        };
+
+        const result = await createFolder(folderData);
+        return result.folder;
+    } catch (error) {
+        console.error('Error creating default folder:', error);
+        return null;
+    }
+}
+
+// Get all applications for current user with optional folder filter
+export async function getApplications(folderId = null) {
     try {
         const user = getCurrentUser();
         if (!user) {
@@ -40,7 +207,17 @@ export async function getApplications() {
         }
 
         const applicationsRef = getUserApplicationsRef(user.uid);
-        const q = query(applicationsRef, orderBy('lastUpdated', 'desc'));
+        let q;
+        
+        if (folderId) {
+            q = query(applicationsRef, 
+                where('folderId', '==', folderId),
+                orderBy('lastUpdated', 'desc')
+            );
+        } else {
+            q = query(applicationsRef, orderBy('lastUpdated', 'desc'));
+        }
+        
         const snapshot = await getDocs(q);
         
         const applications = [];
@@ -79,12 +256,16 @@ export async function getApplications() {
     }
 }
 
-// Add new application
-export async function addApplication(application) {
+// Add new application - now requires folderId
+export async function addApplication(application, folderId) {
     try {
         const user = getCurrentUser();
         if (!user) {
             throw new Error('No user logged in');
+        }
+
+        if (!folderId) {
+            throw new Error('Folder ID is required');
         }
 
         const applicationsRef = getUserApplicationsRef(user.uid);
@@ -93,6 +274,7 @@ export async function addApplication(application) {
         const applicationData = {
             ...application,
             userId: user.uid,
+            folderId: folderId,
             dateApplied: new Date().toISOString().split('T')[0], // Use current local date in YYYY-MM-DD format
             lastUpdated: serverTimestamp(),
             hadInterview: application.status === 'Interview' || application.status === 'Offer' ? true : false,
@@ -106,7 +288,8 @@ export async function addApplication(application) {
             id: docRef.id,
             application: {
                 ...application,
-                id: docRef.id
+                id: docRef.id,
+                folderId: folderId
             }
         };
     } catch (error) {

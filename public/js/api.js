@@ -7,16 +7,23 @@ import {
     clearAllApplications as clearFirebaseApplications,
     getStatusEvents as getFirebaseStatusEvents,
     subscribeToApplications,
-    fixApplicationDates as fixFirebaseApplicationDates
+    fixApplicationDates as fixFirebaseApplicationDates,
+    getFolders as getFirebaseFolders,
+    createFolder as createFirebaseFolder,
+    updateFolder as updateFirebaseFolder,
+    deleteFolder as deleteFirebaseFolder
 } from './firebase-db.js';
 
 // Keep API base URL for job parsing (still using server)
 const API_BASE_URL = 'http://localhost:3000/api';
 
+// Current folder state
+let currentFolderId = null;
+
 // Data storage functions - now using Firebase
-async function getApplications() {
+async function getApplications(folderId = null) {
     try {
-        const applications = await getFirebaseApplications();
+        const applications = await getFirebaseApplications(folderId || currentFolderId);
         return applications;
     } catch (error) {
         console.error('Error fetching applications:', error);
@@ -24,13 +31,83 @@ async function getApplications() {
     }
 }
 
+// Folder management functions
+async function getFolders() {
+    try {
+        const folders = await getFirebaseFolders();
+        
+        // Set current folder to first folder if none is set
+        if (!currentFolderId && folders.length > 0) {
+            currentFolderId = folders[0].id;
+        }
+        
+        return folders;
+    } catch (error) {
+        console.error('Error fetching folders:', error);
+        return [];
+    }
+}
+
+async function createFolder(folderData) {
+    try {
+        const result = await createFirebaseFolder(folderData);
+        
+        // If this is the first folder, set it as current
+        if (!currentFolderId) {
+            currentFolderId = result.folder.id;
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('Error creating folder:', error);
+        throw error;
+    }
+}
+
+async function updateFolder(folderId, updatedData) {
+    try {
+        const result = await updateFirebaseFolder(folderId, updatedData);
+        return result;
+    } catch (error) {
+        console.error('Error updating folder:', error);
+        throw error;
+    }
+}
+
+async function deleteFolder(folderId) {
+    try {
+        const result = await deleteFirebaseFolder(folderId);
+        
+        // If we deleted the current folder, switch to another one
+        if (currentFolderId === folderId) {
+            const folders = await getFolders();
+            currentFolderId = folders.length > 0 ? folders[0].id : null;
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('Error deleting folder:', error);
+        throw error;
+    }
+}
+
+function getCurrentFolderId() {
+    return currentFolderId;
+}
+
+function setCurrentFolderId(folderId) {
+    currentFolderId = folderId;
+}
+
 // We will import these from ui.js when we need them
 let renderApplications;
 let updateStats;
+let renderFolders;
 
-export function setUIFunctions(renderFunc, statsFunc) {
+export function setUIFunctions(renderFunc, statsFunc, foldersFunc = null) {
     renderApplications = renderFunc;
     updateStats = statsFunc;
+    renderFolders = foldersFunc;
 }
 
 async function clearAllData() {
@@ -73,7 +150,16 @@ async function clearAllData() {
 // Application CRUD operations
 async function addApplication(application) {
     try {
-        await addFirebaseApplication(application);
+        if (!currentFolderId) {
+            // If no folder is set, create a default one
+            const folders = await getFolders();
+            if (folders.length === 0) {
+                throw new Error('No folder available. Please create a folder first.');
+            }
+            currentFolderId = folders[0].id;
+        }
+        
+        await addFirebaseApplication(application, currentFolderId);
         await renderApplications();
         updateStats();
     } catch (error) {
@@ -209,5 +295,11 @@ export {
     deleteApplication,
     parseJobPosting,
     getStatusEvents,
-    fixApplicationDates
+    fixApplicationDates,
+    getFolders,
+    createFolder,
+    updateFolder,
+    deleteFolder,
+    getCurrentFolderId,
+    setCurrentFolderId
 };

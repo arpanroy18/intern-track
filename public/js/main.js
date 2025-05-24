@@ -1,13 +1,17 @@
 // Main application entry point
-import { getApplications, addApplication, updateApplication, clearAllData, setUIFunctions, fixApplicationDates } from './api.js';
+import { getApplications, addApplication, updateApplication, clearAllData, setUIFunctions, fixApplicationDates, getFolders } from './api.js';
 import { renderApplications, updateStats, openModal, closeModal, openJobPostingModal, closeJobPostingModal } from './ui.js';
 import { getCurrentLocalDate, handleWindowResize, getPageSizePreference, setPageSizePreference, setCurrentPage } from './utils.js';
 import { initJobParserListeners } from './job-parser.js';
 import { initAuthUI } from './auth-ui.js';
 import { onAuthStateChange } from './firebase-auth.js';
+import { renderFolders, initFolderListeners, setUICallbacks } from './folder-ui.js';
 
 // Set the UI functions in api.js to avoid circular dependency issues
-setUIFunctions(renderApplications, updateStats);
+setUIFunctions(renderApplications, updateStats, renderFolders);
+
+// Set UI callbacks for folder UI
+setUICallbacks(renderApplications, updateStats);
 
 // Wait for Firebase to be loaded
 function waitForFirebase() {
@@ -41,6 +45,7 @@ async function initApp() {
             if (user) {
                 console.log('User signed in:', user.email);
                 // User is signed in, load their data
+                await renderFolders(); // Load folders first
                 await renderApplications();
                 updateStats();
             } else {
@@ -152,6 +157,9 @@ async function initApp() {
     
     // Initialize job parser
     initJobParserListeners();
+    
+    // Initialize folder listeners
+    initFolderListeners();
     
     // Window resize handler
     window.addEventListener('resize', handleWindowResize);
