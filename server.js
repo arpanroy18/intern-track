@@ -296,7 +296,7 @@ app.post('/api/parse-job-posting', async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: 'You are a job posting parser. Extract and return ONLY a JSON object with no markdown formatting, code blocks, or additional text. Use this exact format:\n{\n  "company": "Company Name",\n  "role": "Job Title",\n  "location": "City, State/Province",\n  "description": "Full job description"\n}\n\nEnsure all values are properly escaped JSON strings.'
+          content: 'You are a job posting parser. Extract and return ONLY a valid JSON object with no markdown formatting, code blocks, or additional text. Use this exact format:\n{\n  "company": "Company Name",\n  "role": "Job Title",\n  "location": "City, State/Province",\n  "description": "Full job description"\n}\n\nIMPORTANT: Ensure all string values are properly escaped. Replace any unescaped quotes with \\" and escape any backslashes as \\\\. All values must be valid JSON strings.'
         },
         {
           role: 'user',
@@ -317,25 +317,120 @@ app.post('/api/parse-job-posting', async (req, res) => {
       throw new Error('No response from Groq API');
     }
 
+    console.log('Raw AI response:', parsedResult);
+
     // Remove markdown code blocks if present
     if (parsedResult.startsWith('```') && parsedResult.endsWith('```')) {
       parsedResult = parsedResult.replace(/^```(?:json)?\n/, '').replace(/\n```$/, '');
     }
 
-    // Parse and validate JSON response
-    const jsonResult = JSON.parse(parsedResult);
+    // Function to clean and fix common JSON issues
+    function cleanJsonString(jsonStr) {
+      // Remove any leading/trailing whitespace
+      jsonStr = jsonStr.trim();
+      
+      // Ensure it starts with { and ends with }
+      if (!jsonStr.startsWith('{')) {
+        const startIndex = jsonStr.indexOf('{');
+        if (startIndex !== -1) {
+          jsonStr = jsonStr.substring(startIndex);
+        }
+      }
+      
+      if (!jsonStr.endsWith('}')) {
+        const lastIndex = jsonStr.lastIndexOf('}');
+        if (lastIndex !== -1) {
+          jsonStr = jsonStr.substring(0, lastIndex + 1);
+        }
+      }
+      
+      return jsonStr;
+    }
+
+    // Function to attempt JSON parsing with multiple strategies
+    function attemptJsonParse(jsonStr) {
+      const strategies = [
+        // Strategy 1: Parse as-is
+        () => JSON.parse(jsonStr),
+        
+        // Strategy 2: Clean the JSON string first
+        () => JSON.parse(cleanJsonString(jsonStr)),
+        
+        // Strategy 3: Try to fix common issues with regex
+        () => {
+          let fixed = cleanJsonString(jsonStr);
+          // Fix unescaped quotes in values (basic attempt)
+          fixed = fixed.replace(/([^\\])"([^"]*)"([^,}\s])/g, '$1\\"$2\\"$3');
+          // Fix trailing commas
+          fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
+          return JSON.parse(fixed);
+        },
+        
+        // Strategy 4: Manual parsing for basic structure
+        () => {
+          const companyMatch = jsonStr.match(/"company"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
+          const roleMatch = jsonStr.match(/"role"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
+          const locationMatch = jsonStr.match(/"location"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
+          const descriptionMatch = jsonStr.match(/"description"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
+          
+          if (companyMatch && roleMatch) {
+            return {
+              company: companyMatch[1].replace(/\\"/g, '"'),
+              role: roleMatch[1].replace(/\\"/g, '"'),
+              location: locationMatch ? locationMatch[1].replace(/\\"/g, '"') : '',
+              description: descriptionMatch ? descriptionMatch[1].replace(/\\"/g, '"') : ''
+            };
+          }
+          throw new Error('Could not extract required fields');
+        }
+      ];
+
+      let lastError;
+      for (let i = 0; i < strategies.length; i++) {
+        try {
+          console.log(`Attempting parsing strategy ${i + 1}`);
+          const result = strategies[i]();
+          console.log(`Strategy ${i + 1} succeeded`);
+          return result;
+        } catch (error) {
+          console.log(`Strategy ${i + 1} failed:`, error.message);
+          lastError = error;
+        }
+      }
+      
+      throw lastError;
+    }
+
+    // Attempt to parse with multiple strategies
+    const jsonResult = attemptJsonParse(parsedResult);
     
     // Validate required fields
     if (!jsonResult.company || !jsonResult.role) {
-      throw new Error('Invalid response: missing required fields');
+      throw new Error('Invalid response: missing required fields (company or role)');
     }
 
-    res.json(jsonResult);
+    // Ensure all fields are strings and clean them
+    const cleanResult = {
+      company: String(jsonResult.company || '').trim(),
+      role: String(jsonResult.role || '').trim(),
+      location: String(jsonResult.location || '').trim(),
+      description: String(jsonResult.description || '').trim()
+    };
+
+    console.log('Successfully parsed job posting:', cleanResult);
+    res.json(cleanResult);
+    
   } catch (error) {
     console.error('Error parsing job posting:', error);
+    console.error('Full error details:', {
+      message: error.message,
+      stack: error.stack
+    });
+    
     res.status(500).json({ 
       error: 'Failed to parse job posting', 
-      details: error.message 
+      details: error.message,
+      suggestion: 'Please try again or check if the job posting text is valid'
     });
   }
 });
