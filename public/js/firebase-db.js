@@ -80,7 +80,7 @@ export async function addApplication(application) {
         const applicationData = {
             ...application,
             userId: user.uid,
-            dateApplied: new Date(application.dateApplied),
+            dateApplied: serverTimestamp(), // Use server timestamp to match createdAt
             lastUpdated: serverTimestamp(),
             hadInterview: application.status === 'Interview' || application.status === 'Offered' ? true : false,
             createdAt: serverTimestamp()

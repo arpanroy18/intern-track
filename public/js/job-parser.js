@@ -29,7 +29,9 @@ async function handleJobPostingParse() {
             document.getElementById('role').value = parsedData.role || '';
             document.getElementById('location').value = parsedData.location || '';
             document.getElementById('notes').value = parsedData.description || '';
-            document.getElementById('date-applied').value = getCurrentLocalDate();
+            
+            // Hide date applied field for new applications since we'll use server timestamp
+            document.getElementById('date-applied-group').style.display = 'none';
             
             // Close job posting modal and open application form
             closeJobPostingModal();

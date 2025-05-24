@@ -70,7 +70,8 @@ async function initApp() {
     document.getElementById('add-application-btn').addEventListener('click', () => {
         document.getElementById('application-id').value = '';
         document.getElementById('application-form').reset();
-        document.getElementById('date-applied').value = getCurrentLocalDate();
+        // Hide date applied field for new applications since we'll use server timestamp
+        document.getElementById('date-applied-group').style.display = 'none';
         openModal('Add Application');
     });
     
@@ -92,16 +93,18 @@ async function initApp() {
         const application = {
             company: document.getElementById('company').value,
             role: document.getElementById('role').value,
-            dateApplied: document.getElementById('date-applied').value,
             location: document.getElementById('location').value,
             applicationLink: document.getElementById('application-link').value,
             status: document.getElementById('status').value,
             notes: document.getElementById('notes').value
         };
         
+        // Only include dateApplied for updates, not for new applications
         if (applicationId) {
+            application.dateApplied = document.getElementById('date-applied').value;
             await updateApplication(applicationId, application);
         } else {
+            // For new applications, dateApplied will be set by server timestamp
             await addApplication(application);
         }
         
@@ -169,6 +172,9 @@ async function editApplication(id) {
         document.getElementById('application-link').value = application.applicationLink || '';
         document.getElementById('status').value = application.status;
         document.getElementById('notes').value = application.notes || '';
+        
+        // Show date applied field for editing applications
+        document.getElementById('date-applied-group').style.display = 'block';
         
         openModal('Edit Application');
     }
