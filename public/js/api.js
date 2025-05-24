@@ -23,7 +23,10 @@ let currentFolderId = null;
 // Data storage functions - now using Firebase
 async function getApplications(folderId = null) {
     try {
-        const applications = await getFirebaseApplications(folderId || currentFolderId);
+        const currentFolder = folderId || currentFolderId;
+        console.log('Getting applications for folder:', currentFolder);
+        const applications = await getFirebaseApplications(currentFolder);
+        console.log('Retrieved applications:', applications.length);
         return applications;
     } catch (error) {
         console.error('Error fetching applications:', error);
@@ -35,10 +38,12 @@ async function getApplications(folderId = null) {
 async function getFolders() {
     try {
         const folders = await getFirebaseFolders();
+        console.log('Retrieved folders:', folders);
         
         // Set current folder to first folder if none is set
         if (!currentFolderId && folders.length > 0) {
             currentFolderId = folders[0].id;
+            console.log('Set current folder to:', currentFolderId);
         }
         
         return folders;
@@ -150,18 +155,30 @@ async function clearAllData() {
 // Application CRUD operations
 async function addApplication(application) {
     try {
+        console.log('Adding application, current folder ID:', currentFolderId);
+        
         if (!currentFolderId) {
+            console.log('No current folder set, attempting to get/create one...');
             // If no folder is set, create a default one
             const folders = await getFolders();
+            console.log('Available folders:', folders);
+            
             if (folders.length === 0) {
                 throw new Error('No folder available. Please create a folder first.');
             }
             currentFolderId = folders[0].id;
+            console.log('Set current folder to first available:', currentFolderId);
         }
         
-        await addFirebaseApplication(application, currentFolderId);
+        console.log('Calling Firebase addApplication with folder ID:', currentFolderId);
+        const result = await addFirebaseApplication(application, currentFolderId);
+        console.log('Firebase addApplication result:', result);
+        
+        console.log('Re-rendering applications...');
         await renderApplications();
         updateStats();
+        
+        console.log('Application added successfully');
     } catch (error) {
         console.error('Error adding application:', error);
         alert('Error adding application: ' + error.message);

@@ -4,201 +4,194 @@ import { formatDate, getStatusClass, getPageSizePreference, setPageSizePreferenc
 
 // Render applications in the table
 async function renderApplications() {
-    const applicationsTable = document.getElementById('applications-table');
-    const emptyState = document.getElementById('empty-state');
-    const applications = await getApplications();
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-    
-    // Get pagination settings
-    const pageSizeSelect = document.getElementById('page-size-select');
-    const pageSize = pageSizeSelect ? pageSizeSelect.value : getPageSizePreference();
-    let currentPage = getCurrentPage();
-    
-    // Set the page size select value if it exists
-    if (pageSizeSelect && pageSizeSelect.value !== pageSize) {
-        pageSizeSelect.value = pageSize;
-    }
-    
-    // Filter applications
-    const filteredApplications = applications.filter(app => {
-        const matchesSearch = 
-            app.company.toLowerCase().includes(searchTerm) || 
-            app.role.toLowerCase().includes(searchTerm) || 
-            (app.notes && app.notes.toLowerCase().includes(searchTerm));
+    try {
+        console.log('UI: Starting to render applications...');
+        const applications = await getApplications();
+        console.log('UI: Got applications from API:', applications.length);
         
-        const matchesFilter = activeFilter === 'all' || app.status === activeFilter;
+        const tableBody = document.getElementById('applications-table');
+        const emptyState = document.getElementById('empty-state');
+        const tableContainer = document.querySelector('.applications-table-container');
         
-        return matchesSearch && matchesFilter;
-    });
-    
-    // Sort by creation date (oldest first) so new applications appear at the bottom
-    filteredApplications.sort((a, b) => {
-        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : new Date(a.dateApplied).getTime();
-        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : new Date(b.dateApplied).getTime();
-        return aTime - bTime;
-    });
-    
-    // Clear existing rows
-    applicationsTable.innerHTML = '';
-    
-    if (applications.length === 0) {
-        emptyState.style.display = 'block';
-        return;
-    }
-    
-    emptyState.style.display = 'none';
-    
-    if (filteredApplications.length === 0) {
-        const noResultsRow = document.createElement('tr');
-        noResultsRow.innerHTML = `
-            <td colspan="6" style="text-align: center; padding: 2rem;">
-                No matching applications found
-            </td>
-        `;
-        applicationsTable.appendChild(noResultsRow);
-        return;
-    }
-    
-    // If pageSize is "all", display all applications, otherwise paginate
-    let displayedApplications = filteredApplications;
-    let totalPages = 1;
-    
-    if (pageSize !== 'all') {
-        const pageSizeNum = parseInt(pageSize, 10);
-        totalPages = Math.ceil(filteredApplications.length / pageSizeNum);
+        // Get current filters
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+        const pageSize = getPageSizePreference();
         
-        // Adjust currentPage if it's beyond the available pages
-        if (currentPage > totalPages) {
-            currentPage = totalPages;
-            setCurrentPage(currentPage);
-        }
+        console.log('UI: Current filters - search:', searchTerm, 'status:', activeFilter, 'pageSize:', pageSize);
         
-        // Calculate start and end indices for the current page
-        const startIndex = (currentPage - 1) * pageSizeNum;
-        const endIndex = Math.min(startIndex + pageSizeNum, filteredApplications.length);
-        
-        // Get the applications for the current page
-        displayedApplications = filteredApplications.slice(startIndex, endIndex);
-    }
-    
-    // Create table rows for displayed applications
-    displayedApplications.forEach((app, index) => {
-        const row = document.createElement('tr');
-        const displayIndex = pageSize === 'all' ? 
-            index + 1 : 
-            (currentPage - 1) * parseInt(pageSize, 10) + index + 1;
+        // Apply filters
+        let filteredApplications = applications.filter(app => {
+            const matchesSearch = !searchTerm || 
+                app.company.toLowerCase().includes(searchTerm) ||
+                app.role.toLowerCase().includes(searchTerm) ||
+                (app.notes && app.notes.toLowerCase().includes(searchTerm));
             
-        row.innerHTML = `
-            <td>${displayIndex}</td>
-            <td>
-                <strong>${app.company}</strong>
-                ${app.location ? `<div style="color: var(--text-secondary); font-size: 0.875rem;">${app.location}</div>` : ''}
-            </td>
-            <td>${app.role}</td>
-            <td>
-                <select class="status-select ${getStatusClass(app.status)}" data-id="${app.id}">
-                    <option value="Applied" ${app.status === 'Applied' ? 'selected' : ''}>Applied</option>
-                    <option value="OA" ${app.status === 'OA' ? 'selected' : ''}>Online Assessment</option>
-                    <option value="Interview" ${app.status === 'Interview' ? 'selected' : ''}>Interview</option>
-                    <option value="Offer" ${app.status === 'Offer' ? 'selected' : ''}>Offer</option>
-                    <option value="Closed" ${app.status === 'Closed' ? 'selected' : ''}>Closed</option>
-                </select>
-            </td>
-            <td>${formatDate(app.lastUpdated)}</td>
-            <td class="action-cell">
-                <button class="icon-btn timeline-btn" data-id="${app.id}" title="View Timeline">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                </button>
-                <button class="icon-btn edit-btn" data-id="${app.id}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                </button>
-                <button class="icon-btn delete-btn" data-id="${app.id}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
-                </button>
-                ${app.applicationLink ? `
-                <a href="${app.applicationLink}" target="_blank" class="icon-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                </a>
-                ` : ''}
-            </td>
-        `;
-        applicationsTable.appendChild(row);
-    });
-    
-    // Add event listeners to edit and delete buttons
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => editApplication(btn.dataset.id));
-    });
-    
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => deleteApplication(btn.dataset.id));
-    });
-
-    // Add status select event listeners
-    document.querySelectorAll('.status-select').forEach(select => {
-        select.addEventListener('change', async (e) => {
-            const applicationId = e.target.dataset.id;
-            const newStatus = e.target.value;
+            const matchesFilter = activeFilter === 'all' || app.status === activeFilter;
             
-            // Update status classes
-            e.target.className = `status-select ${getStatusClass(newStatus)}`;
-            
-            try {
-                // Get the full application data first
-                const applications = await getApplications();
-                const currentApp = applications.find(app => app.id === applicationId);
-                
-                if (currentApp) {
-                    // Only update the status field, preserving all other data
-                    const updatedApp = {
-                        company: currentApp.company,
-                        role: currentApp.role,
-                        dateApplied: currentApp.dateApplied,
-                        location: currentApp.location || '',
-                        applicationLink: currentApp.applicationLink || '',
-                        status: newStatus,
-                        notes: currentApp.notes || ''
-                    };
-                    
-                    await updateApplication(applicationId, updatedApp);
-                }
-            } catch (error) {
-                console.error('Error updating status:', error);
-                alert('Error updating status: ' + error.message);
-                // Revert the UI to previous status
-                renderApplications();
-            }
+            return matchesSearch && matchesFilter;
         });
-    });
-
-    // Add timeline event listeners
-    addTimelineEventListeners();
-    
-    // Add pagination controls if needed
-    if (pageSize !== 'all' && totalPages > 1) {
-        renderPaginationControls(filteredApplications.length, parseInt(pageSize, 10), currentPage, totalPages);
-    } else {
-        // Remove pagination controls if they exist
-        const existingControls = document.querySelector('.pagination-controls');
-        if (existingControls) {
-            existingControls.remove();
+        
+        console.log('UI: Filtered applications:', filteredApplications.length);
+        
+        // Remove existing pagination controls
+        const existingPagination = document.querySelector('.pagination-controls');
+        if (existingPagination) {
+            existingPagination.remove();
         }
+        
+        if (filteredApplications.length === 0) {
+            console.log('UI: No applications to display, showing empty state');
+            tableContainer.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+        
+        // Show table, hide empty state
+        tableContainer.style.display = 'block';
+        emptyState.style.display = 'none';
+        
+        // Calculate pagination
+        const currentPage = getCurrentPage();
+        const totalPages = pageSize === 'all' ? 1 : Math.ceil(filteredApplications.length / parseInt(pageSize));
+        const startIndex = pageSize === 'all' ? 0 : (currentPage - 1) * parseInt(pageSize);
+        const endIndex = pageSize === 'all' ? filteredApplications.length : startIndex + parseInt(pageSize);
+        
+        console.log('UI: Pagination - page:', currentPage, 'totalPages:', totalPages, 'showing:', startIndex, 'to', endIndex);
+        
+        const paginatedApplications = filteredApplications.slice(startIndex, endIndex);
+        
+        // Sort by creation date (oldest first) so new applications appear at the bottom
+        paginatedApplications.sort((a, b) => {
+            const aTime = a.createdAt ? new Date(a.createdAt).getTime() : new Date(a.dateApplied).getTime();
+            const bTime = b.createdAt ? new Date(b.createdAt).getTime() : new Date(b.dateApplied).getTime();
+            return aTime - bTime;
+        });
+        
+        // Clear existing rows
+        tableBody.innerHTML = '';
+        
+        // Create table rows for displayed applications
+        paginatedApplications.forEach((app, index) => {
+            const row = document.createElement('tr');
+            const displayIndex = pageSize === 'all' ? 
+                index + 1 : 
+                (currentPage - 1) * parseInt(pageSize, 10) + index + 1;
+            
+            row.innerHTML = `
+                <td>${displayIndex}</td>
+                <td>
+                    <strong>${app.company}</strong>
+                    ${app.location ? `<div style="color: var(--text-secondary); font-size: 0.875rem;">${app.location}</div>` : ''}
+                </td>
+                <td>${app.role}</td>
+                <td>
+                    <select class="status-select ${getStatusClass(app.status)}" data-id="${app.id}">
+                        <option value="Applied" ${app.status === 'Applied' ? 'selected' : ''}>Applied</option>
+                        <option value="OA" ${app.status === 'OA' ? 'selected' : ''}>Online Assessment</option>
+                        <option value="Interview" ${app.status === 'Interview' ? 'selected' : ''}>Interview</option>
+                        <option value="Offer" ${app.status === 'Offer' ? 'selected' : ''}>Offer</option>
+                        <option value="Closed" ${app.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                    </select>
+                </td>
+                <td>${formatDate(app.lastUpdated)}</td>
+                <td class="action-cell">
+                    <button class="icon-btn timeline-btn" data-id="${app.id}" title="View Timeline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </button>
+                    <button class="icon-btn edit-btn" data-id="${app.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    <button class="icon-btn delete-btn" data-id="${app.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                    ${app.applicationLink ? `
+                    <a href="${app.applicationLink}" target="_blank" class="icon-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                    </a>
+                    ` : ''}
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+        
+        // Add event listeners to edit and delete buttons
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', () => editApplication(btn.dataset.id));
+        });
+        
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', () => deleteApplication(btn.dataset.id));
+        });
+
+        // Add status select event listeners
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', async (e) => {
+                const applicationId = e.target.dataset.id;
+                const newStatus = e.target.value;
+                
+                // Update status classes
+                e.target.className = `status-select ${getStatusClass(newStatus)}`;
+                
+                try {
+                    // Get the full application data first
+                    const applications = await getApplications();
+                    const currentApp = applications.find(app => app.id === applicationId);
+                    
+                    if (currentApp) {
+                        // Only update the status field, preserving all other data
+                        const updatedApp = {
+                            company: currentApp.company,
+                            role: currentApp.role,
+                            dateApplied: currentApp.dateApplied,
+                            location: currentApp.location || '',
+                            applicationLink: currentApp.applicationLink || '',
+                            status: newStatus,
+                            notes: currentApp.notes || ''
+                        };
+                        
+                        await updateApplication(applicationId, updatedApp);
+                    }
+                } catch (error) {
+                    console.error('Error updating status:', error);
+                    alert('Error updating status: ' + error.message);
+                    // Revert the UI to previous status
+                    renderApplications();
+                }
+            });
+        });
+
+        // Add timeline event listeners
+        addTimelineEventListeners();
+        
+        // Add pagination controls if needed
+        if (pageSize !== 'all' && totalPages > 1) {
+            renderPaginationControls(filteredApplications.length, parseInt(pageSize, 10), currentPage, totalPages);
+        } else {
+            // Remove pagination controls if they exist
+            const existingControls = document.querySelector('.pagination-controls');
+            if (existingControls) {
+                existingControls.remove();
+            }
+        }
+    } catch (error) {
+        console.error('Error rendering applications:', error);
+        alert('Error rendering applications: ' + error.message);
     }
 }
 

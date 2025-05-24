@@ -210,12 +210,11 @@ export async function getApplications(folderId = null) {
         let q;
         
         if (folderId) {
-            q = query(applicationsRef, 
-                where('folderId', '==', folderId),
-                orderBy('lastUpdated', 'desc')
-            );
+            // Use only where clause to avoid compound index requirements
+            q = query(applicationsRef, where('folderId', '==', folderId));
         } else {
-            q = query(applicationsRef, orderBy('lastUpdated', 'desc'));
+            // Get all applications if no folder filter
+            q = query(applicationsRef);
         }
         
         const snapshot = await getDocs(q);
@@ -249,6 +248,14 @@ export async function getApplications(folderId = null) {
             });
         });
         
+        // Sort in JavaScript instead of Firestore to avoid compound index
+        applications.sort((a, b) => {
+            const dateA = new Date(a.lastUpdated || a.createdAt || 0);
+            const dateB = new Date(b.lastUpdated || b.createdAt || 0);
+            return dateB - dateA; // Newest first
+        });
+        
+        console.log(`Retrieved ${applications.length} applications for folder: ${folderId || 'all'}`);
         return applications;
     } catch (error) {
         console.error('Error fetching applications:', error);
@@ -268,6 +275,7 @@ export async function addApplication(application, folderId) {
             throw new Error('Folder ID is required');
         }
 
+        console.log('Firebase: Adding application to folder:', folderId);
         const applicationsRef = getUserApplicationsRef(user.uid);
         
         // Prepare application data
@@ -281,7 +289,9 @@ export async function addApplication(application, folderId) {
             createdAt: serverTimestamp()
         };
 
+        console.log('Firebase: Application data to save:', applicationData);
         const docRef = await addDoc(applicationsRef, applicationData);
+        console.log('Firebase: Application saved with ID:', docRef.id);
         
         return {
             success: true,
@@ -293,7 +303,7 @@ export async function addApplication(application, folderId) {
             }
         };
     } catch (error) {
-        console.error('Error adding application:', error);
+        console.error('Firebase: Error adding application:', error);
         throw error;
     }
 }

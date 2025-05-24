@@ -44,10 +44,21 @@ async function initApp() {
         onAuthStateChange(async (user) => {
             if (user) {
                 console.log('User signed in:', user.email);
-                // User is signed in, load their data
-                await renderFolders(); // Load folders first
-                await renderApplications();
-                updateStats();
+                // User is signed in, load their data in the correct order
+                try {
+                    console.log('Loading folders...');
+                    await renderFolders(); // Load folders first
+                    
+                    console.log('Loading applications...');
+                    await renderApplications();
+                    
+                    console.log('Updating stats...');
+                    updateStats();
+                    
+                    console.log('App data loaded successfully');
+                } catch (error) {
+                    console.error('Error loading app data:', error);
+                }
             } else {
                 console.log('User signed out');
                 // User is signed out, clear any displayed data

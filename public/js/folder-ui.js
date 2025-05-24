@@ -13,13 +13,32 @@ export function setUICallbacks(renderFunc, statsFunc) {
 // Render folder tabs
 export async function renderFolders() {
     try {
+        console.log('Rendering folders...');
         const folders = await getFolders();
         const foldersContainer = document.getElementById('folders-tabs');
-        const currentFolderId = getCurrentFolderId();
+        let currentFolderId = getCurrentFolderId();
+        
+        console.log('Available folders:', folders.length);
+        console.log('Current folder ID:', currentFolderId);
         
         if (folders.length === 0) {
             foldersContainer.innerHTML = '<div class="empty-folders">No seasons created yet</div>';
             return;
+        }
+        
+        // If no current folder is set, set it to the first folder
+        if (!currentFolderId && folders.length > 0) {
+            currentFolderId = folders[0].id;
+            setCurrentFolderId(currentFolderId);
+            console.log('Set initial current folder to:', currentFolderId);
+        }
+        
+        // Make sure the current folder ID exists in the folders list
+        const folderExists = folders.find(f => f.id === currentFolderId);
+        if (!folderExists && folders.length > 0) {
+            currentFolderId = folders[0].id;
+            setCurrentFolderId(currentFolderId);
+            console.log('Current folder not found, switched to:', currentFolderId);
         }
         
         foldersContainer.innerHTML = folders.map(folder => {
@@ -47,6 +66,8 @@ export async function renderFolders() {
         
         // Add event listeners for folder tabs
         setupFolderTabListeners();
+        
+        console.log('Folders rendered successfully, active folder:', currentFolderId);
         
     } catch (error) {
         console.error('Error rendering folders:', error);
@@ -89,18 +110,24 @@ function setupFolderTabListeners() {
 // Switch to a different folder
 async function switchToFolder(folderId) {
     try {
+        console.log('Switching to folder:', folderId);
         setCurrentFolderId(folderId);
         
         // Update active tab
         document.querySelectorAll('.folder-tab').forEach(tab => {
             tab.classList.remove('active');
         });
-        document.querySelector(`[data-folder-id="${folderId}"]`).classList.add('active');
+        const activeTab = document.querySelector(`[data-folder-id="${folderId}"]`);
+        if (activeTab) {
+            activeTab.classList.add('active');
+        }
         
+        console.log('Re-rendering applications for folder:', folderId);
         // Re-render applications and stats for the new folder
         await renderApplications();
         updateStats();
         
+        console.log('Successfully switched to folder:', folderId);
     } catch (error) {
         console.error('Error switching folder:', error);
         alert('Error switching to folder: ' + error.message);
@@ -174,19 +201,33 @@ export async function handleFolderFormSubmit(e) {
     };
     
     try {
+        let newFolderId = null;
+        
         if (folderId) {
             // Update existing folder
             await updateFolder(folderId, folderData);
+            console.log('Folder updated:', folderId);
         } else {
             // Create new folder
-            await createFolder(folderData);
+            const result = await createFolder(folderData);
+            newFolderId = result.folder.id;
+            console.log('New folder created:', newFolderId);
         }
         
         // Refresh folder list and close modal
         await renderFolders();
         closeFolderModal();
         
-        // If this was a new folder and we have no current folder, switch to it
+        // If this was a new folder, switch to it
+        if (newFolderId) {
+            console.log('Switching to new folder:', newFolderId);
+            setCurrentFolderId(newFolderId);
+            await renderFolders(); // Re-render to show active state
+            await renderApplications(); // Re-render applications for new folder
+            updateStats();
+        }
+        
+        // If this was a new folder and we had no current folder, switch to it
         if (!folderId && !getCurrentFolderId()) {
             const folders = await getFolders();
             if (folders.length > 0) {
