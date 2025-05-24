@@ -1,47 +1,30 @@
-import os
-import google.generativeai as genai
+import sqlite3
+from faker import Faker
+import random
+from datetime import datetime, timedelta
 
-# Configure with API key directly
-genai.configure(api_key="AIzaSyBicqwQfKK737X1N3JbupTydFR-LElT7dg")
+fake = Faker()
+statuses = ["Applied", "Online Assessment", "Interview", "Offer", "Closed"]
 
-# Create the model
-generation_config = {
-    "temperature": 1,
-    "top_p": 0.95,
-    "top_k": 40,
-    "max_output_tokens": 8192,
-}
+conn = sqlite3.connect('interntrack.db')
+cursor = conn.cursor()
 
-model = genai.GenerativeModel(
-    model_name="gemini-pro",  # Changed model name to a valid one
-    generation_config=generation_config,
-)
+for _ in range(50):
+    company = fake.company()
+    role = fake.job()
+    dateApplied = (datetime.now() - timedelta(days=random.randint(0, 365))).strftime('%Y-%m-%d')
+    location = fake.city()
+    applicationLink = fake.url()
+    status = random.choice(statuses)
+    notes = fake.sentence()
+    # Generate a unique id and lastUpdated timestamp
+    app_id = str(int(datetime.now().timestamp() * 1000)) + str(random.randint(100, 999))
+    lastUpdated = datetime.now().isoformat()
 
-# Create chat with specific system prompt
-chat_session = model.start_chat(
-    history=[
-        {
-            "role": "user",
-            "parts": ["You are a job posting parser. When I give you a job posting text, extract the following information and return it in JSON format: Company, Role, Location, and Job Description. Only return the JSON object, nothing else."],
-        },
-        {
-            "role": "model",
-            "parts": ["I understand. I will parse job postings and return a JSON object containing the Company, Role, Location, and Job Description. I will only return the JSON object without any additional text."],
-        }
-    ]
-)
+    cursor.execute("""
+        INSERT INTO applications (id, company, role, dateApplied, location, applicationLink, status, hadInterview, notes, lastUpdated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (app_id, company, role, dateApplied, location, applicationLink, status, 0, notes, lastUpdated))
 
-# Get job posting text from console input
-print("Please paste the job posting text (Press Ctrl+D on Unix/Linux/Mac or Ctrl+Z on Windows when done):")
-job_posting = ""
-try:
-    while True:
-        line = input()
-        job_posting += line + "\n"
-except (EOFError, KeyboardInterrupt):
-    pass
-
-# Send the job posting text for processing
-response = chat_session.send_message(job_posting)
-
-print(response.text)
+conn.commit()
+conn.close()
