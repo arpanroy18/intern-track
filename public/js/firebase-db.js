@@ -82,7 +82,7 @@ export async function addApplication(application) {
             userId: user.uid,
             dateApplied: serverTimestamp(), // Use server timestamp to match createdAt
             lastUpdated: serverTimestamp(),
-            hadInterview: application.status === 'Interview' || application.status === 'Offered' ? true : false,
+            hadInterview: application.status === 'Interview' || application.status === 'Offer' ? true : false,
             createdAt: serverTimestamp()
         };
 
@@ -126,7 +126,7 @@ export async function updateApplication(id, updatedApplication) {
             dateApplied: new Date(updatedApplication.dateApplied),
             lastUpdated: serverTimestamp(),
             hadInterview: updatedApplication.status === 'Interview' || 
-                         updatedApplication.status === 'Offered' || 
+                         updatedApplication.status === 'Offer' || 
                          existingData.hadInterview ? true : false
         };
 

@@ -275,13 +275,13 @@ async function updateStats() {
     const totalApplications = applications.length;
     
     // Count applications that ever had an interview (using hadInterview flag)
-    const totalInterviews = applications.filter(app => app.hadInterview === 1).length;
+    const totalInterviews = applications.filter(app => app.hadInterview === true).length;
     
     // Count applications with Offered status
     const totalOffers = applications.filter(app => app.status === 'Offer').length;
     
     // Count applications that ever had an interview (using hadInterview flag)
-    const totalResponses = applications.filter(app => app.hadInterview === 1).length;
+    const totalResponses = applications.filter(app => app.hadInterview === true).length;
     
     // Calculate response rate based on applications that ever had an interview
     const responseRate = totalApplications > 0 ? 
