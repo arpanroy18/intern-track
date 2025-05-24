@@ -333,6 +333,41 @@
     </div> <!-- End of app-container -->
 
     <!-- Import JavaScript modules -->
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase services
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "REMOVED_FIREBASE_API_KEY",
+            authDomain: "REMOVED_FIREBASE_DOMAIN",
+            projectId: "REMOVED_PROJECT_ID",
+            storageBucket: "REMOVED_PROJECT_ID.REMOVED_STORAGE_BUCKET",
+            messagingSenderId: "REMOVED_SENDER_ID",
+            appId: "1:REMOVED_SENDER_ID:web:0dc82c61d4d796fba8e8db",
+            measurementId: "REMOVED_MEASUREMENT_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase services globally available
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        
+        // Signal that Firebase is ready
+        window.firebaseReady = true;
+        console.log('Firebase initialized and ready');
+        
+        // Dispatch event to signal Firebase is loaded
+        window.dispatchEvent(new Event('firebaseReady'));
+    </script>
     <script type="module" src="public/js/main.js"></script>
 </body>
 </html>

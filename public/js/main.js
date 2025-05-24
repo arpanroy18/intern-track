@@ -9,22 +9,51 @@ import { onAuthStateChange } from './firebase-auth.js';
 // Set the UI functions in api.js to avoid circular dependency issues
 setUIFunctions(renderApplications, updateStats);
 
-// Initialization function
-async function initApp() {
-    // Initialize authentication UI
-    initAuthUI();
-    
-    // Listen for auth state changes to initialize app data
-    onAuthStateChange(async (user) => {
-        if (user) {
-            // User is signed in, load their data
-            await renderApplications();
-            updateStats();
+// Wait for Firebase to be loaded
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        if (window.firebaseReady) {
+            console.log('Firebase already loaded');
+            resolve();
         } else {
-            // User is signed out, clear any displayed data
-            updateStats(); // This will show 0s
+            console.log('Waiting for Firebase ready event...');
+            window.addEventListener('firebaseReady', () => {
+                console.log('Firebase ready event received');
+                resolve();
+            }, { once: true });
         }
     });
+}
+
+// Initialization function
+async function initApp() {
+    try {
+        // Wait for Firebase to be available
+        await waitForFirebase();
+        
+        console.log('Initializing authentication...');
+        // Initialize authentication UI
+        initAuthUI();
+        
+        console.log('Setting up auth state listener...');
+        // Listen for auth state changes to initialize app data
+        onAuthStateChange(async (user) => {
+            if (user) {
+                console.log('User signed in:', user.email);
+                // User is signed in, load their data
+                await renderApplications();
+                updateStats();
+            } else {
+                console.log('User signed out');
+                // User is signed out, clear any displayed data
+                updateStats(); // This will show 0s
+            }
+        });
+        
+        console.log('App initialization complete');
+    } catch (error) {
+        console.error('Error initializing app:', error);
+    }
     
     // Setup page size selector
     const pageSizeSelect = document.getElementById('page-size-select');

@@ -1,5 +1,7 @@
 // Firebase Authentication Service
 import { auth } from './firebase-config.js';
+
+// Import Firebase auth functions from CDN
 import { 
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword, 
@@ -8,7 +10,7 @@ import {
     GoogleAuthProvider,
     signInWithPopup,
     updateProfile
-} from 'firebase/auth';
+} from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
 
 // Auth state management
 let currentUser = null;

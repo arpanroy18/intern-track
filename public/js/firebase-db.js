@@ -15,7 +15,7 @@ import {
     onSnapshot,
     serverTimestamp,
     Timestamp
-} from 'firebase/firestore';
+} from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 
 // Collections
 const APPLICATIONS_COLLECTION = 'applications';
