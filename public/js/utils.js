@@ -25,10 +25,10 @@ function getLocalISOString() {
 function getStatusClass(status) {
     switch (status) {
         case 'Applied': return 'status-applied';
+        case 'OA': return 'status-oa';
         case 'Interview': return 'status-interview';
-        case 'Offered': return 'status-offered';
+        case 'Offer': return 'status-offer';
         case 'Closed': return 'status-closed';
-        case 'Rejected': return 'status-rejected';
         default: return '';
     }
 }

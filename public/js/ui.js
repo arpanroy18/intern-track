@@ -59,8 +59,9 @@ async function renderApplications() {
             <td>
                 <select class="status-select ${getStatusClass(app.status)}" data-id="${app.id}">
                     <option value="Applied" ${app.status === 'Applied' ? 'selected' : ''}>Applied</option>
+                    <option value="OA" ${app.status === 'OA' ? 'selected' : ''}>Online Assessment</option>
                     <option value="Interview" ${app.status === 'Interview' ? 'selected' : ''}>Interview</option>
-                    <option value="Offered" ${app.status === 'Offered' ? 'selected' : ''}>Offered</option>
+                    <option value="Offer" ${app.status === 'Offer' ? 'selected' : ''}>Offer</option>
                     <option value="Closed" ${app.status === 'Closed' ? 'selected' : ''}>Closed</option>
                 </select>
             </td>
