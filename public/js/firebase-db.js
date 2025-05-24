@@ -132,6 +132,11 @@ export async function updateApplication(id, updatedApplication) {
 
         // Record status change if status is different
         if (existingData.status !== updatedApplication.status) {
+            console.log('Status change detected:', {
+                applicationId: id,
+                oldStatus: existingData.status,
+                newStatus: updatedApplication.status
+            });
             await recordStatusEvent(user.uid, id, existingData.status, updatedApplication.status);
         }
 
@@ -202,13 +207,17 @@ async function recordStatusEvent(userId, applicationId, oldStatus, newStatus) {
     try {
         const statusEventsRef = getUserStatusEventsRef(userId);
         
-        await addDoc(statusEventsRef, {
+        const eventData = {
             applicationId: applicationId,
             oldStatus: oldStatus,
             newStatus: newStatus,
             timestamp: serverTimestamp(),
             userId: userId
-        });
+        };
+        
+        console.log('Recording status event:', eventData);
+        const docRef = await addDoc(statusEventsRef, eventData);
+        console.log('Status event recorded with ID:', docRef.id);
     } catch (error) {
         console.error('Error recording status event:', error);
     }
@@ -237,21 +246,25 @@ export async function getStatusEvents(applicationId) {
     try {
         const user = getCurrentUser();
         if (!user) {
+            console.log('No user logged in for getStatusEvents');
             return [];
         }
 
+        console.log('Fetching status events for application:', applicationId);
         const statusEventsRef = getUserStatusEventsRef(user.uid);
         const q = query(
             statusEventsRef,
-            where('applicationId', '==', applicationId),
-            orderBy('timestamp', 'asc')
+            where('applicationId', '==', applicationId)
         );
         
         const snapshot = await getDocs(q);
         const events = [];
         
+        console.log('Status events snapshot size:', snapshot.size);
+        
         snapshot.forEach((doc) => {
             const data = doc.data();
+            console.log('Raw status event data:', data);
             // Convert Firestore timestamp to ISO string
             if (data.timestamp && data.timestamp.toDate) {
                 data.timestamp = data.timestamp.toDate().toISOString();
@@ -262,6 +275,10 @@ export async function getStatusEvents(applicationId) {
             });
         });
         
+        // Sort events by timestamp in JavaScript (ascending order)
+        events.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        
+        console.log('Processed status events:', events);
         return events;
     } catch (error) {
         console.error('Error fetching status events:', error);

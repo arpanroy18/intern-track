@@ -339,6 +339,10 @@ async function renderTimeline(applicationId) {
             getApplications()
         ]);
         
+        console.log('Timeline Debug - Application ID:', applicationId);
+        console.log('Timeline Debug - Status Events:', events);
+        console.log('Timeline Debug - Applications:', applications);
+        
         const application = applications.find(app => app.id === applicationId);
         if (!application) {
             timelineContent.innerHTML = '<div class="error">Application not found</div>';
@@ -349,9 +353,14 @@ async function renderTimeline(applicationId) {
         const timelineEvents = [];
         
         // Always add the initial "Applied" event using the dateApplied
+        // Convert date string to a proper timestamp for consistent sorting
+        const appliedTimestamp = application.dateApplied.includes('T') ? 
+            application.dateApplied : 
+            new Date(application.dateApplied + 'T00:00:00').toISOString();
+        
         timelineEvents.push({
             status: 'Applied',
-            timestamp: application.dateApplied,
+            timestamp: appliedTimestamp,
             notes: null,
             isInitial: true
         });
@@ -359,7 +368,7 @@ async function renderTimeline(applicationId) {
         // Add all status change events
         events.forEach(event => {
             timelineEvents.push({
-                status: event.new_status,
+                status: event.newStatus,
                 timestamp: event.timestamp,
                 notes: null,
                 isInitial: false
