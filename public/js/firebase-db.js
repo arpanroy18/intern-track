@@ -58,9 +58,12 @@ export async function getApplications() {
                 }
             }
             
-            // Handle lastUpdated timestamp
+            // Handle lastUpdated and createdAt timestamps
             if (data.lastUpdated && data.lastUpdated.toDate) {
                 data.lastUpdated = data.lastUpdated.toDate().toISOString();
+            }
+            if (data.createdAt && data.createdAt.toDate) {
+                data.createdAt = data.createdAt.toDate().toISOString();
             }
             
             applications.push({
@@ -323,9 +326,12 @@ export function subscribeToApplications(callback) {
                 }
             }
             
-            // Handle lastUpdated timestamp
+            // Handle lastUpdated and createdAt timestamps
             if (data.lastUpdated && data.lastUpdated.toDate) {
                 data.lastUpdated = data.lastUpdated.toDate().toISOString();
+            }
+            if (data.createdAt && data.createdAt.toDate) {
+                data.createdAt = data.createdAt.toDate().toISOString();
             }
             
             applications.push({
