@@ -278,7 +278,7 @@ async function updateStats() {
     const totalInterviews = applications.filter(app => app.hadInterview === 1).length;
     
     // Count applications with Offered status
-    const totalOffers = applications.filter(app => app.status === 'Offered').length;
+    const totalOffers = applications.filter(app => app.status === 'Offer').length;
     
     // Count applications that ever had an interview (using hadInterview flag)
     const totalResponses = applications.filter(app => app.hadInterview === 1).length;
