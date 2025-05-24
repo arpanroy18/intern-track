@@ -998,9 +998,11 @@ tbody tr:hover {
     padding: 0;
     border-radius: 0.25rem;
     font-size: 0.75rem;
+    text-align: center; /* Ensure content is centered */
 }
 
 .season-btn svg {
     width: 14px;
     height: 14px;
+    margin: 0 auto; /* Center the SVG horizontally */
 }
