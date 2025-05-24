@@ -13,7 +13,7 @@ completion = client.chat.completions.create(
         },
         {
             "role": "user",
-            "content": "Your job posting text here"
+            "content": "bmo, software developer, toronto, 5+ yers of experience"
         }
     ],
     temperature=0.1,
