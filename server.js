@@ -2,6 +2,12 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const cors = require('cors');
+const { Groq } = require('groq-sdk');
+
+// Initialize Groq client
+const groq = new Groq({
+  apiKey: 'REMOVED_GROQ_API_KEY'
+});
 
 // Initialize express app
 const app = express();
@@ -275,6 +281,63 @@ app.get('/api/applications/:id/status-events', (req, res) => {
       res.json(events);
     }
   );
+});
+
+// Parse job posting with Groq API
+app.post('/api/parse-job-posting', async (req, res) => {
+  try {
+    const { jobPostingText } = req.body;
+    
+    if (!jobPostingText || !jobPostingText.trim()) {
+      return res.status(400).json({ error: 'Job posting text is required' });
+    }
+
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a job posting parser. Extract and return ONLY a JSON object with no markdown formatting, code blocks, or additional text. Use this exact format:\n{\n  "company": "Company Name",\n  "role": "Job Title",\n  "location": "City, State/Province",\n  "description": "Brief job description"\n}\n\nEnsure all values are properly escaped JSON strings.'
+        },
+        {
+          role: 'user',
+          content: jobPostingText
+        }
+      ],
+      model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
+      temperature: 0.1,
+      max_completion_tokens: 1024,
+      top_p: 1,
+      stream: false,
+      stop: null
+    });
+
+    let parsedResult = chatCompletion.choices[0]?.message?.content?.trim();
+    
+    if (!parsedResult) {
+      throw new Error('No response from Groq API');
+    }
+
+    // Remove markdown code blocks if present
+    if (parsedResult.startsWith('```') && parsedResult.endsWith('```')) {
+      parsedResult = parsedResult.replace(/^```(?:json)?\n/, '').replace(/\n```$/, '');
+    }
+
+    // Parse and validate JSON response
+    const jsonResult = JSON.parse(parsedResult);
+    
+    // Validate required fields
+    if (!jsonResult.company || !jsonResult.role) {
+      throw new Error('Invalid response: missing required fields');
+    }
+
+    res.json(jsonResult);
+  } catch (error) {
+    console.error('Error parsing job posting:', error);
+    res.status(500).json({ 
+      error: 'Failed to parse job posting', 
+      details: error.message 
+    });
+  }
 });
 
 // Start the server

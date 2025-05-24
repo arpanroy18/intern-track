@@ -178,43 +178,23 @@ async function parseJobPosting(jobPostingText) {
     }
 
     try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const response = await fetch(`${API_BASE_URL}/parse-job-posting`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer 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',
-                'HTTP-Referer': 'localhost',
-                'X-Title': 'Job Parser'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: 'meta-llama/llama-3.3-70b-instruct:free',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'You are a job posting parser. Extract and return ONLY a JSON object with no markdown formatting, code blocks, or additional text. Use this exact format:\n{\n  "company": "Company Name",\n  "role": "Job Title",\n  "location": "City, State/Province",\n  "description": "Brief job description"\n}\n\nEnsure all values are properly escaped JSON strings.'
-                    },
-                    {
-                        role: 'user',
-                        content: jobPostingText
-                    }
-                ]
+                jobPostingText: jobPostingText
             })
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.details || errorData.error || `HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        let parsedResult = data.choices[0].message.content.trim();
-        
-        // Remove markdown code blocks if present
-        if (parsedResult.startsWith('```') && parsedResult.endsWith('```')) {
-            parsedResult = parsedResult.replace(/^```(?:json)?\n/, '').replace(/\n```$/, '');
-        }
-
-        // Parse the JSON response
-        return JSON.parse(parsedResult);
+        const jsonResult = await response.json();
+        return jsonResult;
     } catch (error) {
         console.error('Error parsing job posting:', error);
         alert('Error parsing job posting: ' + error.message);

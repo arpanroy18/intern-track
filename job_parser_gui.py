@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import scrolledtext
 import os
-from openai import OpenAI
+from groq import Groq
 
 def process_job_posting():
     job_posting = input_text.get(1.0, tk.END)
@@ -9,19 +9,14 @@ def process_job_posting():
     root.update()
     
     try:
-        # Initialize OpenRouter client
-        client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key="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",
+        # Initialize Groq client
+        client = Groq(
+            api_key="REMOVED_GROQ_API_KEY"
         )
 
         # Create chat completion
         completion = client.chat.completions.create(
-            extra_headers={
-                "HTTP-Referer": "localhost",  # Local development
-                "X-Title": "Job Parser",      # Application name
-            },
-            model="meta-llama/llama-3.3-70b-instruct:free",
+            model="meta-llama/llama-4-maverick-17b-128e-instruct",
             messages=[
                 {
                     "role": "system",
@@ -31,7 +26,12 @@ def process_job_posting():
                     "role": "user",
                     "content": job_posting
                 }
-            ]
+            ],
+            temperature=0.1,
+            max_completion_tokens=1024,
+            top_p=1,
+            stream=False,
+            stop=None
         )
         
         # Get the response and handle markdown code blocks

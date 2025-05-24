@@ -74,7 +74,7 @@ InternTrack/
 - Frontend: HTML, CSS, JavaScript (ES6+)
 - Backend: Node.js, Express
 - Database: SQLite
-- AI Integration: OpenRouter API for job posting parsing
+- AI Integration: Groq API for job posting parsing
 
 ## License
 
