@@ -63,14 +63,6 @@ export async function getFolders() {
             });
         });
         
-        // If no folders exist, create a default one
-        if (folders.length === 0) {
-            const defaultFolder = await createDefaultFolder();
-            if (defaultFolder) {
-                folders.push(defaultFolder);
-            }
-        }
-        
         return folders;
     } catch (error) {
         console.error('Error fetching folders:', error);
