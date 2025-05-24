@@ -17,8 +17,8 @@ import {
 // Keep API base URL for job parsing (still using server)
 const API_BASE_URL = 'http://localhost:3000/api';
 
-// Current folder state
-let currentFolderId = null;
+// Current folder state (in-memory and persisted)
+let currentFolderId = localStorage.getItem('currentFolderId') || null;
 
 // Data storage functions - now using Firebase
 async function getApplications(folderId = null) {
@@ -97,11 +97,17 @@ async function deleteFolder(folderId) {
 }
 
 function getCurrentFolderId() {
-    return currentFolderId;
+    // Try to get from memory first, then localStorage
+    return currentFolderId || localStorage.getItem('currentFolderId');
 }
 
 function setCurrentFolderId(folderId) {
     currentFolderId = folderId;
+    if (folderId) {
+        localStorage.setItem('currentFolderId', folderId);
+    } else {
+        localStorage.removeItem('currentFolderId');
+    }
 }
 
 // We will import these from ui.js when we need them
