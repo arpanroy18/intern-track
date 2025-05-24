@@ -32,8 +32,12 @@ async function renderApplications() {
         return matchesSearch && matchesFilter;
     });
     
-    // Sort by date applied (most recent first)
-    filteredApplications.sort((a, b) => new Date(b.dateApplied) - new Date(a.dateApplied));
+    // Sort by creation date (oldest first) so new applications appear at the bottom
+    filteredApplications.sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : new Date(a.dateApplied).getTime();
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : new Date(b.dateApplied).getTime();
+        return aTime - bTime;
+    });
     
     // Clear existing rows
     applicationsTable.innerHTML = '';
