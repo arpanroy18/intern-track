@@ -11,6 +11,66 @@
     --border-color: #e5e7eb;
 }
 
+/* Loading Container Styles */
+.loading-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.loading-container.fade-out {
+    opacity: 0;
+}
+
+.loading-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Smooth transitions for main containers */
+#auth-container,
+#app-container {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#auth-container.show,
+#app-container.show {
+    opacity: 1;
+}
+
 * {
     margin: 0;
     padding: 0;

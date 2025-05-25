@@ -13,6 +13,9 @@ setUIFunctions(renderApplications, updateStats, renderFolders);
 // Set UI callbacks for folder UI
 setUICallbacks(renderApplications, updateStats);
 
+// Track if initial auth check is complete
+let initialAuthCheckComplete = false;
+
 // Wait for Firebase to be loaded
 function waitForFirebase() {
     return new Promise((resolve) => {
@@ -42,6 +45,12 @@ async function initApp() {
         console.log('Setting up auth state listener...');
         // Listen for auth state changes to initialize app data
         onAuthStateChange(async (user) => {
+            if (!initialAuthCheckComplete) {
+                // This is the initial auth state check
+                initialAuthCheckComplete = true;
+                console.log('Initial auth state determined:', user ? 'signed in' : 'signed out');
+            }
+            
             if (user) {
                 console.log('User signed in:', user.email);
                 // User is signed in, load their data in the correct order
@@ -69,6 +78,11 @@ async function initApp() {
         console.log('App initialization complete');
     } catch (error) {
         console.error('Error initializing app:', error);
+        // Hide loading container even if there's an error
+        const loadingContainer = document.getElementById('loading-container');
+        if (loadingContainer) {
+            loadingContainer.style.display = 'none';
+        }
     }
     
     // Setup page size selector
