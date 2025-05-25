@@ -425,13 +425,13 @@
 
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyA-nat7l4unbPb_RZxnj25RpZoW8CxBUoY",
-            authDomain: "interntrack-ca34d.firebaseapp.com",
-            projectId: "interntrack-ca34d",
-            storageBucket: "interntrack-ca34d.firebasestorage.app",
-            messagingSenderId: "596082434370",
-            appId: "1:596082434370:web:0dc82c61d4d796fba8e8db",
-            measurementId: "G-19WN3F1BB0"
+            apiKey: process.env.FIREBASE_API_KEY,
+            authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+            appId: process.env.FIREBASE_APP_ID,
+            measurementId: process.env.FIREBASE_MEASUREMENT_ID
         };
 
         // Initialize Firebase
