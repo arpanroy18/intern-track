@@ -1,5 +1,5 @@
 // Firebase Firestore Database Service
-import { db } from './firebase-config.js';
+import { getDb } from './firebase-config.js';
 import { getCurrentUser } from './firebase-auth.js';
 import {
     collection,
@@ -22,17 +22,30 @@ const APPLICATIONS_COLLECTION = 'applications';
 const STATUS_EVENTS_COLLECTION = 'statusEvents';
 const FOLDERS_COLLECTION = 'folders';
 
+let db = null;
+
+// Initialize database connection
+async function initializeDb() {
+    if (!db) {
+        db = await getDb();
+    }
+    return db;
+}
+
 // Get user-specific collection reference
-function getUserApplicationsRef(userId) {
-    return collection(db, 'users', userId, APPLICATIONS_COLLECTION);
+async function getUserApplicationsRef(userId) {
+    const database = await initializeDb();
+    return collection(database, 'users', userId, APPLICATIONS_COLLECTION);
 }
 
-function getUserStatusEventsRef(userId) {
-    return collection(db, 'users', userId, STATUS_EVENTS_COLLECTION);
+async function getUserStatusEventsRef(userId) {
+    const database = await initializeDb();
+    return collection(database, 'users', userId, STATUS_EVENTS_COLLECTION);
 }
 
-function getUserFoldersRef(userId) {
-    return collection(db, 'users', userId, FOLDERS_COLLECTION);
+async function getUserFoldersRef(userId) {
+    const database = await initializeDb();
+    return collection(database, 'users', userId, FOLDERS_COLLECTION);
 }
 
 // Folder management functions
@@ -44,7 +57,7 @@ export async function getFolders() {
             return [];
         }
 
-        const foldersRef = getUserFoldersRef(user.uid);
+        const foldersRef = await getUserFoldersRef(user.uid);
         const q = query(foldersRef, orderBy('createdAt', 'desc'));
         const snapshot = await getDocs(q);
         
@@ -77,7 +90,7 @@ export async function createFolder(folderData) {
             throw new Error('No user logged in');
         }
 
-        const foldersRef = getUserFoldersRef(user.uid);
+        const foldersRef = await getUserFoldersRef(user.uid);
         
         const folder = {
             name: folderData.name,
@@ -110,7 +123,8 @@ export async function updateFolder(folderId, updatedData) {
             throw new Error('No user logged in');
         }
 
-        const folderRef = doc(db, 'users', user.uid, FOLDERS_COLLECTION, folderId);
+        const database = await initializeDb();
+        const folderRef = doc(database, 'users', user.uid, FOLDERS_COLLECTION, folderId);
         
         const updateData = {
             name: updatedData.name,
@@ -134,7 +148,7 @@ export async function deleteFolder(folderId) {
         }
 
         // First, check if this folder has any applications
-        const applicationsRef = getUserApplicationsRef(user.uid);
+        const applicationsRef = await getUserApplicationsRef(user.uid);
         const appsQuery = query(applicationsRef, where('folderId', '==', folderId));
         const appsSnapshot = await getDocs(appsQuery);
         
@@ -142,7 +156,8 @@ export async function deleteFolder(folderId) {
             throw new Error('Cannot delete folder that contains applications. Please move or delete applications first.');
         }
 
-        const folderRef = doc(db, 'users', user.uid, FOLDERS_COLLECTION, folderId);
+        const database = await initializeDb();
+        const folderRef = doc(database, 'users', user.uid, FOLDERS_COLLECTION, folderId);
         await deleteDoc(folderRef);
         
         return { success: true };
@@ -198,7 +213,7 @@ export async function getApplications(folderId = null) {
             return [];
         }
 
-        const applicationsRef = getUserApplicationsRef(user.uid);
+        const applicationsRef = await getUserApplicationsRef(user.uid);
         let q;
         
         if (folderId) {
@@ -268,7 +283,7 @@ export async function addApplication(application, folderId) {
         }
 
         console.log('Firebase: Adding application to folder:', folderId);
-        const applicationsRef = getUserApplicationsRef(user.uid);
+        const applicationsRef = await getUserApplicationsRef(user.uid);
         
         // Prepare application data
         const applicationData = {
@@ -308,7 +323,8 @@ export async function updateApplication(id, updatedApplication) {
             throw new Error('No user logged in');
         }
 
-        const applicationRef = doc(db, 'users', user.uid, APPLICATIONS_COLLECTION, id);
+        const database = await initializeDb();
+        const applicationRef = doc(database, 'users', user.uid, APPLICATIONS_COLLECTION, id);
         
         // Get existing application to check for status changes
         const existingDoc = await getDoc(applicationRef);
@@ -355,7 +371,8 @@ export async function deleteApplication(id) {
             throw new Error('No user logged in');
         }
 
-        const applicationRef = doc(db, 'users', user.uid, APPLICATIONS_COLLECTION, id);
+        const database = await initializeDb();
+        const applicationRef = doc(database, 'users', user.uid, APPLICATIONS_COLLECTION, id);
         await deleteDoc(applicationRef);
         
         // Also delete related status events
@@ -376,7 +393,7 @@ export async function clearAllApplications() {
             throw new Error('No user logged in');
         }
 
-        const applicationsRef = getUserApplicationsRef(user.uid);
+        const applicationsRef = await getUserApplicationsRef(user.uid);
         const snapshot = await getDocs(applicationsRef);
         
         const deletePromises = [];
@@ -385,7 +402,7 @@ export async function clearAllApplications() {
         });
         
         // Also clear status events
-        const statusEventsRef = getUserStatusEventsRef(user.uid);
+        const statusEventsRef = await getUserStatusEventsRef(user.uid);
         const statusSnapshot = await getDocs(statusEventsRef);
         statusSnapshot.forEach((doc) => {
             deletePromises.push(deleteDoc(doc.ref));
@@ -403,7 +420,7 @@ export async function clearAllApplications() {
 // Record status change event
 async function recordStatusEvent(userId, applicationId, oldStatus, newStatus) {
     try {
-        const statusEventsRef = getUserStatusEventsRef(userId);
+        const statusEventsRef = await getUserStatusEventsRef(userId);
         
         const eventData = {
             applicationId: applicationId,
@@ -424,7 +441,7 @@ async function recordStatusEvent(userId, applicationId, oldStatus, newStatus) {
 // Delete status events for an application
 async function deleteStatusEvents(userId, applicationId) {
     try {
-        const statusEventsRef = getUserStatusEventsRef(userId);
+        const statusEventsRef = await getUserStatusEventsRef(userId);
         const q = query(statusEventsRef, where('applicationId', '==', applicationId));
         const snapshot = await getDocs(q);
         
@@ -449,7 +466,7 @@ export async function getStatusEvents(applicationId) {
         }
 
         console.log('Fetching status events for application:', applicationId);
-        const statusEventsRef = getUserStatusEventsRef(user.uid);
+        const statusEventsRef = await getUserStatusEventsRef(user.uid);
         const q = query(
             statusEventsRef,
             where('applicationId', '==', applicationId)
@@ -485,14 +502,14 @@ export async function getStatusEvents(applicationId) {
 }
 
 // Listen to real-time updates
-export function subscribeToApplications(callback) {
+export async function subscribeToApplications(callback) {
     const user = getCurrentUser();
     if (!user) {
         console.error('No user logged in');
         return () => {}; // Return empty unsubscribe function
     }
 
-    const applicationsRef = getUserApplicationsRef(user.uid);
+    const applicationsRef = await getUserApplicationsRef(user.uid);
     const q = query(applicationsRef, orderBy('lastUpdated', 'desc'));
     
     return onSnapshot(q, (snapshot) => {
@@ -552,7 +569,8 @@ export async function fixApplicationDates() {
             if (app.dateApplied === tomorrow) {
                 console.log('Fixing date for application:', app.company);
                 
-                const applicationRef = doc(db, 'users', user.uid, APPLICATIONS_COLLECTION, app.id);
+                const database = await initializeDb();
+                const applicationRef = doc(database, 'users', user.uid, APPLICATIONS_COLLECTION, app.id);
                 await updateDoc(applicationRef, {
                     dateApplied: today
                 });

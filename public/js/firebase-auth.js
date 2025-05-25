@@ -1,5 +1,5 @@
 // Firebase Authentication Service
-import { auth } from './firebase-config.js';
+import { getAuth } from './firebase-config.js';
 
 // Import Firebase auth functions from CDN
 import { 
@@ -16,24 +16,32 @@ import {
 let currentUser = null;
 let authStateCallbacks = [];
 let authStateInitialized = false;
+let auth = null;
 
-// Initialize auth state listener with timeout fallback
-try {
-    onAuthStateChanged(auth, (user) => {
-        currentUser = user;
-        authStateInitialized = true;
-        authStateCallbacks.forEach(callback => callback(user));
+// Initialize auth state listener with proper Firebase initialization
+async function initializeAuth() {
+    try {
+        auth = await getAuth();
         
-        // Show/hide UI elements based on auth state
-        updateUIForAuthState(user);
-    });
-} catch (error) {
-    console.error('Error setting up auth state listener:', error);
-    // Fallback to show login screen
-    setTimeout(() => {
-        updateUIForAuthState(null);
-    }, 100);
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            authStateInitialized = true;
+            authStateCallbacks.forEach(callback => callback(user));
+            
+            // Show/hide UI elements based on auth state
+            updateUIForAuthState(user);
+        });
+    } catch (error) {
+        console.error('Error setting up auth state listener:', error);
+        // Fallback to show login screen
+        setTimeout(() => {
+            updateUIForAuthState(null);
+        }, 100);
+    }
 }
+
+// Initialize auth when module loads
+initializeAuth();
 
 // Add timeout fallback to prevent infinite loading
 setTimeout(() => {
@@ -41,7 +49,7 @@ setTimeout(() => {
         console.warn('Auth state check timed out, showing login screen');
         updateUIForAuthState(null);
     }
-}, 5000); // 5 second timeout
+}, 5000);
 
 // Register callback for auth state changes
 export function onAuthStateChange(callback) {
@@ -60,6 +68,10 @@ export function getCurrentUser() {
 // Sign up with email and password
 export async function signUp(email, password, displayName = '') {
     try {
+        if (!auth) {
+            auth = await getAuth();
+        }
+        
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
         // Update profile with display name if provided
@@ -79,6 +91,10 @@ export async function signUp(email, password, displayName = '') {
 // Sign in with email and password
 export async function signIn(email, password) {
     try {
+        if (!auth) {
+            auth = await getAuth();
+        }
+        
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         return { success: true, user: userCredential.user };
     } catch (error) {
@@ -90,6 +106,10 @@ export async function signIn(email, password) {
 // Sign in with Google
 export async function signInWithGoogle() {
     try {
+        if (!auth) {
+            auth = await getAuth();
+        }
+        
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
         return { success: true, user: result.user };
@@ -102,6 +122,10 @@ export async function signInWithGoogle() {
 // Sign out
 export async function signOutUser() {
     try {
+        if (!auth) {
+            auth = await getAuth();
+        }
+        
         await signOut(auth);
         return { success: true };
     } catch (error) {
