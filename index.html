@@ -423,33 +423,53 @@
         import { getAuth } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
         import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js';
 
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: process.env.FIREBASE_API_KEY,
-            authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-            messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-            appId: process.env.FIREBASE_APP_ID,
-            measurementId: process.env.FIREBASE_MEASUREMENT_ID
-        };
+        // Fetch Firebase configuration from server
+        async function initializeFirebase() {
+            try {
+                const response = await fetch('/api/firebase-config');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch Firebase config: ${response.status}`);
+                }
+                
+                const firebaseConfig = await response.json();
+                console.log('Firebase config loaded from server');
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
 
-        // Make Firebase services globally available
-        window.firebaseApp = app;
-        window.firebaseAuth = auth;
-        window.firebaseDb = db;
-        
-        // Signal that Firebase is ready
-        window.firebaseReady = true;
-        console.log('Firebase initialized and ready');
-        
-        // Dispatch event to signal Firebase is loaded
-        window.dispatchEvent(new Event('firebaseReady'));
+                // Make Firebase services globally available
+                window.firebaseApp = app;
+                window.firebaseAuth = auth;
+                window.firebaseDb = db;
+                
+                // Signal that Firebase is ready
+                window.firebaseReady = true;
+                console.log('Firebase initialized and ready');
+                
+                // Dispatch event to signal Firebase is loaded
+                window.dispatchEvent(new Event('firebaseReady'));
+            } catch (error) {
+                console.error('Failed to initialize Firebase:', error);
+                // Show error to user
+                const loadingContainer = document.getElementById('loading-container');
+                if (loadingContainer) {
+                    loadingContainer.innerHTML = `
+                        <div class="loading-content">
+                            <div style="color: #ef4444; text-align: center;">
+                                <h3>Configuration Error</h3>
+                                <p>Failed to load Firebase configuration. Please check your environment variables.</p>
+                                <p style="font-size: 0.9em; opacity: 0.8;">${error.message}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Initialize Firebase when the page loads
+        initializeFirebase();
     </script>
     <script type="module" src="public/js/main.js"></script>
 </body>
