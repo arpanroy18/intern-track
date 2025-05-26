@@ -436,8 +436,37 @@ app.post('/api/parse-job-posting', async (req, res) => {
   }
 });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    hasGroqKey: !!process.env.GROQ_API_KEY,
+    hasFirebaseVars: {
+      apiKey: !!process.env.FIREBASE_API_KEY,
+      authDomain: !!process.env.FIREBASE_AUTH_DOMAIN,
+      projectId: !!process.env.FIREBASE_PROJECT_ID,
+      storageBucket: !!process.env.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: !!process.env.FIREBASE_MESSAGING_SENDER_ID,
+      appId: !!process.env.FIREBASE_APP_ID,
+      measurementId: !!process.env.FIREBASE_MEASUREMENT_ID
+    }
+  });
+});
+
 // Get Firebase configuration
 app.get('/api/firebase-config', (req, res) => {
+  // Log environment variables for debugging (without exposing sensitive values)
+  console.log('Environment variables check:');
+  console.log('FIREBASE_API_KEY:', process.env.FIREBASE_API_KEY ? 'SET' : 'NOT SET');
+  console.log('FIREBASE_AUTH_DOMAIN:', process.env.FIREBASE_AUTH_DOMAIN ? 'SET' : 'NOT SET');
+  console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID ? 'SET' : 'NOT SET');
+  console.log('FIREBASE_STORAGE_BUCKET:', process.env.FIREBASE_STORAGE_BUCKET ? 'SET' : 'NOT SET');
+  console.log('FIREBASE_MESSAGING_SENDER_ID:', process.env.FIREBASE_MESSAGING_SENDER_ID ? 'SET' : 'NOT SET');
+  console.log('FIREBASE_APP_ID:', process.env.FIREBASE_APP_ID ? 'SET' : 'NOT SET');
+  console.log('FIREBASE_MEASUREMENT_ID:', process.env.FIREBASE_MEASUREMENT_ID ? 'SET' : 'NOT SET');
+
   const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,
     authDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -454,12 +483,15 @@ app.get('/api/firebase-config', (req, res) => {
   
   if (missingFields.length > 0) {
     console.error('Missing Firebase environment variables:', missingFields);
+    console.error('Firebase config object:', firebaseConfig);
     return res.status(500).json({ 
       error: 'Firebase configuration incomplete', 
-      missingFields 
+      missingFields,
+      debug: 'Check server logs for environment variable status'
     });
   }
   
+  console.log('Firebase configuration loaded successfully');
   res.json(firebaseConfig);
 });
 
