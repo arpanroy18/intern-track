@@ -463,8 +463,16 @@ app.get('/api/firebase-config', (req, res) => {
   res.json(firebaseConfig);
 });
 
+// Catch-all handler: send back index.html for any non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Open http://localhost:${PORT} in your browser`);
 });
+
+// Export the Express app for Vercel
+module.exports = app;
