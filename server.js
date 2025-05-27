@@ -3,12 +3,12 @@ const express = require('express');
 // const sqlite3 = require('sqlite3').verbose(); // Keep require, but DB instantiation will be commented
 const path = require('path');
 const cors = require('cors');
-// const { Groq } = require('groq-sdk'); // Temporarily comment out Groq
+const { Groq } = require('groq-sdk'); // Restore Groq import
 
 // Initialize Groq client
-// const groq = new Groq({ // Temporarily comment out Groq
-//   apiKey: process.env.GROQ_API_KEY
-// });
+const groq = new Groq({ // Restore Groq client
+  apiKey: process.env.GROQ_API_KEY
+});
 
 // Initialize express app
 const app = express();
@@ -96,6 +96,96 @@ app.post('/api/parse-job-posting', async (req, res) => {
   // ... code ...
 });
 */
+
+// Parse job posting endpoint using Groq API
+app.post('/api/parse-job-posting', async (req, res) => {
+  try {
+    const { jobPostingText } = req.body;
+    
+    if (!jobPostingText || !jobPostingText.trim()) {
+      return res.status(400).json({ error: 'Job posting text is required' });
+    }
+
+    if (!process.env.GROQ_API_KEY) {
+      return res.status(500).json({ 
+        error: 'Groq API key not configured',
+        details: 'Please set GROQ_API_KEY environment variable'
+      });
+    }
+
+    const prompt = `
+Please extract the following information from this job posting and return it as a JSON object:
+- company: The company name
+- role: The job title/role
+- location: The location (city, state, country, or "Remote")
+- description: A brief summary of the role (2-3 sentences max)
+
+Job Posting:
+${jobPostingText}
+
+Return only valid JSON in this format:
+{
+  "company": "Company Name",
+  "role": "Job Title",
+  "location": "Location",
+  "description": "Brief description"
+}`;
+
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: "llama3-8b-8192",
+      temperature: 0.1,
+      max_tokens: 500
+    });
+
+    const responseText = completion.choices[0]?.message?.content?.trim();
+    
+    if (!responseText) {
+      throw new Error('No response from Groq API');
+    }
+
+    // Try to parse the JSON response
+    let parsedData;
+    try {
+      parsedData = JSON.parse(responseText);
+    } catch (parseError) {
+      // If JSON parsing fails, try to extract JSON from the response
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsedData = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('Invalid JSON response from AI');
+      }
+    }
+
+    // Validate required fields
+    if (!parsedData.company || !parsedData.role) {
+      throw new Error('AI could not extract required information (company and role)');
+    }
+
+    res.json(parsedData);
+
+  } catch (error) {
+    console.error('Error parsing job posting:', error);
+    
+    if (error.message.includes('API key')) {
+      return res.status(500).json({ 
+        error: 'API configuration error',
+        details: error.message
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to parse job posting',
+      details: error.message
+    });
+  }
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

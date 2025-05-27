@@ -15,7 +15,7 @@ import {
 } from './firebase-db.js';
 
 // Keep API base URL for job parsing (still using server)
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 // Current folder state (in-memory and persisted)
 let currentFolderId = localStorage.getItem('currentFolderId') || null;
