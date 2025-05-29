@@ -286,11 +286,30 @@ export async function addApplication(application, folderId) {
         const applicationsRef = await getUserApplicationsRef(user.uid);
         
         // Prepare application data
+        // Validate and format dateApplied if provided, otherwise use current date
+        let dateApplied = application.dateApplied;
+        if (!dateApplied) {
+            dateApplied = new Date().toISOString().split('T')[0];
+        } else {
+            try {
+                const parsedDate = new Date(dateApplied);
+                if (isNaN(parsedDate)) {
+                    throw new Error('Invalid date format');
+                }
+                dateApplied = parsedDate.toISOString().split('T')[0];
+            } catch (error) {
+                console.error('Date parsing error:', error);
+                throw new Error('Invalid time value: dateApplied must be a valid date');
+            }
+        }
+        
+        console.log('Using dateApplied:', dateApplied);
+        
         const applicationData = {
             ...application,
             userId: user.uid,
             folderId: folderId,
-            dateApplied: new Date().toISOString().split('T')[0], // Use current local date in YYYY-MM-DD format
+            dateApplied: dateApplied,
             lastUpdated: serverTimestamp(),
             hadInterview: application.status === 'Interview' || application.status === 'Offer' ? true : false,
             createdAt: serverTimestamp()
@@ -335,12 +354,31 @@ export async function updateApplication(id, updatedApplication) {
         const existingData = existingDoc.data();
         
         // Prepare updated data
+        // Validate and format dateApplied
+        console.log('Original dateApplied:', updatedApplication.dateApplied);
+        let formattedDate;
+        
+        try {
+            // Try parsing as ISO date first
+            formattedDate = new Date(updatedApplication.dateApplied);
+            if (isNaN(formattedDate)) {
+                throw new Error('Invalid date format');
+            }
+            // Convert to YYYY-MM-DD format
+            formattedDate = formattedDate.toISOString().split('T')[0];
+        } catch (error) {
+            console.error('Date parsing error:', error);
+            throw new Error('Invalid time value: dateApplied must be a valid date');
+        }
+        
+        console.log('Formatted dateApplied:', formattedDate);
+        
         const updateData = {
             ...updatedApplication,
-            dateApplied: new Date(updatedApplication.dateApplied),
+            dateApplied: formattedDate,
             lastUpdated: serverTimestamp(),
-            hadInterview: updatedApplication.status === 'Interview' || 
-                         updatedApplication.status === 'Offer' || 
+            hadInterview: updatedApplication.status === 'Interview' ||
+                         updatedApplication.status === 'Offer' ||
                          existingData.hadInterview ? true : false
         };
 
