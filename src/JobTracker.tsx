@@ -318,75 +318,50 @@ const JobTracker = () => {
           </div>
           
 
-          {/* Season Tabs */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 overflow-x-auto pb-2">
-              {/* All Applications Tab */}
-              <button
-                onClick={() => setSelectedFolder(null)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                  !selectedFolder
-                    ? 'bg-slate-800 text-white border border-slate-600'
-                    : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300'
-                }`}
+          {/* Compact Season Selector */}
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <span>Season:</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedFolder?.id || ''}
+                onChange={(e) => {
+                  const folder = folders.find(f => f.id === e.target.value);
+                  setSelectedFolder(folder || null);
+                }}
+                className="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-400 min-w-32"
               >
-                <span>All Applications</span>
-                <span className="px-2 py-0.5 bg-slate-700 text-slate-300 rounded-full text-xs">
-                  {stats.total}
-                </span>
-              </button>
-
-              {/* Season Tabs */}
-              {folders.map(folder => {
-                const folderJobCount = jobs.filter(job => job.folderId === folder.id).length;
-                return (
-                  <button
-                    key={folder.id}
-                    onClick={() => setSelectedFolder(folder)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all relative whitespace-nowrap ${
-                      selectedFolder?.id === folder.id
-                        ? 'bg-slate-800 text-white border border-slate-600'
-                        : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300'
-                    }`}
-                  >
-                    <span>{folder.name}</span>
-                    <span className="px-2 py-0.5 bg-slate-700 text-slate-300 rounded-full text-xs">
-                      {folderJobCount}
-                    </span>
-                    {selectedFolder?.id === folder.id && (
-                      <div 
-                        className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full"
-                        style={{ backgroundColor: folder.color }}
-                      />
-                    )}
-                  </button>
-                );
-              })}
-
-              {/* Add Season Button */}
+                <option value="">All Applications</option>
+                {folders.map(folder => (
+                  <option key={folder.id} value={folder.id}>
+                    {folder.name}
+                  </option>
+                ))}
+              </select>
+              
               <button
                 onClick={() => setShowFolderModal(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-purple-400 transition-all whitespace-nowrap border border-dashed border-slate-600 hover:border-purple-400/50"
+                className="p-2 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-purple-400/50 rounded-lg transition-all"
+                title="Add Season"
               >
-                <Plus className="h-4 w-4" />
-                Add Season
+                <Plus className="h-4 w-4 text-gray-400 hover:text-purple-400" />
               </button>
-
-              {/* Season Management */}
+              
               {folders.length > 0 && (
                 <button
                   onClick={() => setShowFolderManagement(!showFolderManagement)}
-                  className="p-2 text-gray-400 hover:text-gray-300 hover:bg-slate-800/50 rounded-lg transition-all"
+                  className="p-2 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg transition-all"
                   title="Manage seasons"
                 >
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-4 w-4 text-gray-400 hover:text-gray-300" />
                 </button>
               )}
             </div>
 
             {/* Season Management Dropdown */}
             {showFolderManagement && (
-              <div className="mt-2 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl">
+              <div className="absolute mt-12 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl z-10">
                 <div className="p-3 border-b border-slate-700">
                   <h3 className="text-sm font-medium text-gray-200">Manage Seasons</h3>
                 </div>
