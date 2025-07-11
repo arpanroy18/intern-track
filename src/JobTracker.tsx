@@ -324,7 +324,6 @@ const JobTracker = () => {
 
           {/* Ultra-Compact Season Display */}
           <div className="mb-4 flex items-center gap-2">
-            <span className="text-sm text-gray-500">Season:</span>
             <div className="relative season-dropdown">
               <button
                 onClick={() => setShowSeasonDropdown(!showSeasonDropdown)}
