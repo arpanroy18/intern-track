@@ -211,16 +211,34 @@ const JobTracker = () => {
 
                 {/* Floating Accent */}
                 <div
-                  className={`absolute top-4 right-4 w-2 h-2 bg-${stat.color}-400 rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-300`}
+                  className={`absolute top-4 right-4 w-2 h-2 rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-300 ${
+                    stat.color === 'purple' ? 'bg-purple-400' :
+                    stat.color === 'blue' ? 'bg-blue-400' :
+                    stat.color === 'yellow' ? 'bg-yellow-400' :
+                    stat.color === 'green' ? 'bg-green-400' :
+                    'bg-slate-400'
+                  }`}
                 ></div>
 
                 <div className="flex items-center justify-between relative z-10">
                   <div className="space-y-4">
                     <div
-                      className={`p-4 bg-gradient-to-br ${stat.gradient} group-hover:bg-gradient-to-br group-hover:${stat.hoverGradient} rounded-2xl w-fit transition-all duration-300 shadow-lg border border-${stat.color}-500/20 group-hover:shadow-xl`}
+                      className={`p-4 rounded-2xl w-fit transition-all duration-300 shadow-lg group-hover:shadow-xl ${
+                        stat.color === 'purple' ? 'bg-gradient-to-br from-purple-500/25 to-purple-600/25 group-hover:from-purple-500/35 group-hover:to-purple-600/35 border border-purple-500/20' :
+                        stat.color === 'blue' ? 'bg-gradient-to-br from-blue-500/25 to-blue-600/25 group-hover:from-blue-500/35 group-hover:to-blue-600/35 border border-blue-500/20' :
+                        stat.color === 'yellow' ? 'bg-gradient-to-br from-yellow-500/25 to-yellow-600/25 group-hover:from-yellow-500/35 group-hover:to-yellow-600/35 border border-yellow-500/20' :
+                        stat.color === 'green' ? 'bg-gradient-to-br from-green-500/25 to-green-600/25 group-hover:from-green-500/35 group-hover:to-green-600/35 border border-green-500/20' :
+                        'bg-gradient-to-br from-slate-500/25 to-slate-600/25 group-hover:from-slate-500/35 group-hover:to-slate-600/35 border border-slate-500/20'
+                      }`}
                     >
                       <stat.icon
-                        className={`w-6 h-6 text-${stat.color}-300 group-hover:text-${stat.color}-200 transition-colors duration-300`}
+                        className={`w-6 h-6 transition-colors duration-300 ${
+                          stat.color === 'purple' ? 'text-purple-300 group-hover:text-purple-200' :
+                          stat.color === 'blue' ? 'text-blue-300 group-hover:text-blue-200' :
+                          stat.color === 'yellow' ? 'text-yellow-300 group-hover:text-yellow-200' :
+                          stat.color === 'green' ? 'text-green-300 group-hover:text-green-200' :
+                          'text-slate-300 group-hover:text-slate-200'
+                        }`}
                       />
                     </div>
                     <div>
@@ -231,12 +249,24 @@ const JobTracker = () => {
                   </div>
                   <div className="text-right space-y-2">
                     <p
-                      className={`text-5xl font-bold text-white group-hover:text-${stat.color}-100 transition-colors duration-300 drop-shadow-lg`}
+                      className={`text-5xl font-bold text-white transition-colors duration-300 drop-shadow-lg ${
+                        stat.color === 'purple' ? 'group-hover:text-purple-100' :
+                        stat.color === 'blue' ? 'group-hover:text-blue-100' :
+                        stat.color === 'yellow' ? 'group-hover:text-yellow-100' :
+                        stat.color === 'green' ? 'group-hover:text-green-100' :
+                        'group-hover:text-slate-100'
+                      }`}
                     >
                       {stat.value}
                     </p>
                     <div
-                      className={`w-12 h-1.5 bg-gradient-to-r from-${stat.color}-500 to-${stat.color}-400 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0`}
+                      className={`w-12 h-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0 ${
+                        stat.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-purple-400' :
+                        stat.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-400' :
+                        stat.color === 'yellow' ? 'bg-gradient-to-r from-yellow-500 to-yellow-400' :
+                        stat.color === 'green' ? 'bg-gradient-to-r from-green-500 to-green-400' :
+                        'bg-gradient-to-r from-slate-500 to-slate-400'
+                      }`}
                     ></div>
                   </div>
                 </div>
