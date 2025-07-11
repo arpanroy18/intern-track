@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { Job, JobStatus, TimelineEvent } from '../types';
+import { Job, JobStatus, TimelineEvent, Folder } from '../types';
 
 export interface DatabaseJob {
   id: string;
@@ -14,6 +14,18 @@ export interface DatabaseJob {
   status: JobStatus;
   date_applied: string;
   timeline: TimelineEvent[];
+  folder_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DatabaseFolder {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string;
+  color: string;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -23,19 +35,99 @@ const idMapping = new Map<number, string>();
 let nextId = 1;
 
 export class JobApplicationService {
-  static async getAllJobApplications(): Promise<Job[]> {
+  static async getAllJobApplications(folderId?: string): Promise<Job[]> {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) throw new Error('User not authenticated');
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('job_applications')
       .select('*')
-      .eq('user_id', user.user.id)
-      .order('date_applied', { ascending: false });
+      .eq('user_id', user.user.id);
+
+    if (folderId) {
+      query = query.eq('folder_id', folderId);
+    }
+
+    const { data, error } = await query.order('date_applied', { ascending: false });
 
     if (error) throw error;
 
     return data.map(this.mapDatabaseJobToJob);
+  }
+
+  static async getAllFolders(): Promise<Folder[]> {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('folders')
+      .select('*')
+      .eq('user_id', user.user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return data.map(this.mapDatabaseFolderToFolder);
+  }
+
+  static async createFolder(folderData: Omit<Folder, 'id' | 'createdAt' | 'updatedAt'>): Promise<Folder> {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) throw new Error('User not authenticated');
+
+    const databaseFolder = {
+      user_id: user.user.id,
+      name: folderData.name,
+      description: folderData.description,
+      color: folderData.color,
+      is_active: folderData.isActive
+    };
+
+    const { data, error } = await supabase
+      .from('folders')
+      .insert([databaseFolder])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return this.mapDatabaseFolderToFolder(data);
+  }
+
+  static async updateFolder(id: string, updates: Partial<Folder>): Promise<Folder> {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) throw new Error('User not authenticated');
+
+    const databaseUpdates: any = {};
+    
+    if (updates.name !== undefined) databaseUpdates.name = updates.name;
+    if (updates.description !== undefined) databaseUpdates.description = updates.description;
+    if (updates.color !== undefined) databaseUpdates.color = updates.color;
+    if (updates.isActive !== undefined) databaseUpdates.is_active = updates.isActive;
+
+    const { data, error } = await supabase
+      .from('folders')
+      .update(databaseUpdates)
+      .eq('id', id)
+      .eq('user_id', user.user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return this.mapDatabaseFolderToFolder(data);
+  }
+
+  static async deleteFolder(id: string): Promise<void> {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) throw new Error('User not authenticated');
+
+    const { error } = await supabase
+      .from('folders')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.user.id);
+
+    if (error) throw error;
   }
 
   static async createJobApplication(jobData: Omit<Job, 'id'>): Promise<Job> {
@@ -53,7 +145,8 @@ export class JobApplicationService {
       notes: jobData.notes,
       status: jobData.status,
       date_applied: jobData.dateApplied,
-      timeline: jobData.timeline || []
+      timeline: jobData.timeline || [],
+      folder_id: jobData.folderId || null
     };
 
     const { data, error } = await supabase
@@ -83,6 +176,7 @@ export class JobApplicationService {
     if (updates.status !== undefined) databaseUpdates.status = updates.status;
     if (updates.dateApplied !== undefined) databaseUpdates.date_applied = updates.dateApplied;
     if (updates.timeline !== undefined) databaseUpdates.timeline = updates.timeline;
+    if (updates.folderId !== undefined) databaseUpdates.folder_id = updates.folderId;
 
     const { data, error } = await supabase
       .from('job_applications')
@@ -176,7 +270,20 @@ export class JobApplicationService {
       notes: dbJob.notes,
       status: dbJob.status,
       dateApplied: dbJob.date_applied,
-      timeline: dbJob.timeline || []
+      timeline: dbJob.timeline || [],
+      folderId: dbJob.folder_id
+    };
+  }
+
+  private static mapDatabaseFolderToFolder(dbFolder: DatabaseFolder): Folder {
+    return {
+      id: dbFolder.id,
+      name: dbFolder.name,
+      description: dbFolder.description,
+      color: dbFolder.color,
+      isActive: dbFolder.is_active,
+      createdAt: dbFolder.created_at,
+      updatedAt: dbFolder.updated_at
     };
   }
 }

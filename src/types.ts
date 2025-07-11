@@ -6,6 +6,16 @@ export interface TimelineEvent {
 
 export type JobStatus = 'Applied' | 'Online Assessment' | 'Interview' | 'Offer' | 'Closed';
 
+export interface Folder {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Job {
   id: number;
   role: string;
@@ -18,6 +28,7 @@ export interface Job {
   status: JobStatus;
   dateApplied: string;
   timeline: TimelineEvent[];
+  folderId?: string;
 }
 
 export interface JobStats {
