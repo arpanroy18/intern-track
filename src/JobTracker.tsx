@@ -36,6 +36,7 @@ const JobTracker = () => {
   const [showAIParseModal, setShowAIParseModal] = useState<boolean>(false);
   const [jobDescription, setJobDescription] = useState<string>('');
   const [isParsingAI, setIsParsingAI] = useState<boolean>(false);
+  const [isFromAIParse, setIsFromAIParse] = useState<boolean>(false);
   const [folderFormData, setFolderFormData] = useState({
     name: '',
     description: '',
@@ -228,6 +229,7 @@ const JobTracker = () => {
         folderId: ''
       });
       setShowAddModal(false);
+      setIsFromAIParse(false);
     } catch (error) {
       console.error('Error adding job:', error);
       alert('Failed to add job. Please try again.');
@@ -341,45 +343,51 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
       const parsedData = JSON.parse(content);
       console.log('🔍 Parsed Data:', parsedData);
       
-      // Create new job from parsed data
-      const newJob: Omit<Job, 'id'> = {
+      // Populate form data with parsed information
+      setFormData({
         role: parsedData.role || 'Unknown Role',
         company: parsedData.company || 'Unknown Company',
         location: parsedData.location || 'Not specified',
         experienceRequired: parsedData.experienceRequired || 'Not specified',
-        skills: Array.isArray(parsedData.skills) ? parsedData.skills : [],
+        skills: Array.isArray(parsedData.skills) ? parsedData.skills.join(', ') : '',
         remote: parsedData.remote || false,
         notes: parsedData.notes || 'No additional notes',
-        status: 'Applied' as JobStatus,
-        dateApplied: new Date().toISOString().split('T')[0],
-        timeline: [
-          {
-            status: 'Applied' as JobStatus,
-            date: new Date().toISOString().split('T')[0],
-            note: 'Application submitted via AI parsing'
-          }
-        ],
-        folderId: selectedFolder?.id
-      };
+        folderId: selectedFolder?.id || ''
+      });
       
-      console.log('💼 Creating job:', newJob);
-      const createdJob = await JobApplicationService.createJobApplication(newJob);
-      setJobs([...jobs, createdJob]);
-      setJobDescription('');
+      // Close AI parse modal and show add job modal with parsed data
       setShowAIParseModal(false);
-      console.log('✅ Job created successfully!');
+      setIsFromAIParse(true);
+      setShowAddModal(true);
+      setJobDescription('');
+      console.log('✅ Job data parsed and ready for preview!');
       
     } catch (error) {
       console.error('❌ Error parsing job with AI:', error);
       console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace',
+        name: error instanceof Error ? error.name : 'Unknown error type'
       });
       alert('Failed to parse job description. Please try again or add the job manually.');
     } finally {
       setIsParsingAI(false);
     }
+  };
+
+  const handleCloseAddModal = () => {
+    setShowAddModal(false);
+    setIsFromAIParse(false);
+    setFormData({
+      role: '',
+      company: '',
+      location: '',
+      experienceRequired: '',
+      skills: '',
+      remote: false,
+      notes: '',
+      folderId: ''
+    });
   };
 
   const handleDeleteFolder = async (folderId: string) => {
@@ -1023,11 +1031,19 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
             <div className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full border border-slate-800 shadow-2xl">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-purple-400/10 rounded-xl">
-                  <Plus className="w-6 h-6 text-purple-400" />
+                  {isFromAIParse ? (
+                    <Sparkles className="w-6 h-6 text-purple-400" />
+                  ) : (
+                    <Plus className="w-6 h-6 text-purple-400" />
+                  )}
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold">Add New Application</h2>
-                  <p className="text-gray-500 text-sm">Fill in the job details manually</p>
+                  <h2 className="text-xl font-semibold">
+                    {isFromAIParse ? 'Review AI Parsed Job' : 'Add New Application'}
+                  </h2>
+                  <p className="text-gray-500 text-sm">
+                    {isFromAIParse ? 'Review and edit the extracted job details' : 'Fill in the job details manually'}
+                  </p>
                 </div>
               </div>
               
@@ -1139,7 +1155,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
               
               <div className="flex gap-3 justify-end mt-6">
                 <button
-                  onClick={() => setShowAddModal(false)}
+                  onClick={handleCloseAddModal}
                   className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
                 >
                   Cancel
@@ -1532,7 +1548,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                   ) : (
                     <>
                       <Wand2 className="w-4 h-4" />
-                      Parse & Add Job
+                      Parse & Preview Job
                     </>
                   )}
                 </button>
