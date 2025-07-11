@@ -33,6 +33,7 @@ const JobTracker = () => {
   const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
   const [showFolderModal, setShowFolderModal] = useState<boolean>(false);
   const [showFolderManagement, setShowFolderManagement] = useState<boolean>(false);
+  const [showSeasonDropdown, setShowSeasonDropdown] = useState<boolean>(false);
   const [folderFormData, setFolderFormData] = useState({
     name: '',
     description: '',
@@ -130,11 +131,14 @@ const JobTracker = () => {
       if (showFolderManagement && !(event.target as Element).closest('.folder-management')) {
         setShowFolderManagement(false);
       }
+      if (showSeasonDropdown && !(event.target as Element).closest('.season-dropdown')) {
+        setShowSeasonDropdown(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showUserMenu, showFolderManagement]);
+  }, [showUserMenu, showFolderManagement, showSeasonDropdown]);
 
   const handleAddJob = async () => {
     if (!formData.role.trim() || !formData.company.trim()) return;
@@ -321,9 +325,9 @@ const JobTracker = () => {
           {/* Ultra-Compact Season Display */}
           <div className="mb-4 flex items-center gap-2">
             <span className="text-sm text-gray-500">Season:</span>
-            <div className="relative">
+            <div className="relative season-dropdown">
               <button
-                onClick={() => setShowFolderManagement(!showFolderManagement)}
+                onClick={() => setShowSeasonDropdown(!showSeasonDropdown)}
                 className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg transition-all text-sm"
               >
                 {selectedFolder ? (
@@ -343,14 +347,14 @@ const JobTracker = () => {
               </button>
 
               {/* Season Dropdown */}
-              {showFolderManagement && (
+              {showSeasonDropdown && (
                 <div className="absolute top-full mt-1 left-0 min-w-48 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl z-50">
                   {/* Season Options */}
                   <div className="py-1">
                     <button
                       onClick={() => {
                         setSelectedFolder(null);
-                        setShowFolderManagement(false);
+                        setShowSeasonDropdown(false);
                       }}
                       className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-700/50 transition-colors ${
                         !selectedFolder ? 'text-purple-400 bg-slate-700/30' : 'text-gray-300'
@@ -369,7 +373,7 @@ const JobTracker = () => {
                           key={folder.id}
                           onClick={() => {
                             setSelectedFolder(folder);
-                            setShowFolderManagement(false);
+                            setShowSeasonDropdown(false);
                           }}
                           className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-700/50 transition-colors ${
                             selectedFolder?.id === folder.id ? 'text-purple-400 bg-slate-700/30' : 'text-gray-300'
@@ -396,7 +400,7 @@ const JobTracker = () => {
                     <button
                       onClick={() => {
                         setShowFolderModal(true);
-                        setShowFolderManagement(false);
+                        setShowSeasonDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-purple-400 hover:bg-slate-700/50 transition-colors"
                     >
@@ -408,8 +412,8 @@ const JobTracker = () => {
                     {folders.length > 0 && (
                       <button
                         onClick={() => {
-                          // Keep dropdown open but show management options
-                          console.log('Manage seasons - could expand inline or show edit options');
+                          setShowFolderManagement(true);
+                          setShowSeasonDropdown(false);
                         }}
                         className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-gray-300 hover:bg-slate-700/50 transition-colors"
                       >
@@ -424,6 +428,55 @@ const JobTracker = () => {
               )}
             </div>
           </div>
+
+          {/* Season Management Dropdown */}
+          {showFolderManagement && (
+            <div className="mb-4 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl folder-management">
+              <div className="p-3 border-b border-slate-700">
+                <h3 className="text-sm font-medium text-gray-200">Manage Seasons</h3>
+              </div>
+              <div className="max-h-48 overflow-y-auto">
+                {folders.map(folder => (
+                  <div key={folder.id} className="flex items-center justify-between p-3 hover:bg-slate-700/50 transition-colors">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: folder.color }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-200 truncate">{folder.name}</div>
+                        {folder.description && (
+                          <div className="text-xs text-gray-400 truncate">{folder.description}</div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => {
+                          // TODO: Add edit functionality
+                          console.log('Edit folder:', folder.id);
+                        }}
+                        className="p-1 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded transition-colors"
+                        title="Edit season"
+                      >
+                        <Edit2 className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleDeleteFolder(folder.id);
+                          setShowFolderManagement(false);
+                        }}
+                        className="p-1 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
+                        title="Delete season"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Search Bar, Filter Toggle, and Add Application Button */}
           <div className="flex gap-3 items-center justify-between relative">
