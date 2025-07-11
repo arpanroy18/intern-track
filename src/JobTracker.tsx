@@ -538,16 +538,16 @@ const JobTracker = () => {
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {(searchTerm || selectedStatusFilter !== 'All' ? filteredJobs : jobs).map(job => (
                   <div
                     key={job.id}
-                    className="bg-slate-800/50 rounded-xl p-5 hover:bg-slate-800 transition-all border border-slate-700/50 hover:border-slate-600 cursor-pointer"
+                    className="bg-slate-800/50 rounded-xl p-3 hover:bg-slate-800 transition-all border border-slate-700/50 hover:border-slate-600 cursor-pointer"
                     onClick={() => showJobDetails(job)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-4 mb-3">
+                        <div className="flex items-center gap-4 mb-2">
                           <h3 className="text-lg font-medium">{job.role}</h3>
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
                             {job.status}
@@ -574,7 +574,7 @@ const JobTracker = () => {
                           </div>
                         </div>
                         
-                        <div className="mt-3 flex items-center gap-2">
+                        <div className="mt-2 flex items-center gap-2">
                           {job.skills.slice(0, 3).map((skill, index) => (
                             <span key={index} className="px-2 py-1 bg-slate-700 rounded text-xs">
                               {skill}
