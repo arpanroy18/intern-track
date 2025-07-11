@@ -317,11 +317,12 @@ const JobTracker = () => {
             </div>
           </div>
           
-          {/* Folder Selector - Integrated into header */}
-          <div className="flex gap-3 items-center justify-between mb-6">
+
+          {/* Search Bar, Filter Toggle, Folder Selector, and Add Application Button */}
+          <div className="flex gap-3 items-center justify-between relative">
             <div className="flex gap-3 items-center">
-              {/* Subtle Folder Selector */}
-              <div className="relative">
+              {/* Folder Selector */}
+              <div className="relative folder-management">
                 <div className="flex items-center gap-2">
                   <Folder className="h-4 w-4 text-gray-400" />
                   <select
@@ -330,7 +331,7 @@ const JobTracker = () => {
                       const folder = folders.find(f => f.id === e.target.value);
                       setSelectedFolder(folder || null);
                     }}
-                    className="bg-transparent border-none text-gray-300 focus:outline-none focus:text-white transition-colors text-sm cursor-pointer hover:text-white"
+                    className="bg-transparent border-none text-gray-300 focus:outline-none focus:text-white transition-colors text-sm cursor-pointer hover:text-white pr-2"
                   >
                     <option value="" className="bg-slate-800">All Applications</option>
                     {folders.map(folder => (
@@ -339,24 +340,22 @@ const JobTracker = () => {
                       </option>
                     ))}
                   </select>
+                  {folders.length > 0 && (
+                    <button
+                      onClick={() => setShowFolderManagement(!showFolderManagement)}
+                      className="p-1 text-gray-400 hover:text-gray-300 hover:bg-slate-800/50 rounded transition-all"
+                      title="Manage folders"
+                    >
+                      <Settings className="h-3 w-3" />
+                    </button>
+                  )}
                 </div>
                 {selectedFolder && (
                   <div 
-                    className="absolute -bottom-0.5 left-0 h-0.5 rounded-full transition-all"
-                    style={{ backgroundColor: selectedFolder.color, width: '100%' }}
+                    className="absolute -bottom-0.5 left-5 h-0.5 rounded-full transition-all"
+                    style={{ backgroundColor: selectedFolder.color, width: 'calc(100% - 20px)' }}
                   />
                 )}
-              </div>
-
-              {/* Folder management dropdown */}
-              <div className="relative folder-management">
-                <button
-                  onClick={() => setShowFolderManagement(!showFolderManagement)}
-                  className="p-2 text-gray-400 hover:text-gray-300 hover:bg-slate-800/50 rounded-lg transition-all"
-                  title="Manage folders"
-                >
-                  <Settings className="h-4 w-4" />
-                </button>
 
                 {/* Folder Management Dropdown */}
                 {showFolderManagement && (
@@ -413,23 +412,7 @@ const JobTracker = () => {
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Current folder indicator */}
-            {selectedFolder && (
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <div
-                  className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: selectedFolder.color }}
-                />
-                <span>{selectedFolder.name}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Search Bar, Filter Toggle, and Add Application Button */}
-          <div className="flex gap-3 items-center justify-between relative">
-            <div className="flex gap-3 items-center">
               {/* Search Bar */}
               <div className="relative flex-1 max-w-md">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -502,13 +485,24 @@ const JobTracker = () => {
             </div>
             
             {/* Add Application Button */}
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
-            >
-              <Sparkles className="w-4 h-4" />
-              Add Application
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
+              >
+                <Sparkles className="w-4 h-4" />
+                Add Application
+              </button>
+              
+              {/* Quick Create Folder Button */}
+              <button
+                onClick={() => setShowFolderModal(true)}
+                className="p-2.5 text-gray-400 hover:text-purple-400 hover:bg-purple-400/10 rounded-lg transition-all"
+                title="Create new folder"
+              >
+                <FolderPlus className="h-4 w-4" />
+              </button>
+            </div>
           </div>
           
           {/* Search/Filter Results Info */}
