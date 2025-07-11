@@ -615,7 +615,7 @@ ${jobDescription}
 Extract these fields:
 - role (job title, only the job title. If it is something like Software Developer (Fall 2025), only return "Software Developer")
 - company (company name)
-- location (job location)
+- location (job location. Do not need to include other details. For example, Canada not Canada (Remote), just include the country and city if given.)
 - experienceRequired (years of experience required, otherwise "Not specified")
 - skills (array of key skills mentioned, maximum 6)
 - remote (boolean - true if remote work is mentioned)
@@ -817,7 +817,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
               <div className="relative">
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`filter-button h-11 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  className={`h-11 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                     showFilters || selectedStatusFilter !== 'All'
                       ? 'bg-blue-500 text-white shadow-lg'
                       : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
