@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Briefcase, MapPin, Plus, Trash2, Edit2, Check, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter, LogOut, User } from 'lucide-react';
 import { Job, JobStats, JobStatus, TimelineEvent } from './types';
 import { useAuth } from './contexts/AuthContext';
+import { JobApplicationService } from './services/jobApplicationService';
 
 const JobTracker = () => {
   const { signOut } = useAuth();
@@ -13,6 +14,7 @@ const JobTracker = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [jobDescription, setJobDescription] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingData, setEditingData] = useState<Partial<Job>>({});
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -38,6 +40,24 @@ const JobTracker = () => {
     remote: false,
     notes: ''
   });
+
+  // Load jobs from Supabase on component mount
+  useEffect(() => {
+    loadJobs();
+  }, []);
+
+  const loadJobs = async () => {
+    try {
+      setIsLoading(true);
+      const jobsData = await JobApplicationService.getAllJobApplications();
+      setJobs(jobsData);
+    } catch (error) {
+      console.error('Error loading jobs:', error);
+      alert('Failed to load job applications. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Search function
   const searchJobs = (term: string, jobList: Job[]): Job[] => {
@@ -88,13 +108,12 @@ const JobTracker = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showUserMenu]);
 
-  const handleAddJob = () => {
+  const handleAddJob = async () => {
     if (!formData.role.trim() || !formData.company.trim()) return;
 
     setIsProcessing(true);
     try {
-      const newJob: Job = {
-        id: Date.now(),
+      const newJob: Omit<Job, 'id'> = {
         role: formData.role,
         company: formData.company,
         location: formData.location || 'Not specified',
@@ -113,7 +132,8 @@ const JobTracker = () => {
         ]
       };
       
-      setJobs([...jobs, newJob]);
+      const createdJob = await JobApplicationService.createJobApplication(newJob);
+      setJobs([...jobs, createdJob]);
       setFormData({
         role: '',
         company: '',
@@ -126,28 +146,31 @@ const JobTracker = () => {
       setJobDescription('');
       setShowAddModal(false);
     } catch (error) {
+      console.error('Error adding job:', error);
       alert('Failed to add job. Please try again.');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const deleteJob = (id: number) => {
-    setJobs(jobs.filter(job => job.id !== id));
+  const deleteJob = async (id: number) => {
+    try {
+      await JobApplicationService.deleteJobApplication(id);
+      setJobs(jobs.filter(job => job.id !== id));
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      alert('Failed to delete job. Please try again.');
+    }
   };
 
-  const updateStatus = (id: number, status: JobStatus) => {
-    setJobs(jobs.map(job => {
-      if (job.id === id) {
-        const updatedTimeline: TimelineEvent[] = [...(job.timeline || []), {
-          status,
-          date: new Date().toISOString().split('T')[0],
-          note: `Status changed to ${status}`
-        }];
-        return { ...job, status, timeline: updatedTimeline };
-      }
-      return job;
-    }));
+  const updateStatus = async (id: number, status: JobStatus) => {
+    try {
+      const updatedJob = await JobApplicationService.updateJobStatus(id, status);
+      setJobs(jobs.map(job => job.id === id ? updatedJob : job));
+    } catch (error) {
+      console.error('Error updating job status:', error);
+      alert('Failed to update job status. Please try again.');
+    }
   };
 
   const showJobDetails = (job: Job) => {
@@ -201,7 +224,7 @@ const JobTracker = () => {
             </div>
             
             {/* User Menu */}
-            <div className="relative user-menu">
+            <div className="relative user-menu z-50">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="w-10 h-10 bg-slate-800/50 hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors border border-slate-700/50"
@@ -210,13 +233,13 @@ const JobTracker = () => {
               </button>
               
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2">
+                <div className="absolute right-0 mt-2 w-36 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2 z-50">
                   <button
                     onClick={() => {
                       signOut();
                       setShowUserMenu(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out
@@ -457,7 +480,14 @@ const JobTracker = () => {
           
           {/* Applications List */}
           <div className="p-6">
-            {jobs.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Loader className="w-8 h-8 text-purple-400 animate-spin" />
+                </div>
+                <p className="text-gray-500 mb-4">Loading applications...</p>
+              </div>
+            ) : jobs.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <FileText className="w-8 h-8 text-gray-600" />
