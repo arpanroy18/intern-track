@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, MapPin, Plus, Trash2, Edit2, Check, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter, LogOut, User, Folder, Settings } from 'lucide-react';
-import { Job, JobStats, JobStatus, TimelineEvent, Folder as FolderType } from './types';
+import { Briefcase, MapPin, Plus, Trash2, Edit2, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter, LogOut, User, Settings } from 'lucide-react';
+import { Job, JobStats, JobStatus, Folder as FolderType } from './types';
 import { useAuth } from './contexts/AuthContext';
 import { JobApplicationService } from './services/jobApplicationService';
 
 const JobTracker = () => {
-  const { signOut } = useAuth();
+  const { signOut, user, updateEmail, updatePassword } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showDetailsModal, setShowDetailsModal] = useState<boolean>(false);
   const [showTimelineModal, setShowTimelineModal] = useState<boolean>(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [jobDescription, setJobDescription] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editingData, setEditingData] = useState<Partial<Job>>({});
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [stats, setStats] = useState<JobStats>({
@@ -32,12 +29,20 @@ const JobTracker = () => {
   const [folders, setFolders] = useState<FolderType[]>([]);
   const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
   const [showFolderModal, setShowFolderModal] = useState<boolean>(false);
+  const [showUserSettingsModal, setShowUserSettingsModal] = useState<boolean>(false);
   const [showFolderManagement, setShowFolderManagement] = useState<boolean>(false);
   const [showSeasonDropdown, setShowSeasonDropdown] = useState<boolean>(false);
   const [folderFormData, setFolderFormData] = useState({
     name: '',
     description: '',
     color: '#6366f1'
+  });
+  
+  const [userSettingsFormData, setUserSettingsFormData] = useState({
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
 
   // Manual form fields for adding jobs
@@ -62,6 +67,47 @@ const JobTracker = () => {
   useEffect(() => {
     loadJobs();
   }, [selectedFolder]);
+
+  // Populate email field when user settings modal opens
+  useEffect(() => {
+    if (showUserSettingsModal && user?.email) {
+      setUserSettingsFormData({ ...userSettingsFormData, email: user.email });
+    }
+  }, [showUserSettingsModal, user?.email]);
+
+  const handleUpdateEmail = async () => {
+    try {
+      const { error } = await updateEmail(userSettingsFormData.email);
+      if (error) throw error;
+      alert('Email updated successfully! Please check your new email for verification.');
+      setShowUserSettingsModal(false);
+      setUserSettingsFormData({ ...userSettingsFormData, email: '' });
+    } catch (error: any) {
+      console.error('Error updating email:', error);
+      alert(error.message || 'Failed to update email. Please try again.');
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (userSettingsFormData.newPassword !== userSettingsFormData.confirmPassword) {
+      alert('New passwords do not match.');
+      return;
+    }
+    if (userSettingsFormData.newPassword.length < 6) {
+      alert('Password must be at least 6 characters long.');
+      return;
+    }
+    try {
+      const { error } = await updatePassword(userSettingsFormData.newPassword);
+      if (error) throw error;
+      alert('Password updated successfully!');
+      setShowUserSettingsModal(false);
+      setUserSettingsFormData({ ...userSettingsFormData, currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error: any) {
+      console.error('Error updating password:', error);
+      alert(error.message || 'Failed to update password. Please try again.');
+    }
+  };
 
   const loadJobs = async () => {
     try {
@@ -177,7 +223,6 @@ const JobTracker = () => {
         notes: '',
         folderId: ''
       });
-      setJobDescription('');
       setShowAddModal(false);
     } catch (error) {
       console.error('Error adding job:', error);
@@ -264,12 +309,6 @@ const JobTracker = () => {
     'Closed': 'text-red-400 bg-red-400/10'
   };
 
-  const statCards = [
-    { label: 'Total Applications', value: stats.total, icon: BarChart3, color: 'text-purple-400', bg: 'bg-purple-400/10' },
-    { label: 'Applied', value: stats.applied, icon: FileText, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-    { label: 'Interview', value: stats.interview, icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
-    { label: 'Offer', value: stats.offer, icon: TrendingUp, color: 'text-green-400', bg: 'bg-green-400/10' },
-  ];
 
   return (
     <div className="min-h-screen bg-slate-950 text-gray-100 p-6 relative overflow-hidden">
@@ -305,7 +344,17 @@ const JobTracker = () => {
               </button>
               
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-36 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-40 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2 z-50">
+                  <button
+                    onClick={() => {
+                      setShowUserSettingsModal(true);
+                      setShowUserMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </button>
                   <button
                     onClick={() => {
                       signOut();
@@ -1220,6 +1269,93 @@ const JobTracker = () => {
                   >
                     Create Season
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showUserSettingsModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+            <div className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-400/10 rounded-lg">
+                    <Settings className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <h2 className="text-xl font-semibold">User Settings</h2>
+                </div>
+                <button
+                  onClick={() => setShowUserSettingsModal(false)}
+                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Email Section */}
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Change Email</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-2">
+                        New Email
+                      </label>
+                      <input
+                        type="email"
+                        value={userSettingsFormData.email}
+                        onChange={(e) => setUserSettingsFormData({...userSettingsFormData, email: e.target.value})}
+                        placeholder="Enter new email address"
+                        className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                      />
+                    </div>
+                    <button
+                      onClick={handleUpdateEmail}
+                      disabled={!userSettingsFormData.email || userSettingsFormData.email === user?.email}
+                      className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+                    >
+                      Update Email
+                    </button>
+                  </div>
+                </div>
+
+                {/* Password Section */}
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Change Password</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-2">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={userSettingsFormData.newPassword}
+                        onChange={(e) => setUserSettingsFormData({...userSettingsFormData, newPassword: e.target.value})}
+                        placeholder="Enter new password"
+                        className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-2">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={userSettingsFormData.confirmPassword}
+                        onChange={(e) => setUserSettingsFormData({...userSettingsFormData, confirmPassword: e.target.value})}
+                        placeholder="Confirm new password"
+                        className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                      />
+                    </div>
+                    <button
+                      onClick={handleUpdatePassword}
+                      disabled={!userSettingsFormData.newPassword || !userSettingsFormData.confirmPassword}
+                      className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+                    >
+                      Update Password
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
