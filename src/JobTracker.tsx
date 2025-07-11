@@ -255,8 +255,8 @@ const JobTracker = () => {
   });
   const [showFolderModal, setShowFolderModal] = useState<boolean>(false);
   const [showUserSettingsModal, setShowUserSettingsModal] = useState<boolean>(false);
-  const [showFolderManagement, setShowFolderManagement] = useState<boolean>(false);
   const [showSeasonDropdown, setShowSeasonDropdown] = useState<boolean>(false);
+  const [showSeasonsManagementModal, setShowSeasonsManagementModal] = useState<boolean>(false);
   const [showAIParseModal, setShowAIParseModal] = useState<boolean>(false);
   const [jobDescription, setJobDescription] = useState<string>('');
   const [isParsingAI, setIsParsingAI] = useState<boolean>(false);
@@ -440,9 +440,6 @@ const JobTracker = () => {
       if (showUserMenu && !(event.target as Element).closest('.user-menu')) {
         setShowUserMenu(false);
       }
-      if (showFolderManagement && !(event.target as Element).closest('.folder-management')) {
-        setShowFolderManagement(false);
-      }
       if (showSeasonDropdown && !(event.target as Element).closest('.season-dropdown')) {
         setShowSeasonDropdown(false);
       }
@@ -450,7 +447,7 @@ const JobTracker = () => {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showUserMenu, showFolderManagement, showSeasonDropdown]);
+  }, [showUserMenu, showSeasonDropdown]);
 
   const handleAddJob = useCallback(async () => {
     if (!formData.role.trim() || !formData.company.trim()) return;
@@ -742,54 +739,6 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
           
 
 
-          {/* Season Management Dropdown */}
-          {showFolderManagement && (
-            <div className="mb-4 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl folder-management">
-              <div className="p-3 border-b border-slate-700">
-                <h3 className="text-sm font-medium text-gray-200">Manage Seasons</h3>
-              </div>
-              <div className="max-h-48 overflow-y-auto">
-                {folders.map(folder => (
-                  <div key={folder.id} className="flex items-center justify-between p-3 hover:bg-slate-700/50 transition-colors">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div
-                        className="w-3 h-3 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: folder.color }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-200 truncate">{folder.name}</div>
-                        {folder.description && (
-                          <div className="text-xs text-gray-400 truncate">{folder.description}</div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => {
-                          // TODO: Add edit functionality
-                          console.log('Edit folder:', folder.id);
-                        }}
-                        className="p-1 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded transition-colors"
-                        title="Edit season"
-                      >
-                        <Edit2 className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleDeleteFolder(folder.id);
-                          setShowFolderManagement(false);
-                        }}
-                        className="p-1 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
-                        title="Delete season"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Search Bar, Filter Toggle, Season Selector, and Add Application Button */}
           <div className="flex gap-3 items-center justify-between relative">
@@ -953,7 +902,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                       {folders.length > 0 && (
                         <button
                           onClick={() => {
-                            setShowFolderManagement(true);
+                            setShowSeasonsManagementModal(true);
                             setShowSeasonDropdown(false);
                           }}
                           className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-gray-300 hover:bg-slate-700/50 transition-colors"
@@ -1628,6 +1577,106 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                   )}
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Seasons Management Modal */}
+        {showSeasonsManagementModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+            <div className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-slate-800 shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-400/10 rounded-lg">
+                    <Settings className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <h2 className="text-xl font-semibold">Manage Seasons</h2>
+                </div>
+                <button
+                  onClick={() => setShowSeasonsManagementModal(false)}
+                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {folders.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Calendar className="w-8 h-8 text-gray-600" />
+                    </div>
+                    <p className="text-gray-500 mb-4">No seasons created yet</p>
+                    <button
+                      onClick={() => {
+                        setShowSeasonsManagementModal(false);
+                        setShowFolderModal(true);
+                      }}
+                      className="text-purple-400 hover:text-purple-300 text-sm font-medium"
+                    >
+                      Create your first season →
+                    </button>
+                  </div>
+                ) : (
+                  folders.map(folder => (
+                    <div key={folder.id} className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 hover:border-slate-600 transition-all">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div
+                            className="w-4 h-4 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: folder.color }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-lg font-medium text-gray-200 truncate">{folder.name}</div>
+                            {folder.description && (
+                              <div className="text-sm text-gray-400 truncate mt-1">{folder.description}</div>
+                            )}
+                            <div className="text-xs text-gray-500 mt-2">
+                              {jobs.filter(job => job.folderId === folder.id).length} applications
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              // TODO: Add edit functionality
+                              console.log('Edit folder:', folder.id);
+                            }}
+                            className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors"
+                            title="Edit season"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleDeleteFolder(folder.id);
+                            }}
+                            className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                            title="Delete season"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {folders.length > 0 && (
+                <div className="mt-6 pt-4 border-t border-slate-700">
+                  <button
+                    onClick={() => {
+                      setShowSeasonsManagementModal(false);
+                      setShowFolderModal(true);
+                    }}
+                    className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add New Season
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
