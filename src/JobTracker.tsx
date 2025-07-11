@@ -750,7 +750,7 @@ const JobTracker = () => {
         {/* Main Content Area */}
         <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
           <div className="p-3 border-b border-slate-800">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
+            <h2 className="text-xl font-semibold flex items-center gap-2 ml-6">
               <Briefcase className="w-5 h-5 text-purple-400" />
               Applications
               <span className="text-sm text-gray-500 ml-2">Manage your job applications</span>
