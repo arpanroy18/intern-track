@@ -753,7 +753,7 @@ const JobTracker = () => {
             <h2 className="text-xl font-semibold flex items-center gap-2 ml-6">
               <Briefcase className="w-5 h-5 text-purple-400" />
               Applications
-              <span className="text-sm text-gray-500 ml-2">Manage your job applications</span>
+              
             </h2>
           </div>
           
