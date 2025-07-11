@@ -699,10 +699,9 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-semibold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 InternTrack
               </h1>
-              <p className="text-gray-500 text-sm">AI-powered tracking for your career journey</p>
             </div>
             
             {/* User Menu */}
