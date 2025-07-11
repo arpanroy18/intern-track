@@ -249,7 +249,10 @@ const JobTracker = () => {
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<JobStatus | 'All'>('All');
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [folders, setFolders] = useState<FolderType[]>([]);
-  const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(() => {
+    const savedFolderId = localStorage.getItem('selectedFolderId');
+    return savedFolderId ? { id: savedFolderId } as FolderType : null;
+  });
   const [showFolderModal, setShowFolderModal] = useState<boolean>(false);
   const [showUserSettingsModal, setShowUserSettingsModal] = useState<boolean>(false);
   const [showFolderManagement, setShowFolderManagement] = useState<boolean>(false);
@@ -294,6 +297,30 @@ const JobTracker = () => {
   useEffect(() => {
     loadJobs();
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFolder]);
+
+  // Restore selected folder from localStorage after folders are loaded
+  useEffect(() => {
+    const savedFolderId = localStorage.getItem('selectedFolderId');
+    if (savedFolderId && folders.length > 0) {
+      const savedFolder = folders.find(folder => folder.id === savedFolderId);
+      if (savedFolder) {
+        setSelectedFolder(savedFolder);
+      } else {
+        // If saved folder doesn't exist anymore, clear localStorage
+        localStorage.removeItem('selectedFolderId');
+        setSelectedFolder(null);
+      }
+    }
+  }, [folders]);
+
+  // Save selected folder to localStorage whenever it changes
+  useEffect(() => {
+    if (selectedFolder) {
+      localStorage.setItem('selectedFolderId', selectedFolder.id);
+    } else {
+      localStorage.removeItem('selectedFolderId');
+    }
   }, [selectedFolder]);
 
   // Populate email field when user settings modal opens
