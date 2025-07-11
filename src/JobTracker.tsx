@@ -442,7 +442,7 @@ const JobTracker = () => {
     };
   }, [jobs]);
 
-  // Close user menu when clicking outside
+  // Close user menu and filters when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (showUserMenu && !(event.target as Element).closest('.user-menu')) {
@@ -451,11 +451,14 @@ const JobTracker = () => {
       if (showSeasonDropdown && !(event.target as Element).closest('.season-dropdown')) {
         setShowSeasonDropdown(false);
       }
+      if (showFilters && !(event.target as Element).closest('.filter-panel')) {
+        setShowFilters(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showUserMenu, showSeasonDropdown]);
+  }, [showUserMenu, showSeasonDropdown, showFilters]);
 
   const handleAddJob = useCallback(async () => {
     if (!formData.role.trim() || !formData.company.trim()) return;
@@ -610,7 +613,7 @@ Job Description:
 ${jobDescription}
 
 Extract these fields:
-- role (job title)
+- role (job title, only the job title. If it is something like Software Developer (Fall 2025), only return "Software Developer")
 - company (company name)
 - location (job location)
 - experienceRequired (years of experience required, otherwise "Not specified")
@@ -830,7 +833,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                 </button>
 
                 {/* Status Filter Buttons - Horizontal Sliding Panel */}
-                <div className={`absolute top-0 left-full ml-3 transition-all duration-300 ease-out z-50 ${
+                <div className={`absolute top-0 left-full ml-3 transition-all duration-300 ease-out z-50 filter-panel ${
                   showFilters 
                     ? 'opacity-100 translate-x-0 pointer-events-auto' 
                     : 'opacity-0 -translate-x-4 pointer-events-none'
@@ -1095,8 +1098,14 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
 
         {/* Add Job Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full border border-slate-800 shadow-2xl">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={handleCloseAddModal}
+          >
+            <div 
+              className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full border border-slate-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-purple-400/10 rounded-xl">
                   {isFromAIParse ? (
@@ -1252,8 +1261,14 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
 
         {/* Job Details Modal */}
         {showDetailsModal && selectedJob && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-slate-800 shadow-2xl">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => setShowDetailsModal(false)}
+          >
+            <div 
+              className="bg-slate-900 rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-slate-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2 className="text-2xl font-semibold mb-2">{selectedJob.role}</h2>
@@ -1323,8 +1338,14 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
 
         {/* Timeline Modal */}
         {showTimelineModal && selectedJob && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => setShowTimelineModal(false)}
+          >
+            <div 
+              className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2 className="text-xl font-semibold mb-1">Application Timeline</h2>
@@ -1389,8 +1410,14 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
 
         {/* Create Season Modal */}
         {showFolderModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => setShowFolderModal(false)}
+          >
+            <div 
+              className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-purple-400/10 rounded-lg">
@@ -1469,8 +1496,14 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
         )}
 
         {showUserSettingsModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => setShowUserSettingsModal(false)}
+          >
+            <div 
+              className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-purple-400/10 rounded-lg">
@@ -1557,8 +1590,14 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
 
         {/* AI Parse Modal */}
         {showAIParseModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full border border-slate-800 shadow-2xl">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => setShowAIParseModal(false)}
+          >
+            <div 
+              className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full border border-slate-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-blue-400/10 rounded-xl">
                   <Wand2 className="w-6 h-6 text-blue-400" />
@@ -1627,8 +1666,14 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
 
         {/* Seasons Management Modal */}
         {showSeasonsManagementModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-slate-800 shadow-2xl">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => setShowSeasonsManagementModal(false)}
+          >
+            <div 
+              className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-slate-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-purple-400/10 rounded-lg">
@@ -1724,8 +1769,17 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
 
         {/* Edit Season Modal */}
         {showEditSeasonModal && editingFolder && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => {
+              setShowEditSeasonModal(false);
+              setEditingFolder(null);
+            }}
+          >
+            <div 
+              className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-blue-400/10 rounded-lg">
