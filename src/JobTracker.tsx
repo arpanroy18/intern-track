@@ -257,11 +257,19 @@ const JobTracker = () => {
   const [showUserSettingsModal, setShowUserSettingsModal] = useState<boolean>(false);
   const [showSeasonDropdown, setShowSeasonDropdown] = useState<boolean>(false);
   const [showSeasonsManagementModal, setShowSeasonsManagementModal] = useState<boolean>(false);
+  const [showEditSeasonModal, setShowEditSeasonModal] = useState<boolean>(false);
+  const [editingFolder, setEditingFolder] = useState<FolderType | null>(null);
   const [showAIParseModal, setShowAIParseModal] = useState<boolean>(false);
   const [jobDescription, setJobDescription] = useState<string>('');
   const [isParsingAI, setIsParsingAI] = useState<boolean>(false);
   const [isFromAIParse, setIsFromAIParse] = useState<boolean>(false);
   const [folderFormData, setFolderFormData] = useState({
+    name: '',
+    description: '',
+    color: '#6366f1'
+  });
+  
+  const [editFolderFormData, setEditFolderFormData] = useState({
     name: '',
     description: '',
     color: '#6366f1'
@@ -543,6 +551,42 @@ const JobTracker = () => {
       alert('Failed to create folder. Please try again.');
     }
   }, [folderFormData, folders]);
+
+  const handleEditFolder = useCallback((folder: FolderType) => {
+    setEditingFolder(folder);
+    setEditFolderFormData({
+      name: folder.name,
+      description: folder.description || '',
+      color: folder.color
+    });
+    setShowEditSeasonModal(true);
+  }, []);
+
+  const handleUpdateFolder = useCallback(async () => {
+    if (!editingFolder || !editFolderFormData.name.trim()) return;
+
+    try {
+      const updatedFolder = await JobApplicationService.updateFolder(editingFolder.id, {
+        name: editFolderFormData.name,
+        description: editFolderFormData.description,
+        color: editFolderFormData.color,
+        isActive: true
+      });
+      setFolders(folders.map(folder => 
+        folder.id === editingFolder.id ? updatedFolder : folder
+      ));
+      setEditFolderFormData({
+        name: '',
+        description: '',
+        color: '#6366f1'
+      });
+      setEditingFolder(null);
+      setShowEditSeasonModal(false);
+    } catch (error) {
+      console.error('Error updating folder:', error);
+      alert('Failed to update folder. Please try again.');
+    }
+  }, [editingFolder, editFolderFormData, folders]);
 
   const handleAIParseJob = useCallback(async () => {
     if (!jobDescription.trim()) return;
@@ -1638,10 +1682,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                         </div>
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => {
-                              // TODO: Add edit functionality
-                              console.log('Edit folder:', folder.id);
-                            }}
+                            onClick={() => handleEditFolder(folder)}
                             className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors"
                             title="Edit season"
                           >
@@ -1677,6 +1718,93 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Edit Season Modal */}
+        {showEditSeasonModal && editingFolder && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+            <div className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-400/10 rounded-lg">
+                    <Edit2 className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <h2 className="text-xl font-semibold">Edit Season</h2>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowEditSeasonModal(false);
+                    setEditingFolder(null);
+                  }}
+                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                    Season Name
+                  </label>
+                  <input
+                    type="text"
+                    value={editFolderFormData.name}
+                    onChange={(e) => setEditFolderFormData({...editFolderFormData, name: e.target.value})}
+                    placeholder="e.g., Summer 2025, Fall 2025"
+                    className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:bg-slate-800 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={editFolderFormData.description}
+                    onChange={(e) => setEditFolderFormData({...editFolderFormData, description: e.target.value})}
+                    placeholder="Optional description for this season"
+                    className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:bg-slate-800 transition-all"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                    Color Theme
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={editFolderFormData.color}
+                      onChange={(e) => setEditFolderFormData({...editFolderFormData, color: e.target.value})}
+                      className="w-12 h-10 bg-slate-800/50 border border-slate-700 rounded-lg cursor-pointer"
+                    />
+                    <span className="text-sm text-gray-400">Choose a color to represent this season</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => {
+                      setShowEditSeasonModal(false);
+                      setEditingFolder(null);
+                    }}
+                    className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-gray-300 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdateFolder}
+                    disabled={!editFolderFormData.name.trim()}
+                    className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                  >
+                    Update Season
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
