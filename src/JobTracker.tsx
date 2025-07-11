@@ -199,113 +199,115 @@ const JobTracker = () => {
               </h1>
               <p className="text-gray-500 text-sm">AI-powered tracking for your career journey</p>
             </div>
-            <div className="flex items-center gap-3">
+            
+            {/* User Menu */}
+            <div className="relative user-menu">
               <button
-                onClick={() => setShowAddModal(true)}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="w-10 h-10 bg-slate-800/50 hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors border border-slate-700/50"
               >
-                <Sparkles className="w-4 h-4" />
-                Add Application
+                <User className="w-5 h-5 text-gray-400" />
               </button>
               
-              {/* User Menu */}
-              <div className="relative user-menu">
-                <button
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="w-10 h-10 bg-slate-800/50 hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors border border-slate-700/50"
-                >
-                  <User className="w-5 h-5 text-gray-400" />
-                </button>
-                
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2">
-                    <button
-                      onClick={() => {
-                        signOut();
-                        setShowUserMenu(false);
-                      }}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2">
+                  <button
+                    onClick={() => {
+                      signOut();
+                      setShowUserMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           
-          {/* Search Bar and Filter Toggle */}
-          <div className="flex gap-3 items-center relative">
-            {/* Search Bar */}
-            <div className="relative flex-1 max-w-md">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by company, role, or notes..."
-                className="w-full h-11 pl-10 pr-4 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  <X className="h-4 w-4 text-gray-400 hover:text-gray-300" />
-                </button>
-              )}
-            </div>
-
-            {/* Filter Toggle Button and Sliding Panel */}
-            <div className="relative">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`h-11 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                  showFilters || selectedStatusFilter !== 'All'
-                    ? 'bg-blue-500 text-white shadow-lg'
-                    : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
-                }`}
-              >
-                <Filter className="h-4 w-4" />
-                Filters
-                {selectedStatusFilter !== 'All' && (
-                  <span className="ml-1 px-1.5 py-0.5 rounded text-xs bg-black/20">
-                    1
-                  </span>
+          {/* Search Bar, Filter Toggle, and Add Application Button */}
+          <div className="flex gap-3 items-center justify-between relative">
+            <div className="flex gap-3 items-center">
+              {/* Search Bar */}
+              <div className="relative flex-1 max-w-md">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by company, role, or notes..."
+                  className="w-full h-11 pl-10 pr-4 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    <X className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                  </button>
                 )}
-              </button>
+              </div>
 
-              {/* Status Filter Buttons - Horizontal Sliding Panel */}
-              <div className={`absolute top-0 left-full ml-3 transition-all duration-300 ease-out ${
-                showFilters 
-                  ? 'opacity-100 translate-x-0 pointer-events-auto' 
-                  : 'opacity-0 -translate-x-4 pointer-events-none'
-              }`}>
-                <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl">
-                  <div className="flex items-center h-11 px-3 gap-2">
-                    {(['All', 'Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'] as const).map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => {
-                          setSelectedStatusFilter(status);
-                          setShowFilters(false);
-                        }}
-                        className={`h-8 px-3 rounded-md text-sm font-medium whitespace-nowrap transition-all ${
-                          selectedStatusFilter === status
-                            ? 'bg-blue-500 text-white shadow-md'
-                            : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600 hover:text-white'
-                        }`}
-                      >
-                        {status}
-                      </button>
-                    ))}
+              {/* Filter Toggle Button and Sliding Panel */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`h-11 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                    showFilters || selectedStatusFilter !== 'All'
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
+                  }`}
+                >
+                  <Filter className="h-4 w-4" />
+                  Filters
+                  {selectedStatusFilter !== 'All' && (
+                    <span className="ml-1 px-1.5 py-0.5 rounded text-xs bg-black/20">
+                      1
+                    </span>
+                  )}
+                </button>
+
+                {/* Status Filter Buttons - Horizontal Sliding Panel */}
+                <div className={`absolute top-0 left-full ml-3 transition-all duration-300 ease-out ${
+                  showFilters 
+                    ? 'opacity-100 translate-x-0 pointer-events-auto' 
+                    : 'opacity-0 -translate-x-4 pointer-events-none'
+                }`}>
+                  <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl">
+                    <div className="flex items-center h-11 px-3 gap-2">
+                      {(['All', 'Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'] as const).map((status) => (
+                        <button
+                          key={status}
+                          onClick={() => {
+                            setSelectedStatusFilter(status);
+                            setShowFilters(false);
+                          }}
+                          className={`h-8 px-3 rounded-md text-sm font-medium whitespace-nowrap transition-all ${
+                            selectedStatusFilter === status
+                              ? 'bg-blue-500 text-white shadow-md'
+                              : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600 hover:text-white'
+                          }`}
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            
+            {/* Add Application Button */}
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
+            >
+              <Sparkles className="w-4 h-4" />
+              Add Application
+            </button>
           </div>
           
           {/* Search/Filter Results Info */}
