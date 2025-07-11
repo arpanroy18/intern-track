@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, MapPin, Plus, Trash2, Edit2, Check, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search } from 'lucide-react';
+import { Briefcase, MapPin, Plus, Trash2, Edit2, Check, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter } from 'lucide-react';
 import { Job, JobStats, JobStatus, TimelineEvent } from './types';
 
 const JobTracker = () => {
@@ -23,6 +23,7 @@ const JobTracker = () => {
     closed: 0
   });
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<JobStatus | 'All'>('All');
+  const [showFilters, setShowFilters] = useState<boolean>(false);
 
   // Manual form fields for adding jobs
   const [formData, setFormData] = useState({
@@ -178,7 +179,7 @@ const JobTracker = () => {
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-3xl font-semibold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Job Application Tracker
+                InternTrack
               </h1>
               <p className="text-gray-500 text-sm">AI-powered tracking for your career journey</p>
             </div>
@@ -191,10 +192,10 @@ const JobTracker = () => {
             </button>
           </div>
           
-          {/* Search Bar and Status Filter Buttons */}
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+          {/* Search Bar and Filter Toggle */}
+          <div className="flex gap-3 items-center relative">
             {/* Search Bar */}
-            <div className="relative w-full max-w-md">
+            <div className="relative flex-1 max-w-md">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
               </div>
@@ -203,7 +204,7 @@ const JobTracker = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by company, role, or notes..."
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                className="w-full h-11 pl-10 pr-4 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
               />
               {searchTerm && (
                 <button
@@ -215,21 +216,52 @@ const JobTracker = () => {
               )}
             </div>
 
-            {/* Status Filter Buttons */}
-            <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0">
-              {(['All', 'Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'] as const).map((status) => (
-                <button
-                  key={status}
-                  onClick={() => setSelectedStatusFilter(status)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                    selectedStatusFilter === status
-                      ? 'bg-blue-500 text-white shadow-lg'
-                      : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
-                  }`}
-                >
-                  {status}
-                </button>
-              ))}
+            {/* Filter Toggle Button and Sliding Panel */}
+            <div className="relative">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`h-11 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  showFilters || selectedStatusFilter !== 'All'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
+                }`}
+              >
+                <Filter className="h-4 w-4" />
+                Filters
+                {selectedStatusFilter !== 'All' && (
+                  <span className="ml-1 px-1.5 py-0.5 rounded text-xs bg-black/20">
+                    1
+                  </span>
+                )}
+              </button>
+
+              {/* Status Filter Buttons - Horizontal Sliding Panel */}
+              <div className={`absolute top-0 left-full ml-3 transition-all duration-300 ease-out ${
+                showFilters 
+                  ? 'opacity-100 translate-x-0 pointer-events-auto' 
+                  : 'opacity-0 -translate-x-4 pointer-events-none'
+              }`}>
+                <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl">
+                  <div className="flex items-center h-11 px-3 gap-2">
+                    {(['All', 'Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'] as const).map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => {
+                          setSelectedStatusFilter(status);
+                          setShowFilters(false);
+                        }}
+                        className={`h-8 px-3 rounded-md text-sm font-medium whitespace-nowrap transition-all ${
+                          selectedStatusFilter === status
+                            ? 'bg-blue-500 text-white shadow-md'
+                            : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600 hover:text-white'
+                        }`}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
