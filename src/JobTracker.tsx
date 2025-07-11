@@ -569,7 +569,7 @@ const JobTracker = () => {
               key={index}
               className="bg-gradient-to-br from-slate-800/70 via-slate-800/50 to-slate-900/70 border border-slate-700/60 backdrop-blur-md hover:bg-gradient-to-br hover:from-slate-800/90 hover:via-slate-800/70 hover:to-slate-900/90 hover:border-slate-600/80 transition-all duration-500 group shadow-2xl hover:shadow-3xl cursor-pointer transform hover:-translate-y-3 hover:rotate-1 rounded-2xl"
             >
-              <div className="p-5 relative overflow-hidden">
+              <div className="p-4 relative overflow-hidden">
                 {/* Animated Background Elements */}
                 <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-slate-600/10 via-slate-500/5 to-transparent rounded-full -translate-y-20 translate-x-20 group-hover:scale-110 transition-transform duration-700"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-slate-700/15 to-transparent rounded-full translate-y-12 -translate-x-12 group-hover:scale-110 transition-transform duration-700"></div>
