@@ -539,50 +539,55 @@ const JobTracker = () => {
               </div>
             ) : (
               <div className="space-y-2">
-                {(searchTerm || selectedStatusFilter !== 'All' ? filteredJobs : jobs).map(job => (
+                {(searchTerm || selectedStatusFilter !== 'All' ? filteredJobs : jobs).map((job, index) => (
                   <div
                     key={job.id}
                     className="bg-slate-800/50 rounded-xl p-3 hover:bg-slate-800 transition-all border border-slate-700/50 hover:border-slate-600 cursor-pointer"
                     onClick={() => showJobDetails(job)}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-4 mb-2">
-                          <h3 className="text-lg font-medium">{job.role}</h3>
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
-                            {job.status}
-                          </span>
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="flex-shrink-0 w-8 h-8 bg-slate-700/50 rounded-lg flex items-center justify-center">
+                          <span className="text-sm font-medium text-gray-400">{index + 1}</span>
                         </div>
-                        
-                        <div className="flex items-center gap-6 text-sm text-gray-400">
-                          <div className="flex items-center gap-2">
-                            <Building2 className="w-4 h-4" />
-                            {job.company}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-4 mb-2">
+                            <h3 className="text-lg font-medium">{job.role}</h3>
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
+                              {job.status}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4" />
-                            {job.location}
-                            {job.remote && (
-                              <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 rounded text-xs ml-1">
-                                Remote
+                          
+                          <div className="flex items-center gap-6 text-sm text-gray-400">
+                            <div className="flex items-center gap-2">
+                              <Building2 className="w-4 h-4" />
+                              {job.company}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="w-4 h-4" />
+                              {job.location}
+                              {job.remote && (
+                                <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 rounded text-xs ml-1">
+                                  Remote
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-4 h-4" />
+                              {job.dateApplied}
+                            </div>
+                          </div>
+                          
+                          <div className="mt-2 flex items-center gap-2">
+                            {job.skills.slice(0, 3).map((skill, index) => (
+                              <span key={index} className="px-2 py-1 bg-slate-700 rounded text-xs">
+                                {skill}
                               </span>
+                            ))}
+                            {job.skills.length > 3 && (
+                              <span className="text-xs text-gray-500">+{job.skills.length - 3} more</span>
                             )}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            {job.dateApplied}
-                          </div>
-                        </div>
-                        
-                        <div className="mt-2 flex items-center gap-2">
-                          {job.skills.slice(0, 3).map((skill, index) => (
-                            <span key={index} className="px-2 py-1 bg-slate-700 rounded text-xs">
-                              {skill}
-                            </span>
-                          ))}
-                          {job.skills.length > 3 && (
-                            <span className="text-xs text-gray-500">+{job.skills.length - 3} more</span>
-                          )}
                         </div>
                       </div>
                       
