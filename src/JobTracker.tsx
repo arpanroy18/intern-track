@@ -127,11 +127,14 @@ const JobTracker = () => {
       if (showUserMenu && !(event.target as Element).closest('.user-menu')) {
         setShowUserMenu(false);
       }
+      if (showFolderManagement && !(event.target as Element).closest('.folder-management')) {
+        setShowFolderManagement(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showUserMenu]);
+  }, [showUserMenu, showFolderManagement]);
 
   const handleAddJob = async () => {
     if (!formData.role.trim() || !formData.company.trim()) return;
@@ -314,46 +317,114 @@ const JobTracker = () => {
             </div>
           </div>
           
-          {/* Folder Selector */}
-          <div className="flex gap-3 items-center justify-between mb-4">
+          {/* Folder Selector - Integrated into header */}
+          <div className="flex gap-3 items-center justify-between mb-6">
             <div className="flex gap-3 items-center">
-              {/* Folder Selector */}
+              {/* Subtle Folder Selector */}
               <div className="relative">
-                <select
-                  value={selectedFolder?.id || ''}
-                  onChange={(e) => {
-                    const folder = folders.find(f => f.id === e.target.value);
-                    setSelectedFolder(folder || null);
-                  }}
-                  className="h-11 px-4 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
-                >
-                  <option value="">All Applications</option>
-                  {folders.map(folder => (
-                    <option key={folder.id} value={folder.id}>
-                      {folder.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center gap-2">
+                  <Folder className="h-4 w-4 text-gray-400" />
+                  <select
+                    value={selectedFolder?.id || ''}
+                    onChange={(e) => {
+                      const folder = folders.find(f => f.id === e.target.value);
+                      setSelectedFolder(folder || null);
+                    }}
+                    className="bg-transparent border-none text-gray-300 focus:outline-none focus:text-white transition-colors text-sm cursor-pointer hover:text-white"
+                  >
+                    <option value="" className="bg-slate-800">All Applications</option>
+                    {folders.map(folder => (
+                      <option key={folder.id} value={folder.id} className="bg-slate-800">
+                        {folder.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {selectedFolder && (
+                  <div 
+                    className="absolute -bottom-0.5 left-0 h-0.5 rounded-full transition-all"
+                    style={{ backgroundColor: selectedFolder.color, width: '100%' }}
+                  />
+                )}
               </div>
 
-              {/* Folder Management Button */}
-              <button
-                onClick={() => setShowFolderManagement(true)}
-                className="h-11 px-4 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-400 hover:bg-slate-800 hover:text-gray-300 transition-all flex items-center gap-2"
-              >
-                <Settings className="h-4 w-4" />
-                Manage Folders
-              </button>
+              {/* Folder management dropdown */}
+              <div className="relative folder-management">
+                <button
+                  onClick={() => setShowFolderManagement(!showFolderManagement)}
+                  className="p-2 text-gray-400 hover:text-gray-300 hover:bg-slate-800/50 rounded-lg transition-all"
+                  title="Manage folders"
+                >
+                  <Settings className="h-4 w-4" />
+                </button>
+
+                {/* Folder Management Dropdown */}
+                {showFolderManagement && (
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl z-50">
+                    <div className="p-3 border-b border-slate-700">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-medium text-gray-200">Folders</h3>
+                        <button
+                          onClick={() => {
+                            setShowFolderModal(true);
+                            setShowFolderManagement(false);
+                          }}
+                          className="p-1 text-gray-400 hover:text-purple-400 hover:bg-purple-400/10 rounded transition-colors"
+                          title="Create new folder"
+                        >
+                          <FolderPlus className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                      {folders.length === 0 ? (
+                        <div className="p-4 text-center text-gray-400 text-sm">
+                          No folders yet
+                        </div>
+                      ) : (
+                        folders.map(folder => (
+                          <div key={folder.id} className="flex items-center justify-between p-3 hover:bg-slate-700/50 transition-colors">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div
+                                className="w-3 h-3 rounded-full flex-shrink-0"
+                                style={{ backgroundColor: folder.color }}
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium text-gray-200 truncate">{folder.name}</div>
+                                {folder.description && (
+                                  <div className="text-xs text-gray-400 truncate">{folder.description}</div>
+                                )}
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => {
+                                handleDeleteFolder(folder.id);
+                                setShowFolderManagement(false);
+                              }}
+                              className="p-1 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
+                              title="Delete folder"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Create Folder Button */}
-            <button
-              onClick={() => setShowFolderModal(true)}
-              className="h-11 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all flex items-center gap-2"
-            >
-              <FolderPlus className="h-4 w-4" />
-              New Folder
-            </button>
+            {/* Current folder indicator */}
+            {selectedFolder && (
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: selectedFolder.color }}
+                />
+                <span>{selectedFolder.name}</span>
+              </div>
+            )}
           </div>
 
           {/* Search Bar, Filter Toggle, and Add Application Button */}
@@ -808,21 +879,30 @@ const JobTracker = () => {
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Folder</label>
-                  <select
-                    value={formData.folderId}
-                    onChange={(e) => setFormData({...formData, folderId: e.target.value})}
-                    className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 border border-slate-700 focus:border-purple-400 focus:outline-none"
-                  >
-                    <option value="">Select a folder (optional)</option>
-                    {folders.map(folder => (
-                      <option key={folder.id} value={folder.id}>
-                        {folder.name}
+                {folders.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                      <div className="flex items-center gap-2">
+                        <Folder className="h-3 w-3" />
+                        Folder
+                      </div>
+                    </label>
+                    <select
+                      value={formData.folderId}
+                      onChange={(e) => setFormData({...formData, folderId: e.target.value})}
+                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                    >
+                      <option value="">
+                        {selectedFolder ? `Use current folder (${selectedFolder.name})` : 'No folder (default)'}
                       </option>
-                    ))}
-                  </select>
-                </div>
+                      {folders.map(folder => (
+                        <option key={folder.id} value={folder.id}>
+                          {folder.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 
                 <div>
                   <label className="flex items-center gap-2">
@@ -1086,54 +1166,6 @@ const JobTracker = () => {
           </div>
         )}
 
-        {/* Folder Management Modal */}
-        {showFolderManagement && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-            <div className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-slate-800 shadow-2xl">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Manage Folders</h2>
-                <button
-                  onClick={() => setShowFolderManagement(false)}
-                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-400" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {folders.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
-                    <Folder className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No folders created yet</p>
-                  </div>
-                ) : (
-                  folders.map(folder => (
-                    <div key={folder.id} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-4 h-4 rounded-full"
-                          style={{ backgroundColor: folder.color }}
-                        />
-                        <div>
-                          <h3 className="font-medium">{folder.name}</h3>
-                          {folder.description && (
-                            <p className="text-sm text-gray-400">{folder.description}</p>
-                          )}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteFolder(folder.id)}
-                        className="p-2 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
