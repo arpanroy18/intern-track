@@ -418,12 +418,12 @@ const JobTracker = () => {
                 </button>
 
                 {/* Status Filter Buttons - Horizontal Sliding Panel */}
-                <div className={`absolute top-0 left-full ml-3 transition-all duration-300 ease-out ${
+                <div className={`absolute top-0 left-full ml-3 transition-all duration-300 ease-out z-50 ${
                   showFilters 
                     ? 'opacity-100 translate-x-0 pointer-events-auto' 
                     : 'opacity-0 -translate-x-4 pointer-events-none'
                 }`}>
-                  <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl">
+                  <div className="bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-lg shadow-2xl ring-1 ring-slate-600/20">
                     <div className="flex items-center h-11 px-3 gap-2">
                       {(['All', 'Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'] as const).map((status) => (
                         <button
