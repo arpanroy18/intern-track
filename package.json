@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cerebras/cerebras_cloud_sdk": "^1.35.0",
     "@supabase/supabase-js": "^2.50.5",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",

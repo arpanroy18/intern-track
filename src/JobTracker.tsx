@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, MapPin, Plus, Trash2, Edit2, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter, LogOut, User, Settings } from 'lucide-react';
+import { Briefcase, MapPin, Plus, Trash2, Edit2, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter, LogOut, User, Settings, Wand2 } from 'lucide-react';
 import { Job, JobStats, JobStatus, Folder as FolderType } from './types';
 import { useAuth } from './contexts/AuthContext';
 import { JobApplicationService } from './services/jobApplicationService';
+import Cerebras from '@cerebras/cerebras_cloud_sdk';
 
 const JobTracker = () => {
   const { signOut, user, updateEmail, updatePassword } = useAuth();
@@ -32,6 +33,9 @@ const JobTracker = () => {
   const [showUserSettingsModal, setShowUserSettingsModal] = useState<boolean>(false);
   const [showFolderManagement, setShowFolderManagement] = useState<boolean>(false);
   const [showSeasonDropdown, setShowSeasonDropdown] = useState<boolean>(false);
+  const [showAIParseModal, setShowAIParseModal] = useState<boolean>(false);
+  const [jobDescription, setJobDescription] = useState<string>('');
+  const [isParsingAI, setIsParsingAI] = useState<boolean>(false);
   const [folderFormData, setFolderFormData] = useState({
     name: '',
     description: '',
@@ -277,6 +281,89 @@ const JobTracker = () => {
     } catch (error) {
       console.error('Error creating folder:', error);
       alert('Failed to create folder. Please try again.');
+    }
+  };
+
+  const handleAIParseJob = async () => {
+    if (!jobDescription.trim()) return;
+
+    setIsParsingAI(true);
+    try {
+      const cerebras = new Cerebras({
+        apiKey: import.meta.env.VITE_CEREBRAS_API_KEY
+      });
+
+      const completionCreateResponse = await cerebras.chat.completions.create({
+        messages: [
+          {
+            "role": "system",
+            "content": `Extract the following information from this job description and respond ONLY with a valid JSON object:
+
+Job Description:
+${jobDescription}
+
+Extract these fields:
+- role (job title)
+- company (company name)
+- location (job location)
+- experienceRequired (years of experience required, otherwise "Not specified")
+- skills (array of key skills mentioned, maximum 6)
+- remote (boolean - true if remote work is mentioned)
+- notes (comprehensive summary that captures ALL important information including responsibilities, requirements, nice-to-haves, benefits, and any other relevant details. Be thorough but concise)
+
+IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any other text, backticks, or markdown formatting.`
+          },
+          {
+            "role": "user",
+            "content": jobDescription
+          }
+        ],
+        model: 'llama-3.1-70b',
+        stream: false,
+        max_completion_tokens: 2048,
+        temperature: 0.2,
+        top_p: 1,
+        response_format: { type: "json_object" }
+      });
+
+      const content = (completionCreateResponse.choices as any)?.[0]?.message?.content;
+      if (!content) {
+        throw new Error('No response from AI service');
+      }
+
+      const parsedData = JSON.parse(content);
+      
+      // Create new job from parsed data
+      const newJob: Omit<Job, 'id'> = {
+        role: parsedData.role || 'Unknown Role',
+        company: parsedData.company || 'Unknown Company',
+        location: parsedData.location || 'Not specified',
+        experienceRequired: parsedData.experienceRequired || 'Not specified',
+        skills: Array.isArray(parsedData.skills) ? parsedData.skills : [],
+        remote: parsedData.remote || false,
+        notes: parsedData.notes || 'No additional notes',
+        status: 'Applied' as JobStatus,
+        dateApplied: new Date().toISOString().split('T')[0],
+        timeline: [
+          {
+            status: 'Applied' as JobStatus,
+            date: new Date().toISOString().split('T')[0],
+            note: 'Application submitted via AI parsing'
+          }
+        ],
+        folderId: selectedFolder?.id
+      };
+      
+      const createdJob = await JobApplicationService.createJobApplication(newJob);
+      setJobs([...jobs, createdJob]);
+      setJobDescription('');
+      setShowAIParseModal(false);
+      
+    } catch (error) {
+      console.error('Error parsing job with AI:', error);
+      alert('Failed to parse job description. Please try again or add the job manually.');
+    } finally {
+      setIsParsingAI(false);
     }
   };
 
@@ -602,6 +689,13 @@ const JobTracker = () => {
             
             {/* Add Application Button */}
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowAIParseModal(true)}
+                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
+              >
+                <Wand2 className="w-4 h-4" />
+                Parse with AI
+              </button>
               <button
                 onClick={() => setShowAddModal(true)}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
@@ -1357,6 +1451,76 @@ const JobTracker = () => {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AI Parse Modal */}
+        {showAIParseModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+            <div className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full border border-slate-800 shadow-2xl">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-3 bg-blue-400/10 rounded-xl">
+                  <Wand2 className="w-6 h-6 text-blue-400" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">Parse Job with AI</h2>
+                  <p className="text-gray-500 text-sm">Paste a job description and let AI extract the details</p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                    Job Description
+                  </label>
+                  <textarea
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    placeholder="Paste the job description here..."
+                    className="w-full h-64 bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 resize-none border border-slate-700 focus:border-blue-400 focus:outline-none"
+                  />
+                </div>
+                
+                <div className="bg-slate-800/50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-blue-400" />
+                    <span className="text-sm font-medium text-gray-300">What the AI will extract:</span>
+                  </div>
+                  <div className="text-sm text-gray-400 space-y-1">
+                    <p>• Job title and company name</p>
+                    <p>• Location and remote work options</p>
+                    <p>• Required skills and experience</p>
+                    <p>• Comprehensive job summary</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 justify-end mt-6">
+                <button
+                  onClick={() => setShowAIParseModal(false)}
+                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAIParseJob}
+                  disabled={isParsingAI || !jobDescription.trim()}
+                  className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isParsingAI ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      Parsing...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-4 h-4" />
+                      Parse & Add Job
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>

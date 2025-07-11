@@ -2,10 +2,9 @@ import React from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Auth from './components/Auth'
 import JobTracker from './JobTracker'
-import { LogOut } from 'lucide-react'
 
 const AppContent: React.FC = () => {
-  const { user, loading, signOut } = useAuth()
+  const { user, loading } = useAuth()
 
   if (loading) {
     return (
