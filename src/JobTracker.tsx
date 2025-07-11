@@ -451,7 +451,7 @@ const JobTracker = () => {
       if (showSeasonDropdown && !(event.target as Element).closest('.season-dropdown')) {
         setShowSeasonDropdown(false);
       }
-      if (showFilters && !(event.target as Element).closest('.filter-panel')) {
+      if (showFilters && !(event.target as Element).closest('.filter-panel') && !(event.target as Element).closest('.filter-button')) {
         setShowFilters(false);
       }
     };
@@ -817,7 +817,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
               <div className="relative">
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`h-11 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  className={`filter-button h-11 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                     showFilters || selectedStatusFilter !== 'All'
                       ? 'bg-blue-500 text-white shadow-lg'
                       : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
