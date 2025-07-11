@@ -322,111 +322,6 @@ const JobTracker = () => {
           </div>
           
 
-          {/* Ultra-Compact Season Display */}
-          <div className="mb-4 flex items-center gap-2">
-            <div className="relative season-dropdown">
-              <button
-                onClick={() => setShowSeasonDropdown(!showSeasonDropdown)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg transition-all text-sm"
-              >
-                {selectedFolder ? (
-                  <>
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: selectedFolder.color }}
-                    />
-                    <span className="text-gray-200">{selectedFolder.name}</span>
-                  </>
-                ) : (
-                  <span className="text-gray-400">All Applications</span>
-                )}
-                <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {/* Season Dropdown */}
-              {showSeasonDropdown && (
-                <div className="absolute top-full mt-1 left-0 min-w-48 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl z-50">
-                  {/* Season Options */}
-                  <div className="py-1">
-                    <button
-                      onClick={() => {
-                        setSelectedFolder(null);
-                        setShowSeasonDropdown(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-700/50 transition-colors ${
-                        !selectedFolder ? 'text-purple-400 bg-slate-700/30' : 'text-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-gray-500" />
-                        <span>All Applications</span>
-                        <span className="ml-auto text-xs text-gray-500">({jobs.length})</span>
-                      </div>
-                    </button>
-                    {folders.map(folder => {
-                      const folderJobCount = jobs.filter(job => job.folderId === folder.id).length;
-                      return (
-                        <button
-                          key={folder.id}
-                          onClick={() => {
-                            setSelectedFolder(folder);
-                            setShowSeasonDropdown(false);
-                          }}
-                          className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-700/50 transition-colors ${
-                            selectedFolder?.id === folder.id ? 'text-purple-400 bg-slate-700/30' : 'text-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div
-                              className="w-2 h-2 rounded-full"
-                              style={{ backgroundColor: folder.color }}
-                            />
-                            <span>{folder.name}</span>
-                            <span className="ml-auto text-xs text-gray-500">({folderJobCount})</span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  
-                  {/* Divider */}
-                  <div className="border-t border-slate-700 my-1" />
-                  
-                  {/* Quick Actions */}
-                  <div className="py-1">
-                    <button
-                      onClick={() => {
-                        setShowFolderModal(true);
-                        setShowSeasonDropdown(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-purple-400 hover:bg-slate-700/50 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Plus className="w-3 h-3" />
-                        <span>Add Season</span>
-                      </div>
-                    </button>
-                    {folders.length > 0 && (
-                      <button
-                        onClick={() => {
-                          setShowFolderManagement(true);
-                          setShowSeasonDropdown(false);
-                        }}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-gray-300 hover:bg-slate-700/50 transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Settings className="w-3 h-3" />
-                          <span>Manage Seasons</span>
-                        </div>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
 
           {/* Season Management Dropdown */}
           {showFolderManagement && (
@@ -477,7 +372,7 @@ const JobTracker = () => {
             </div>
           )}
 
-          {/* Search Bar, Filter Toggle, and Add Application Button */}
+          {/* Search Bar, Filter Toggle, Season Selector, and Add Application Button */}
           <div className="flex gap-3 items-center justify-between relative">
             <div className="flex gap-3 items-center">
 
@@ -549,6 +444,110 @@ const JobTracker = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Season Selector */}
+              <div className="relative season-dropdown">
+                <button
+                  onClick={() => setShowSeasonDropdown(!showSeasonDropdown)}
+                  className="flex items-center gap-2 px-3 py-2.5 h-11 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg transition-all text-sm"
+                >
+                  {selectedFolder ? (
+                    <>
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: selectedFolder.color }}
+                      />
+                      <span className="text-gray-200">{selectedFolder.name}</span>
+                    </>
+                  ) : (
+                    <span className="text-gray-400">All Applications</span>
+                  )}
+                  <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Season Dropdown */}
+                {showSeasonDropdown && (
+                  <div className="absolute top-full mt-1 left-0 min-w-48 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl z-50">
+                    {/* Season Options */}
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          setSelectedFolder(null);
+                          setShowSeasonDropdown(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-700/50 transition-colors ${
+                          !selectedFolder ? 'text-purple-400 bg-slate-700/30' : 'text-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-gray-500" />
+                          <span>All Applications</span>
+                          <span className="ml-auto text-xs text-gray-500">({jobs.length})</span>
+                        </div>
+                      </button>
+                      {folders.map(folder => {
+                        const folderJobCount = jobs.filter(job => job.folderId === folder.id).length;
+                        return (
+                          <button
+                            key={folder.id}
+                            onClick={() => {
+                              setSelectedFolder(folder);
+                              setShowSeasonDropdown(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-700/50 transition-colors ${
+                              selectedFolder?.id === folder.id ? 'text-purple-400 bg-slate-700/30' : 'text-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-2 h-2 rounded-full"
+                                style={{ backgroundColor: folder.color }}
+                              />
+                              <span>{folder.name}</span>
+                              <span className="ml-auto text-xs text-gray-500">({folderJobCount})</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Divider */}
+                    <div className="border-t border-slate-700 my-1" />
+                    
+                    {/* Quick Actions */}
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          setShowFolderModal(true);
+                          setShowSeasonDropdown(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-purple-400 hover:bg-slate-700/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Plus className="w-3 h-3" />
+                          <span>Add Season</span>
+                        </div>
+                      </button>
+                      {folders.length > 0 && (
+                        <button
+                          onClick={() => {
+                            setShowFolderManagement(true);
+                            setShowSeasonDropdown(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-gray-300 hover:bg-slate-700/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Settings className="w-3 h-3" />
+                            <span>Manage Seasons</span>
+                          </div>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
