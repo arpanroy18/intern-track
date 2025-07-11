@@ -293,6 +293,9 @@ const JobTracker = () => {
         apiKey: import.meta.env.VITE_CEREBRAS_API_KEY
       });
 
+      console.log('🤖 Sending request to Cerebras AI...');
+      console.log('📝 Job description length:', jobDescription.length);
+
       const completionCreateResponse = await cerebras.chat.completions.create({
         messages: [
           {
@@ -318,7 +321,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
             "content": jobDescription
           }
         ],
-        model: 'llama-3.1-70b',
+        model: 'llama-4-scout-17b-16e-instruct',
         stream: false,
         max_completion_tokens: 2048,
         temperature: 0.2,
@@ -326,12 +329,17 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
         response_format: { type: "json_object" }
       });
 
+      console.log('✅ Full AI Response:', completionCreateResponse);
+      
       const content = (completionCreateResponse.choices as any)?.[0]?.message?.content;
+      console.log('📋 AI Response Content:', content);
+      
       if (!content) {
         throw new Error('No response from AI service');
       }
 
       const parsedData = JSON.parse(content);
+      console.log('🔍 Parsed Data:', parsedData);
       
       // Create new job from parsed data
       const newJob: Omit<Job, 'id'> = {
@@ -354,13 +362,20 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
         folderId: selectedFolder?.id
       };
       
+      console.log('💼 Creating job:', newJob);
       const createdJob = await JobApplicationService.createJobApplication(newJob);
       setJobs([...jobs, createdJob]);
       setJobDescription('');
       setShowAIParseModal(false);
+      console.log('✅ Job created successfully!');
       
     } catch (error) {
-      console.error('Error parsing job with AI:', error);
+      console.error('❌ Error parsing job with AI:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       alert('Failed to parse job description. Please try again or add the job manually.');
     } finally {
       setIsParsingAI(false);
