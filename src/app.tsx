@@ -17,10 +17,12 @@ const JobTracker = () => {
   const [stats, setStats] = useState<JobStats>({
     total: 0,
     applied: 0,
-    interviewing: 0,
-    offered: 0,
-    rejected: 0
+    onlineAssessment: 0,
+    interview: 0,
+    offer: 0,
+    closed: 0
   });
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<JobStatus | 'All'>('All');
 
   // Manual form fields for adding jobs
   const [formData, setFormData] = useState({
@@ -48,21 +50,27 @@ const JobTracker = () => {
   };
 
   useEffect(() => {
-    // Filter jobs based on search term
-    const filtered = searchJobs(searchTerm, jobs);
+    // First filter by search term
+    let filtered = searchJobs(searchTerm, jobs);
+    
+    // Then filter by status if not "All"
+    if (selectedStatusFilter !== 'All') {
+      filtered = filtered.filter(job => job.status === selectedStatusFilter);
+    }
+    
     setFilteredJobs(filtered);
     
-    // Calculate stats based on filtered results for search, or all jobs when not searching
-    const statsSource = searchTerm.trim() ? filtered : jobs;
+    // Calculate stats based on all jobs (not filtered results)
     const newStats: JobStats = {
-      total: statsSource.length,
-      applied: statsSource.filter(j => j.status === 'Applied').length,
-      interviewing: statsSource.filter(j => j.status === 'Interviewing').length,
-      offered: statsSource.filter(j => j.status === 'Offered').length,
-      rejected: statsSource.filter(j => j.status === 'Rejected').length
+      total: jobs.length,
+      applied: jobs.filter(j => j.status === 'Applied').length,
+      onlineAssessment: jobs.filter(j => j.status === 'Online Assessment').length,
+      interview: jobs.filter(j => j.status === 'Interview').length,
+      offer: jobs.filter(j => j.status === 'Offer').length,
+      closed: jobs.filter(j => j.status === 'Closed').length
     };
     setStats(newStats);
-  }, [jobs, searchTerm]);
+  }, [jobs, searchTerm, selectedStatusFilter]);
 
   const handleAddJob = () => {
     if (!formData.role.trim() || !formData.company.trim()) return;
@@ -139,16 +147,17 @@ const JobTracker = () => {
 
   const statusColors: Record<JobStatus, string> = {
     'Applied': 'text-blue-400 bg-blue-400/10',
-    'Interviewing': 'text-yellow-400 bg-yellow-400/10',
-    'Offered': 'text-green-400 bg-green-400/10',
-    'Rejected': 'text-red-400 bg-red-400/10'
+    'Online Assessment': 'text-orange-400 bg-orange-400/10',
+    'Interview': 'text-yellow-400 bg-yellow-400/10',
+    'Offer': 'text-green-400 bg-green-400/10',
+    'Closed': 'text-red-400 bg-red-400/10'
   };
 
   const statCards = [
     { label: 'Total Applications', value: stats.total, icon: BarChart3, color: 'text-purple-400', bg: 'bg-purple-400/10' },
     { label: 'Applied', value: stats.applied, icon: FileText, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-    { label: 'Interviewing', value: stats.interviewing, icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
-    { label: 'Offered', value: stats.offered, icon: TrendingUp, color: 'text-green-400', bg: 'bg-green-400/10' },
+    { label: 'Interview', value: stats.interview, icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
+    { label: 'Offer', value: stats.offer, icon: TrendingUp, color: 'text-green-400', bg: 'bg-green-400/10' },
   ];
 
   return (
@@ -182,6 +191,37 @@ const JobTracker = () => {
             </button>
           </div>
           
+          {/* Status Filter Buttons */}
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+            {(['All', 'Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'] as const).map((status) => (
+              <button
+                key={status}
+                onClick={() => setSelectedStatusFilter(status)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                  selectedStatusFilter === status
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
+                }`}
+              >
+                {status}
+                {status !== 'All' && (
+                  <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-black/20">
+                    {status === 'Applied' ? stats.applied :
+                     status === 'Online Assessment' ? stats.onlineAssessment :
+                     status === 'Interview' ? stats.interview :
+                     status === 'Offer' ? stats.offer :
+                     status === 'Closed' ? stats.closed : 0}
+                  </span>
+                )}
+                {status === 'All' && (
+                  <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-black/20">
+                    {stats.total}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
           {/* Search Bar */}
           <div className="relative max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -204,14 +244,20 @@ const JobTracker = () => {
             )}
           </div>
           
-          {/* Search Results Info */}
-          {searchTerm && (
+          {/* Search/Filter Results Info */}
+          {(searchTerm || selectedStatusFilter !== 'All') && (
             <div className="mt-3 text-sm text-gray-400">
               {filteredJobs.length === 0 ? (
-                <span>No applications found for "{searchTerm}"</span>
+                <span>
+                  No applications found
+                  {searchTerm && ` for "${searchTerm}"`}
+                  {selectedStatusFilter !== 'All' && ` with status "${selectedStatusFilter}"`}
+                </span>
               ) : (
                 <span>
-                  Found {filteredJobs.length} application{filteredJobs.length !== 1 ? 's' : ''} for "{searchTerm}"
+                  Found {filteredJobs.length} application{filteredJobs.length !== 1 ? 's' : ''}
+                  {searchTerm && ` for "${searchTerm}"`}
+                  {selectedStatusFilter !== 'All' && ` with status "${selectedStatusFilter}"`}
                 </span>
               )}
             </div>
@@ -241,8 +287,8 @@ const JobTracker = () => {
             },
             {
               icon: Clock,
-              label: "Interviewing",
-              value: stats.interviewing,
+              label: "Interview",
+              value: stats.interview,
               color: "yellow",
               gradient: "from-yellow-500/25 to-yellow-600/25",
               hoverGradient: "from-yellow-500/35 to-yellow-600/35",
@@ -250,8 +296,8 @@ const JobTracker = () => {
             },
             {
               icon: TrendingUp,
-              label: "Offered",
-              value: stats.offered,
+              label: "Offer",
+              value: stats.offer,
               color: "green",
               gradient: "from-green-500/25 to-green-600/25",
               hoverGradient: "from-green-500/35 to-green-600/35",
@@ -358,23 +404,46 @@ const JobTracker = () => {
                   Add your first application →
                 </button>
               </div>
-            ) : filteredJobs.length === 0 && searchTerm ? (
+            ) : filteredJobs.length === 0 && (searchTerm || selectedStatusFilter !== 'All') ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Search className="w-8 h-8 text-gray-600" />
                 </div>
                 <p className="text-gray-500 mb-2">No applications found</p>
-                <p className="text-gray-600 text-sm mb-4">Try adjusting your search terms</p>
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="text-purple-400 hover:text-purple-300 text-sm font-medium"
-                >
-                  Clear search
-                </button>
+                <p className="text-gray-600 text-sm mb-4">Try adjusting your search terms or filters</p>
+                <div className="flex gap-2 justify-center">
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="text-purple-400 hover:text-purple-300 text-sm font-medium"
+                    >
+                      Clear search
+                    </button>
+                  )}
+                  {selectedStatusFilter !== 'All' && (
+                    <button
+                      onClick={() => setSelectedStatusFilter('All')}
+                      className="text-purple-400 hover:text-purple-300 text-sm font-medium"
+                    >
+                      Clear filter
+                    </button>
+                  )}
+                  {(searchTerm || selectedStatusFilter !== 'All') && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm('');
+                        setSelectedStatusFilter('All');
+                      }}
+                      className="text-purple-400 hover:text-purple-300 text-sm font-medium"
+                    >
+                      Clear all
+                    </button>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="space-y-3">
-                {(searchTerm ? filteredJobs : jobs).map(job => (
+                {(searchTerm || selectedStatusFilter !== 'All' ? filteredJobs : jobs).map(job => (
                   <div
                     key={job.id}
                     className="bg-slate-800/50 rounded-xl p-5 hover:bg-slate-800 transition-all border border-slate-700/50 hover:border-slate-600 cursor-pointer"
@@ -435,9 +504,10 @@ const JobTracker = () => {
                           className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-purple-400"
                         >
                           <option value="Applied">Applied</option>
-                          <option value="Interviewing">Interviewing</option>
-                          <option value="Offered">Offered</option>
-                          <option value="Rejected">Rejected</option>
+                          <option value="Online Assessment">Online Assessment</option>
+                          <option value="Interview">Interview</option>
+                          <option value="Offer">Offer</option>
+                          <option value="Closed">Closed</option>
                         </select>
                         <button
                           onClick={(e) => {
@@ -682,14 +752,16 @@ const JobTracker = () => {
                       <div className="relative z-10">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                           event.status === 'Applied' ? 'bg-blue-400/10' :
-                          event.status === 'Interviewing' ? 'bg-yellow-400/10' :
-                          event.status === 'Offered' ? 'bg-green-400/10' :
+                          event.status === 'Online Assessment' ? 'bg-orange-400/10' :
+                          event.status === 'Interview' ? 'bg-yellow-400/10' :
+                          event.status === 'Offer' ? 'bg-green-400/10' :
                           'bg-red-400/10'
                         }`}>
                           {event.status === 'Applied' && <FileText className="w-5 h-5 text-blue-400" />}
-                          {event.status === 'Interviewing' && <Clock className="w-5 h-5 text-yellow-400" />}
-                          {event.status === 'Offered' && <TrendingUp className="w-5 h-5 text-green-400" />}
-                          {event.status === 'Rejected' && <X className="w-5 h-5 text-red-400" />}
+                          {event.status === 'Online Assessment' && <Clock className="w-5 h-5 text-orange-400" />}
+                          {event.status === 'Interview' && <Clock className="w-5 h-5 text-yellow-400" />}
+                          {event.status === 'Offer' && <TrendingUp className="w-5 h-5 text-green-400" />}
+                          {event.status === 'Closed' && <X className="w-5 h-5 text-red-400" />}
                         </div>
                       </div>
                       
@@ -698,8 +770,9 @@ const JobTracker = () => {
                         <div className="flex items-center justify-between mb-1">
                           <span className={`text-sm font-medium ${
                             event.status === 'Applied' ? 'text-blue-400' :
-                            event.status === 'Interviewing' ? 'text-yellow-400' :
-                            event.status === 'Offered' ? 'text-green-400' :
+                            event.status === 'Online Assessment' ? 'text-orange-400' :
+                            event.status === 'Interview' ? 'text-yellow-400' :
+                            event.status === 'Offer' ? 'text-green-400' :
                             'text-red-400'
                           }`}>
                             {event.status}

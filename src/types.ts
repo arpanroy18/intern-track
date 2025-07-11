@@ -4,7 +4,7 @@ export interface TimelineEvent {
   note: string;
 }
 
-export type JobStatus = 'Applied' | 'Interviewing' | 'Offered' | 'Rejected';
+export type JobStatus = 'Applied' | 'Online Assessment' | 'Interview' | 'Offer' | 'Closed';
 
 export interface Job {
   id: number;
@@ -23,7 +23,8 @@ export interface Job {
 export interface JobStats {
   total: number;
   applied: number;
-  interviewing: number;
-  offered: number;
-  rejected: number;
+  onlineAssessment: number;
+  interview: number;
+  offer: number;
+  closed: number;
 } 
