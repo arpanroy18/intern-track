@@ -19,20 +19,7 @@ const AppContent: React.FC = () => {
     return <Auth />
   }
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-gray-100">
-      <div className="absolute top-4 right-4 z-50">
-        <button
-          onClick={signOut}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors text-sm"
-        >
-          <LogOut className="w-4 h-4" />
-          Sign Out
-        </button>
-      </div>
-      <JobTracker />
-    </div>
-  )
+  return <JobTracker />
 }
 
 const App: React.FC = () => {

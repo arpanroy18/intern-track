@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, MapPin, Plus, Trash2, Edit2, Check, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter } from 'lucide-react';
+import { Briefcase, MapPin, Plus, Trash2, Edit2, Check, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter, LogOut } from 'lucide-react';
 import { Job, JobStats, JobStatus, TimelineEvent } from './types';
+import { useAuth } from './contexts/AuthContext';
 
 const JobTracker = () => {
+  const { signOut } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showDetailsModal, setShowDetailsModal] = useState<boolean>(false);
@@ -183,13 +185,22 @@ const JobTracker = () => {
               </h1>
               <p className="text-gray-500 text-sm">AI-powered tracking for your career journey</p>
             </div>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
-            >
-              <Sparkles className="w-4 h-4" />
-              Add Application
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={signOut}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors text-sm"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
+              >
+                <Sparkles className="w-4 h-4" />
+                Add Application
+              </button>
+            </div>
           </div>
           
           {/* Search Bar and Filter Toggle */}
