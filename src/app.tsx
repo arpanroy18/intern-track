@@ -131,8 +131,18 @@ const JobTracker = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-gray-100 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-950 text-gray-100 p-6 relative overflow-hidden">
+      {/* Advanced Background Effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.06),transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,rgba(120,200,255,0.04),transparent_50%)]"></div>
+
+      {/* Floating Particles */}
+      <div className="absolute top-20 left-20 w-2 h-2 bg-purple-400/30 rounded-full animate-pulse"></div>
+      <div className="absolute top-40 right-32 w-1 h-1 bg-pink-400/40 rounded-full animate-pulse delay-1000"></div>
+      <div className="absolute bottom-32 left-1/4 w-1.5 h-1.5 bg-blue-400/30 rounded-full animate-pulse delay-2000"></div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
@@ -150,17 +160,87 @@ const JobTracker = () => {
           </button>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {statCards.map((stat, index) => (
-            <div key={index} className="bg-slate-900 rounded-2xl p-6 border border-slate-800 hover:border-slate-700 transition-all">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-xl ${stat.bg}`}>
-                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+        {/* Premium Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {[
+            {
+              icon: BarChart3,
+              label: "Total Applications",
+              value: stats.total,
+              color: "purple",
+              gradient: "from-purple-500/25 to-purple-600/25",
+              hoverGradient: "from-purple-500/35 to-purple-600/35",
+              shadowColor: "purple-500/25",
+            },
+            {
+              icon: FileText,
+              label: "Applied",
+              value: stats.applied,
+              color: "blue",
+              gradient: "from-blue-500/25 to-blue-600/25",
+              hoverGradient: "from-blue-500/35 to-blue-600/35",
+              shadowColor: "blue-500/25",
+            },
+            {
+              icon: Clock,
+              label: "Interviewing",
+              value: stats.interviewing,
+              color: "yellow",
+              gradient: "from-yellow-500/25 to-yellow-600/25",
+              hoverGradient: "from-yellow-500/35 to-yellow-600/35",
+              shadowColor: "yellow-500/25",
+            },
+            {
+              icon: TrendingUp,
+              label: "Offered",
+              value: stats.offered,
+              color: "green",
+              gradient: "from-green-500/25 to-green-600/25",
+              hoverGradient: "from-green-500/35 to-green-600/35",
+              shadowColor: "green-500/25",
+            },
+          ].map((stat, index) => (
+            <div
+              key={index}
+              className="bg-gradient-to-br from-slate-800/70 via-slate-800/50 to-slate-900/70 border border-slate-700/60 backdrop-blur-md hover:bg-gradient-to-br hover:from-slate-800/90 hover:via-slate-800/70 hover:to-slate-900/90 hover:border-slate-600/80 transition-all duration-500 group shadow-2xl hover:shadow-3xl cursor-pointer transform hover:-translate-y-3 hover:rotate-1 rounded-2xl"
+            >
+              <div className="p-7 relative overflow-hidden">
+                {/* Animated Background Elements */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-slate-600/10 via-slate-500/5 to-transparent rounded-full -translate-y-20 translate-x-20 group-hover:scale-110 transition-transform duration-700"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-slate-700/15 to-transparent rounded-full translate-y-12 -translate-x-12 group-hover:scale-110 transition-transform duration-700"></div>
+
+                {/* Floating Accent */}
+                <div
+                  className={`absolute top-4 right-4 w-2 h-2 bg-${stat.color}-400 rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-300`}
+                ></div>
+
+                <div className="flex items-center justify-between relative z-10">
+                  <div className="space-y-4">
+                    <div
+                      className={`p-4 bg-gradient-to-br ${stat.gradient} group-hover:bg-gradient-to-br group-hover:${stat.hoverGradient} rounded-2xl w-fit transition-all duration-300 shadow-lg border border-${stat.color}-500/20 group-hover:shadow-xl`}
+                    >
+                      <stat.icon
+                        className={`w-6 h-6 text-${stat.color}-300 group-hover:text-${stat.color}-200 transition-colors duration-300`}
+                      />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-sm font-semibold tracking-wide group-hover:text-slate-300 transition-colors duration-300">
+                        {stat.label}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right space-y-2">
+                    <p
+                      className={`text-5xl font-bold text-white group-hover:text-${stat.color}-100 transition-colors duration-300 drop-shadow-lg`}
+                    >
+                      {stat.value}
+                    </p>
+                    <div
+                      className={`w-12 h-1.5 bg-gradient-to-r from-${stat.color}-500 to-${stat.color}-400 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0`}
+                    ></div>
+                  </div>
                 </div>
-                <span className="text-3xl font-bold">{stat.value}</span>
               </div>
-              <p className="text-gray-500 text-sm">{stat.label}</p>
             </div>
           ))}
         </div>
