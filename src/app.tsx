@@ -204,20 +204,6 @@ const JobTracker = () => {
                 }`}
               >
                 {status}
-                {status !== 'All' && (
-                  <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-black/20">
-                    {status === 'Applied' ? stats.applied :
-                     status === 'Online Assessment' ? stats.onlineAssessment :
-                     status === 'Interview' ? stats.interview :
-                     status === 'Offer' ? stats.offer :
-                     status === 'Closed' ? stats.closed : 0}
-                  </span>
-                )}
-                {status === 'All' && (
-                  <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-black/20">
-                    {stats.total}
-                  </span>
-                )}
               </button>
             ))}
           </div>
