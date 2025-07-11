@@ -140,6 +140,12 @@ const StatsGrid = React.memo(({ stats }: { stats: JobStats }) => {
     },
     {
       icon: Clock,
+      label: "Online Assessment",
+      value: stats.onlineAssessment,
+      color: "orange",
+    },
+    {
+      icon: Clock,
       label: "Interview",
       value: stats.interview,
       color: "yellow",
@@ -153,7 +159,7 @@ const StatsGrid = React.memo(({ stats }: { stats: JobStats }) => {
   ], [stats]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
       {statItems.map((stat, index) => (
         <div
           key={index}
