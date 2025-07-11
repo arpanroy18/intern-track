@@ -191,43 +191,46 @@ const JobTracker = () => {
             </button>
           </div>
           
-          {/* Status Filter Buttons */}
-          <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-            {(['All', 'Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'] as const).map((status) => (
-              <button
-                key={status}
-                onClick={() => setSelectedStatusFilter(status)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                  selectedStatusFilter === status
-                    ? 'bg-blue-500 text-white shadow-lg'
-                    : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
-                }`}
-              >
-                {status}
-              </button>
-            ))}
-          </div>
-
-          {/* Search Bar */}
-          <div className="relative max-w-md">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
+          {/* Search Bar and Status Filter Buttons */}
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+            {/* Search Bar */}
+            <div className="relative w-full max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by company, role, or notes..."
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  <X className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                </button>
+              )}
             </div>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by company, role, or notes..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                <X className="h-4 w-4 text-gray-400 hover:text-gray-300" />
-              </button>
-            )}
+
+            {/* Status Filter Buttons */}
+            <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0">
+              {(['All', 'Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setSelectedStatusFilter(status)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                    selectedStatusFilter === status
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
           </div>
           
           {/* Search/Filter Results Info */}
