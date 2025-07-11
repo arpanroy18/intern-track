@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, MapPin, Plus, Trash2, Edit2, Check, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles } from 'lucide-react';
+import { Briefcase, MapPin, Plus, Trash2, Edit2, Check, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search } from 'lucide-react';
 import { Job, JobStats, JobStatus, TimelineEvent } from './types';
 
 const JobTracker = () => {
@@ -12,6 +12,8 @@ const JobTracker = () => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingData, setEditingData] = useState<Partial<Job>>({});
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [stats, setStats] = useState<JobStats>({
     total: 0,
     applied: 0,
@@ -31,17 +33,36 @@ const JobTracker = () => {
     notes: ''
   });
 
+  // Search function
+  const searchJobs = (term: string, jobList: Job[]): Job[] => {
+    if (!term.trim()) return jobList;
+    
+    const lowerTerm = term.toLowerCase();
+    return jobList.filter(job => 
+      job.role.toLowerCase().includes(lowerTerm) ||
+      job.company.toLowerCase().includes(lowerTerm) ||
+      job.location.toLowerCase().includes(lowerTerm) ||
+      job.notes.toLowerCase().includes(lowerTerm) ||
+      job.skills.some(skill => skill.toLowerCase().includes(lowerTerm))
+    );
+  };
+
   useEffect(() => {
-    // Calculate stats whenever jobs change
+    // Filter jobs based on search term
+    const filtered = searchJobs(searchTerm, jobs);
+    setFilteredJobs(filtered);
+    
+    // Calculate stats based on filtered results for search, or all jobs when not searching
+    const statsSource = searchTerm.trim() ? filtered : jobs;
     const newStats: JobStats = {
-      total: jobs.length,
-      applied: jobs.filter(j => j.status === 'Applied').length,
-      interviewing: jobs.filter(j => j.status === 'Interviewing').length,
-      offered: jobs.filter(j => j.status === 'Offered').length,
-      rejected: jobs.filter(j => j.status === 'Rejected').length
+      total: statsSource.length,
+      applied: statsSource.filter(j => j.status === 'Applied').length,
+      interviewing: statsSource.filter(j => j.status === 'Interviewing').length,
+      offered: statsSource.filter(j => j.status === 'Offered').length,
+      rejected: statsSource.filter(j => j.status === 'Rejected').length
     };
     setStats(newStats);
-  }, [jobs]);
+  }, [jobs, searchTerm]);
 
   const handleAddJob = () => {
     if (!formData.role.trim() || !formData.company.trim()) return;
@@ -144,20 +165,57 @@ const JobTracker = () => {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-semibold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Job Application Tracker
-            </h1>
-            <p className="text-gray-500 text-sm">AI-powered tracking for your career journey</p>
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-3xl font-semibold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Job Application Tracker
+              </h1>
+              <p className="text-gray-500 text-sm">AI-powered tracking for your career journey</p>
+            </div>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
+            >
+              <Sparkles className="w-4 h-4" />
+              Add Application
+            </button>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg"
-          >
-            <Sparkles className="w-4 h-4" />
-            Add Application
-          </button>
+          
+          {/* Search Bar */}
+          <div className="relative max-w-md">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by company, role, or notes..."
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <X className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+              </button>
+            )}
+          </div>
+          
+          {/* Search Results Info */}
+          {searchTerm && (
+            <div className="mt-3 text-sm text-gray-400">
+              {filteredJobs.length === 0 ? (
+                <span>No applications found for "{searchTerm}"</span>
+              ) : (
+                <span>
+                  Found {filteredJobs.length} application{filteredJobs.length !== 1 ? 's' : ''} for "{searchTerm}"
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Premium Stats Grid */}
@@ -300,9 +358,23 @@ const JobTracker = () => {
                   Add your first application →
                 </button>
               </div>
+            ) : filteredJobs.length === 0 && searchTerm ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-gray-600" />
+                </div>
+                <p className="text-gray-500 mb-2">No applications found</p>
+                <p className="text-gray-600 text-sm mb-4">Try adjusting your search terms</p>
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="text-purple-400 hover:text-purple-300 text-sm font-medium"
+                >
+                  Clear search
+                </button>
+              </div>
             ) : (
               <div className="space-y-3">
-                {jobs.map(job => (
+                {(searchTerm ? filteredJobs : jobs).map(job => (
                   <div
                     key={job.id}
                     className="bg-slate-800/50 rounded-xl p-5 hover:bg-slate-800 transition-all border border-slate-700/50 hover:border-slate-600 cursor-pointer"
