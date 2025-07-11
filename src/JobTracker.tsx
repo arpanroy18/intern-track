@@ -1,9 +1,238 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Briefcase, MapPin, Plus, Trash2, Edit2, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter, LogOut, User, Settings, Wand2 } from 'lucide-react';
 import { Job, JobStats, JobStatus, Folder as FolderType } from './types';
 import { useAuth } from './contexts/AuthContext';
 import { JobApplicationService } from './services/jobApplicationService';
 import Cerebras from '@cerebras/cerebras_cloud_sdk';
+
+// Memoized JobCard component to prevent unnecessary re-renders
+const JobCard = React.memo(({ 
+  job, 
+  index, 
+  statusColors, 
+  onShowDetails, 
+  onShowTimeline, 
+  onUpdateStatus, 
+  onDelete 
+}: {
+  job: Job;
+  index: number;
+  statusColors: Record<JobStatus, string>;
+  onShowDetails: (job: Job) => void;
+  onShowTimeline: (e: React.MouseEvent, job: Job) => void;
+  onUpdateStatus: (id: number, status: JobStatus) => void;
+  onDelete: (id: number) => void;
+}) => {
+  const handleStatusChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    onUpdateStatus(job.id, e.target.value as JobStatus);
+  }, [job.id, onUpdateStatus]);
+
+  const handleDelete = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(job.id);
+  }, [job.id, onDelete]);
+
+  const handleShowDetails = useCallback(() => {
+    onShowDetails(job);
+  }, [job, onShowDetails]);
+
+  const handleShowTimeline = useCallback((e: React.MouseEvent) => {
+    onShowTimeline(e, job);
+  }, [job, onShowTimeline]);
+
+  return (
+    <div
+      className="bg-slate-800/50 rounded-xl p-3 hover:bg-slate-800 transition-all border border-slate-700/50 hover:border-slate-600 cursor-pointer"
+      onClick={handleShowDetails}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-4 flex-1">
+          <div className="flex-shrink-0 w-8 h-8 bg-slate-700/50 rounded-lg flex items-center justify-center mt-0.5">
+            <span className="text-sm font-medium text-gray-400">{index + 1}</span>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-4 mb-2">
+              <h3 className="text-lg font-medium">{job.role}</h3>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
+                {job.status}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-6 text-sm text-gray-400">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
+                {job.company}
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                {job.location}
+                {job.remote && (
+                  <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 rounded text-xs ml-1">
+                    Remote
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                {job.dateApplied}
+              </div>
+            </div>
+            
+            <div className="mt-2 flex items-center gap-2">
+              {job.skills.slice(0, 3).map((skill, skillIndex) => (
+                <span key={skillIndex} className="px-2 py-1 bg-slate-700 rounded text-xs">
+                  {skill}
+                </span>
+              ))}
+              {job.skills.length > 3 && (
+                <span className="text-xs text-gray-500">+{job.skills.length - 3} more</span>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={handleShowTimeline}
+            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+            title="View Timeline"
+          >
+            <Clock className="w-4 h-4 text-purple-400" />
+          </button>
+          <select
+            value={job.status}
+            onChange={handleStatusChange}
+            className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-purple-400"
+          >
+            <option value="Applied">Applied</option>
+            <option value="Online Assessment">Online Assessment</option>
+            <option value="Interview">Interview</option>
+            <option value="Offer">Offer</option>
+            <option value="Closed">Closed</option>
+          </select>
+          <button
+            onClick={handleDelete}
+            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+          >
+            <Trash2 className="w-4 h-4 text-gray-400" />
+          </button>
+          <ChevronRight className="w-5 h-5 text-gray-400" />
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// Memoized StatsGrid component
+const StatsGrid = React.memo(({ stats }: { stats: JobStats }) => {
+  const statItems = useMemo(() => [
+    {
+      icon: BarChart3,
+      label: "Total Applications",
+      value: stats.total,
+      color: "purple",
+    },
+    {
+      icon: FileText,
+      label: "Applied",
+      value: stats.applied,
+      color: "blue",
+    },
+    {
+      icon: Clock,
+      label: "Interview",
+      value: stats.interview,
+      color: "yellow",
+    },
+    {
+      icon: TrendingUp,
+      label: "Offer",
+      value: stats.offer,
+      color: "green",
+    },
+  ], [stats]);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {statItems.map((stat, index) => (
+        <div
+          key={index}
+          className="bg-gradient-to-br from-slate-800/70 via-slate-800/50 to-slate-900/70 border border-slate-700/60 backdrop-blur-md hover:bg-gradient-to-br hover:from-slate-800/90 hover:via-slate-800/70 hover:to-slate-900/90 hover:border-slate-600/80 transition-all duration-500 group shadow-2xl hover:shadow-3xl cursor-pointer transform hover:-translate-y-3 hover:rotate-1 rounded-2xl"
+        >
+          <div className="p-4 relative overflow-hidden">
+            {/* Animated Background Elements */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-slate-600/10 via-slate-500/5 to-transparent rounded-full -translate-y-20 translate-x-20 group-hover:scale-110 transition-transform duration-700"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-slate-700/15 to-transparent rounded-full translate-y-12 -translate-x-12 group-hover:scale-110 transition-transform duration-700"></div>
+
+            {/* Floating Accent */}
+            <div
+              className={`absolute top-4 right-4 w-2 h-2 rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-300 ${
+                stat.color === 'purple' ? 'bg-purple-400' :
+                stat.color === 'blue' ? 'bg-blue-400' :
+                stat.color === 'yellow' ? 'bg-yellow-400' :
+                stat.color === 'green' ? 'bg-green-400' :
+                'bg-slate-400'
+              }`}
+            ></div>
+
+            <div className="flex items-center justify-between relative z-10">
+              <div className="space-y-3">
+                <div
+                  className={`p-3 rounded-2xl w-fit transition-all duration-300 shadow-lg group-hover:shadow-xl ${
+                    stat.color === 'purple' ? 'bg-gradient-to-br from-purple-500/25 to-purple-600/25 group-hover:from-purple-500/35 group-hover:to-purple-600/35 border border-purple-500/20' :
+                    stat.color === 'blue' ? 'bg-gradient-to-br from-blue-500/25 to-blue-600/25 group-hover:from-blue-500/35 group-hover:to-blue-600/35 border border-blue-500/20' :
+                    stat.color === 'yellow' ? 'bg-gradient-to-br from-yellow-500/25 to-yellow-600/25 group-hover:from-yellow-500/35 group-hover:to-yellow-600/35 border border-yellow-500/20' :
+                    stat.color === 'green' ? 'bg-gradient-to-br from-green-500/25 to-green-600/25 group-hover:from-green-500/35 group-hover:to-green-600/35 border border-green-500/20' :
+                    'bg-gradient-to-br from-slate-500/25 to-slate-600/25 group-hover:from-slate-500/35 group-hover:to-slate-600/35 border border-slate-500/20'
+                  }`}
+                >
+                  <stat.icon
+                    className={`w-6 h-6 transition-colors duration-300 ${
+                      stat.color === 'purple' ? 'text-purple-300 group-hover:text-purple-200' :
+                      stat.color === 'blue' ? 'text-blue-300 group-hover:text-blue-200' :
+                      stat.color === 'yellow' ? 'text-yellow-300 group-hover:text-yellow-200' :
+                      stat.color === 'green' ? 'text-green-300 group-hover:text-green-200' :
+                      'text-slate-300 group-hover:text-slate-200'
+                    }`}
+                  />
+                </div>
+                <div>
+                  <p className="text-slate-400 text-sm font-semibold tracking-wide group-hover:text-slate-300 transition-colors duration-300">
+                    {stat.label}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right space-y-2">
+                <p
+                  className={`text-5xl font-bold text-white transition-colors duration-300 drop-shadow-lg ${
+                    stat.color === 'purple' ? 'group-hover:text-purple-100' :
+                    stat.color === 'blue' ? 'group-hover:text-blue-100' :
+                    stat.color === 'yellow' ? 'group-hover:text-yellow-100' :
+                    stat.color === 'green' ? 'group-hover:text-green-100' :
+                    'group-hover:text-slate-100'
+                  }`}
+                >
+                  {stat.value}
+                </p>
+                <div
+                  className={`w-12 h-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0 ${
+                    stat.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-purple-400' :
+                    stat.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-400' :
+                    stat.color === 'yellow' ? 'bg-gradient-to-r from-yellow-500 to-yellow-400' :
+                    stat.color === 'green' ? 'bg-gradient-to-r from-green-500 to-green-400' :
+                    'bg-gradient-to-r from-slate-500 to-slate-400'
+                  }`}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
+JobCard.displayName = 'JobCard';
+StatsGrid.displayName = 'StatsGrid';
 
 const JobTracker = () => {
   const { signOut, user, updateEmail, updatePassword } = useAuth();
@@ -16,15 +245,7 @@ const JobTracker = () => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [stats, setStats] = useState<JobStats>({
-    total: 0,
-    applied: 0,
-    onlineAssessment: 0,
-    interview: 0,
-    offer: 0,
-    closed: 0
-  });
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>('');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<JobStatus | 'All'>('All');
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [folders, setFolders] = useState<FolderType[]>([]);
@@ -66,34 +287,36 @@ const JobTracker = () => {
   useEffect(() => {
     loadJobs();
     loadFolders();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load jobs when selected folder changes
   useEffect(() => {
     loadJobs();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFolder]);
 
   // Populate email field when user settings modal opens
   useEffect(() => {
     if (showUserSettingsModal && user?.email) {
-      setUserSettingsFormData({ ...userSettingsFormData, email: user.email });
+      setUserSettingsFormData(prev => ({ ...prev, email: user.email || '' }));
     }
   }, [showUserSettingsModal, user?.email]);
 
-  const handleUpdateEmail = async () => {
+  const handleUpdateEmail = useCallback(async () => {
     try {
       const { error } = await updateEmail(userSettingsFormData.email);
       if (error) throw error;
       alert('Email updated successfully! Please check your new email for verification.');
       setShowUserSettingsModal(false);
-      setUserSettingsFormData({ ...userSettingsFormData, email: '' });
-    } catch (error: any) {
+      setUserSettingsFormData(prev => ({ ...prev, email: '' }));
+    } catch (error: unknown) {
       console.error('Error updating email:', error);
-      alert(error.message || 'Failed to update email. Please try again.');
+      alert((error as Error).message || 'Failed to update email. Please try again.');
     }
-  };
+  }, [userSettingsFormData.email, updateEmail]);
 
-  const handleUpdatePassword = async () => {
+  const handleUpdatePassword = useCallback(async () => {
     if (userSettingsFormData.newPassword !== userSettingsFormData.confirmPassword) {
       alert('New passwords do not match.');
       return;
@@ -107,12 +330,12 @@ const JobTracker = () => {
       if (error) throw error;
       alert('Password updated successfully!');
       setShowUserSettingsModal(false);
-      setUserSettingsFormData({ ...userSettingsFormData, currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (error: any) {
+      setUserSettingsFormData(prev => ({ ...prev, currentPassword: '', newPassword: '', confirmPassword: '' }));
+    } catch (error: unknown) {
       console.error('Error updating password:', error);
-      alert(error.message || 'Failed to update password. Please try again.');
+      alert((error as Error).message || 'Failed to update password. Please try again.');
     }
-  };
+  }, [userSettingsFormData.newPassword, userSettingsFormData.confirmPassword, updatePassword]);
 
   const loadJobs = async () => {
     try {
@@ -136,8 +359,8 @@ const JobTracker = () => {
     }
   };
 
-  // Search function
-  const searchJobs = (term: string, jobList: Job[]): Job[] => {
+  // Memoized search function
+  const searchJobs = useCallback((term: string, jobList: Job[]): Job[] => {
     if (!term.trim()) return jobList;
     
     const lowerTerm = term.toLowerCase();
@@ -148,21 +371,33 @@ const JobTracker = () => {
       job.notes.toLowerCase().includes(lowerTerm) ||
       job.skills.some(skill => skill.toLowerCase().includes(lowerTerm))
     );
-  };
+  }, []);
 
+  // Debounce search term to reduce excessive filtering
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Memoized filtered jobs
+  const filteredJobs = useMemo(() => {
     // First filter by search term
-    let filtered = searchJobs(searchTerm, jobs);
+    let filtered = searchJobs(debouncedSearchTerm, jobs);
     
     // Then filter by status if not "All"
     if (selectedStatusFilter !== 'All') {
       filtered = filtered.filter(job => job.status === selectedStatusFilter);
     }
     
-    setFilteredJobs(filtered);
-    
-    // Calculate stats based on all jobs (not filtered results)
-    const newStats: JobStats = {
+    return filtered;
+  }, [jobs, debouncedSearchTerm, selectedStatusFilter, searchJobs]);
+
+  // Memoized stats calculation
+  const stats = useMemo(() => {
+    return {
       total: jobs.length,
       applied: jobs.filter(j => j.status === 'Applied').length,
       onlineAssessment: jobs.filter(j => j.status === 'Online Assessment').length,
@@ -170,8 +405,7 @@ const JobTracker = () => {
       offer: jobs.filter(j => j.status === 'Offer').length,
       closed: jobs.filter(j => j.status === 'Closed').length
     };
-    setStats(newStats);
-  }, [jobs, searchTerm, selectedStatusFilter]);
+  }, [jobs]);
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -191,7 +425,7 @@ const JobTracker = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showUserMenu, showFolderManagement, showSeasonDropdown]);
 
-  const handleAddJob = async () => {
+  const handleAddJob = useCallback(async () => {
     if (!formData.role.trim() || !formData.company.trim()) return;
 
     setIsProcessing(true);
@@ -236,9 +470,9 @@ const JobTracker = () => {
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [formData, jobs, selectedFolder?.id]);
 
-  const deleteJob = async (id: number) => {
+  const deleteJob = useCallback(async (id: number) => {
     try {
       await JobApplicationService.deleteJobApplication(id);
       setJobs(jobs.filter(job => job.id !== id));
@@ -246,9 +480,9 @@ const JobTracker = () => {
       console.error('Error deleting job:', error);
       alert('Failed to delete job. Please try again.');
     }
-  };
+  }, [jobs]);
 
-  const updateStatus = async (id: number, status: JobStatus) => {
+  const updateStatus = useCallback(async (id: number, status: JobStatus) => {
     try {
       const updatedJob = await JobApplicationService.updateJobStatus(id, status);
       setJobs(jobs.map(job => job.id === id ? updatedJob : job));
@@ -256,14 +490,14 @@ const JobTracker = () => {
       console.error('Error updating job status:', error);
       alert('Failed to update job status. Please try again.');
     }
-  };
+  }, [jobs]);
 
-  const showJobDetails = (job: Job) => {
+  const showJobDetails = useCallback((job: Job) => {
     setSelectedJob(job);
     setShowDetailsModal(true);
-  };
+  }, []);
 
-  const handleCreateFolder = async () => {
+  const handleCreateFolder = useCallback(async () => {
     if (!folderFormData.name.trim()) return;
 
     try {
@@ -284,9 +518,9 @@ const JobTracker = () => {
       console.error('Error creating folder:', error);
       alert('Failed to create folder. Please try again.');
     }
-  };
+  }, [folderFormData, folders]);
 
-  const handleAIParseJob = async () => {
+  const handleAIParseJob = useCallback(async () => {
     if (!jobDescription.trim()) return;
 
     setIsParsingAI(true);
@@ -333,7 +567,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
 
       console.log('✅ Full AI Response:', completionCreateResponse);
       
-      const content = (completionCreateResponse.choices as any)?.[0]?.message?.content;
+      const content = (completionCreateResponse.choices as { message?: { content?: string } }[])?.[0]?.message?.content;
       console.log('📋 AI Response Content:', content);
       
       if (!content) {
@@ -373,9 +607,9 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
     } finally {
       setIsParsingAI(false);
     }
-  };
+  }, [jobDescription, selectedFolder?.id]);
 
-  const handleCloseAddModal = () => {
+  const handleCloseAddModal = useCallback(() => {
     setShowAddModal(false);
     setIsFromAIParse(false);
     setFormData({
@@ -388,9 +622,9 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
       notes: '',
       folderId: ''
     });
-  };
+  }, []);
 
-  const handleDeleteFolder = async (folderId: string) => {
+  const handleDeleteFolder = useCallback(async (folderId: string) => {
     if (window.confirm('Are you sure you want to delete this folder? Jobs in this folder will not be deleted.')) {
       try {
         await JobApplicationService.deleteFolder(folderId);
@@ -403,21 +637,21 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
         alert('Failed to delete folder. Please try again.');
       }
     }
-  };
+  }, [folders, selectedFolder?.id]);
 
-  const showJobTimeline = (e: React.MouseEvent, job: Job) => {
+  const showJobTimeline = useCallback((e: React.MouseEvent, job: Job) => {
     e.stopPropagation();
     setSelectedJob(job);
     setShowTimelineModal(true);
-  };
+  }, []);
 
-  const statusColors: Record<JobStatus, string> = {
+  const statusColors: Record<JobStatus, string> = useMemo(() => ({
     'Applied': 'text-blue-400 bg-blue-400/10',
     'Online Assessment': 'text-orange-400 bg-orange-400/10',
     'Interview': 'text-yellow-400 bg-yellow-400/10',
     'Offer': 'text-green-400 bg-green-400/10',
     'Closed': 'text-red-400 bg-red-400/10'
-  };
+  }), []);
 
 
   return (
@@ -730,18 +964,18 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
           </div>
           
           {/* Search/Filter Results Info */}
-          {(searchTerm || selectedStatusFilter !== 'All') && (
+          {(debouncedSearchTerm || selectedStatusFilter !== 'All') && (
             <div className="mt-3 text-sm text-gray-400">
               {filteredJobs.length === 0 ? (
                 <span>
                   No applications found
-                  {searchTerm && ` for "${searchTerm}"`}
+                  {debouncedSearchTerm && ` for "${debouncedSearchTerm}"`}
                   {selectedStatusFilter !== 'All' && ` with status "${selectedStatusFilter}"`}
                 </span>
               ) : (
                 <span>
                   Found {filteredJobs.length} application{filteredJobs.length !== 1 ? 's' : ''}
-                  {searchTerm && ` for "${searchTerm}"`}
+                  {debouncedSearchTerm && ` for "${debouncedSearchTerm}"`}
                   {selectedStatusFilter !== 'All' && ` with status "${selectedStatusFilter}"`}
                 </span>
               )}
@@ -750,119 +984,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
         </div>
 
         {/* Premium Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[
-            {
-              icon: BarChart3,
-              label: "Total Applications",
-              value: stats.total,
-              color: "purple",
-              gradient: "from-purple-500/25 to-purple-600/25",
-              hoverGradient: "from-purple-500/35 to-purple-600/35",
-              shadowColor: "purple-500/25",
-            },
-            {
-              icon: FileText,
-              label: "Applied",
-              value: stats.applied,
-              color: "blue",
-              gradient: "from-blue-500/25 to-blue-600/25",
-              hoverGradient: "from-blue-500/35 to-blue-600/35",
-              shadowColor: "blue-500/25",
-            },
-            {
-              icon: Clock,
-              label: "Interview",
-              value: stats.interview,
-              color: "yellow",
-              gradient: "from-yellow-500/25 to-yellow-600/25",
-              hoverGradient: "from-yellow-500/35 to-yellow-600/35",
-              shadowColor: "yellow-500/25",
-            },
-            {
-              icon: TrendingUp,
-              label: "Offer",
-              value: stats.offer,
-              color: "green",
-              gradient: "from-green-500/25 to-green-600/25",
-              hoverGradient: "from-green-500/35 to-green-600/35",
-              shadowColor: "green-500/25",
-            },
-          ].map((stat, index) => (
-            <div
-              key={index}
-              className="bg-gradient-to-br from-slate-800/70 via-slate-800/50 to-slate-900/70 border border-slate-700/60 backdrop-blur-md hover:bg-gradient-to-br hover:from-slate-800/90 hover:via-slate-800/70 hover:to-slate-900/90 hover:border-slate-600/80 transition-all duration-500 group shadow-2xl hover:shadow-3xl cursor-pointer transform hover:-translate-y-3 hover:rotate-1 rounded-2xl"
-            >
-              <div className="p-4 relative overflow-hidden">
-                {/* Animated Background Elements */}
-                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-slate-600/10 via-slate-500/5 to-transparent rounded-full -translate-y-20 translate-x-20 group-hover:scale-110 transition-transform duration-700"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-slate-700/15 to-transparent rounded-full translate-y-12 -translate-x-12 group-hover:scale-110 transition-transform duration-700"></div>
-
-                {/* Floating Accent */}
-                <div
-                  className={`absolute top-4 right-4 w-2 h-2 rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-300 ${
-                    stat.color === 'purple' ? 'bg-purple-400' :
-                    stat.color === 'blue' ? 'bg-blue-400' :
-                    stat.color === 'yellow' ? 'bg-yellow-400' :
-                    stat.color === 'green' ? 'bg-green-400' :
-                    'bg-slate-400'
-                  }`}
-                ></div>
-
-                <div className="flex items-center justify-between relative z-10">
-                  <div className="space-y-3">
-                    <div
-                      className={`p-3 rounded-2xl w-fit transition-all duration-300 shadow-lg group-hover:shadow-xl ${
-                        stat.color === 'purple' ? 'bg-gradient-to-br from-purple-500/25 to-purple-600/25 group-hover:from-purple-500/35 group-hover:to-purple-600/35 border border-purple-500/20' :
-                        stat.color === 'blue' ? 'bg-gradient-to-br from-blue-500/25 to-blue-600/25 group-hover:from-blue-500/35 group-hover:to-blue-600/35 border border-blue-500/20' :
-                        stat.color === 'yellow' ? 'bg-gradient-to-br from-yellow-500/25 to-yellow-600/25 group-hover:from-yellow-500/35 group-hover:to-yellow-600/35 border border-yellow-500/20' :
-                        stat.color === 'green' ? 'bg-gradient-to-br from-green-500/25 to-green-600/25 group-hover:from-green-500/35 group-hover:to-green-600/35 border border-green-500/20' :
-                        'bg-gradient-to-br from-slate-500/25 to-slate-600/25 group-hover:from-slate-500/35 group-hover:to-slate-600/35 border border-slate-500/20'
-                      }`}
-                    >
-                      <stat.icon
-                        className={`w-6 h-6 transition-colors duration-300 ${
-                          stat.color === 'purple' ? 'text-purple-300 group-hover:text-purple-200' :
-                          stat.color === 'blue' ? 'text-blue-300 group-hover:text-blue-200' :
-                          stat.color === 'yellow' ? 'text-yellow-300 group-hover:text-yellow-200' :
-                          stat.color === 'green' ? 'text-green-300 group-hover:text-green-200' :
-                          'text-slate-300 group-hover:text-slate-200'
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <p className="text-slate-400 text-sm font-semibold tracking-wide group-hover:text-slate-300 transition-colors duration-300">
-                        {stat.label}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right space-y-2">
-                    <p
-                      className={`text-5xl font-bold text-white transition-colors duration-300 drop-shadow-lg ${
-                        stat.color === 'purple' ? 'group-hover:text-purple-100' :
-                        stat.color === 'blue' ? 'group-hover:text-blue-100' :
-                        stat.color === 'yellow' ? 'group-hover:text-yellow-100' :
-                        stat.color === 'green' ? 'group-hover:text-green-100' :
-                        'group-hover:text-slate-100'
-                      }`}
-                    >
-                      {stat.value}
-                    </p>
-                    <div
-                      className={`w-12 h-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-2 group-hover:translate-x-0 ${
-                        stat.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-purple-400' :
-                        stat.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-400' :
-                        stat.color === 'yellow' ? 'bg-gradient-to-r from-yellow-500 to-yellow-400' :
-                        stat.color === 'green' ? 'bg-gradient-to-r from-green-500 to-green-400' :
-                        'bg-gradient-to-r from-slate-500 to-slate-400'
-                      }`}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <StatsGrid stats={stats} />
 
         {/* Main Content Area */}
         <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
@@ -896,7 +1018,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                   Add your first application →
                 </button>
               </div>
-            ) : filteredJobs.length === 0 && (searchTerm || selectedStatusFilter !== 'All') ? (
+            ) : filteredJobs.length === 0 && (debouncedSearchTerm || selectedStatusFilter !== 'All') ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Search className="w-8 h-8 text-gray-600" />
@@ -904,7 +1026,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                 <p className="text-gray-500 mb-2">No applications found</p>
                 <p className="text-gray-600 text-sm mb-4">Try adjusting your search terms or filters</p>
                 <div className="flex gap-2 justify-center">
-                  {searchTerm && (
+                  {debouncedSearchTerm && (
                     <button
                       onClick={() => setSearchTerm('')}
                       className="text-purple-400 hover:text-purple-300 text-sm font-medium"
@@ -920,7 +1042,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                       Clear filter
                     </button>
                   )}
-                  {(searchTerm || selectedStatusFilter !== 'All') && (
+                  {(debouncedSearchTerm || selectedStatusFilter !== 'All') && (
                     <button
                       onClick={() => {
                         setSearchTerm('');
@@ -935,90 +1057,17 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
               </div>
             ) : (
               <div className="space-y-2">
-                {(searchTerm || selectedStatusFilter !== 'All' ? filteredJobs : jobs).map((job, index) => (
-                  <div
+                {(debouncedSearchTerm || selectedStatusFilter !== 'All' ? filteredJobs : jobs).map((job, index) => (
+                  <JobCard
                     key={job.id}
-                    className="bg-slate-800/50 rounded-xl p-3 hover:bg-slate-800 transition-all border border-slate-700/50 hover:border-slate-600 cursor-pointer"
-                    onClick={() => showJobDetails(job)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-4 flex-1">
-                        <div className="flex-shrink-0 w-8 h-8 bg-slate-700/50 rounded-lg flex items-center justify-center mt-0.5">
-                          <span className="text-sm font-medium text-gray-400">{index + 1}</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-4 mb-2">
-                            <h3 className="text-lg font-medium">{job.role}</h3>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
-                              {job.status}
-                            </span>
-                          </div>
-                          
-                          <div className="flex items-center gap-6 text-sm text-gray-400">
-                            <div className="flex items-center gap-2">
-                              <Building2 className="w-4 h-4" />
-                              {job.company}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MapPin className="w-4 h-4" />
-                              {job.location}
-                              {job.remote && (
-                                <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 rounded text-xs ml-1">
-                                  Remote
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4" />
-                              {job.dateApplied}
-                            </div>
-                          </div>
-                          
-                          <div className="mt-2 flex items-center gap-2">
-                            {job.skills.slice(0, 3).map((skill, index) => (
-                              <span key={index} className="px-2 py-1 bg-slate-700 rounded text-xs">
-                                {skill}
-                              </span>
-                            ))}
-                            {job.skills.length > 3 && (
-                              <span className="text-xs text-gray-500">+{job.skills.length - 3} more</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          onClick={(e) => showJobTimeline(e, job)}
-                          className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-                          title="View Timeline"
-                        >
-                          <Clock className="w-4 h-4 text-purple-400" />
-                        </button>
-                        <select
-                          value={job.status}
-                          onChange={(e) => updateStatus(job.id, e.target.value as JobStatus)}
-                          className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-purple-400"
-                        >
-                          <option value="Applied">Applied</option>
-                          <option value="Online Assessment">Online Assessment</option>
-                          <option value="Interview">Interview</option>
-                          <option value="Offer">Offer</option>
-                          <option value="Closed">Closed</option>
-                        </select>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteJob(job.id);
-                          }}
-                          className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4 text-gray-400" />
-                        </button>
-                        <ChevronRight className="w-5 h-5 text-gray-400" />
-                      </div>
-                    </div>
-                  </div>
+                    job={job}
+                    index={index}
+                    statusColors={statusColors}
+                    onShowDetails={showJobDetails}
+                    onShowTimeline={showJobTimeline}
+                    onUpdateStatus={updateStatus}
+                    onDelete={deleteJob}
+                  />
                 ))}
               </div>
             )}
