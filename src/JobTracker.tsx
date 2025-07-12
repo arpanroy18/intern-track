@@ -619,7 +619,7 @@ Job Description:
 ${jobDescription}
 
 Extract these fields:
-- role (job title, only the job title. If it is something like Software Developer (Fall 2025), only return "Software Developer. Basically, just return the role as if it a basic title but into HR system, no unnecessary details.")
+– role (only the core, standardized job title as it would appear in an HR system, stripping away levels, seniority, numbering, seasons, dates, or extra details; e.g., return “Software Engineer” instead of “Software Engineer I” or “Principal Associate, Software Engineer”, and “Software Developer” instead of “Software Developer (Fall 2025)”)
 - company (company name)
 - location (job location. Do not need to include other details. For example, Canada not Canada (Remote), just include the country and city if given.)
 - experienceRequired (years of experience required, otherwise "Not specified")
