@@ -268,6 +268,8 @@ const JobTracker = () => {
   const [showAIParseModal, setShowAIParseModal] = useState<boolean>(false);
   const [jobDescription, setJobDescription] = useState<string>('');
   const [isParsingAI, setIsParsingAI] = useState<boolean>(false);
+  const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [isFromAIParse, setIsFromAIParse] = useState<boolean>(false);
   const [folderFormData, setFolderFormData] = useState({
     name: '',
@@ -680,7 +682,11 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
         stack: error instanceof Error ? error.stack : 'No stack trace',
         name: error instanceof Error ? error.name : 'Unknown error type'
       });
-      alert('Failed to parse job description. Please try again or add the job manually.');
+      
+      // Show error popup with detailed message
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
+      setErrorMessage(`Failed to parse job description: ${errorMsg}`);
+      setShowErrorModal(true);
     } finally {
       setIsParsingAI(false);
     }
@@ -1864,6 +1870,51 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                     Update Season
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Modal */}
+        {showErrorModal && (
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            onClick={() => setShowErrorModal(false)}
+          >
+            <div 
+              className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-red-500/20 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 bg-red-500/10 rounded-xl">
+                  <X className="w-6 h-6 text-red-400" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-red-400">Parsing Error</h2>
+                  <p className="text-gray-500 text-sm">An error occurred while parsing the job description</p>
+                </div>
+              </div>
+              
+              <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
+                <p className="text-gray-300 text-sm break-words">{errorMessage}</p>
+              </div>
+              
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    setShowErrorModal(false);
+                    setShowAddModal(true);
+                  }}
+                  className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all"
+                >
+                  Add Manually
+                </button>
               </div>
             </div>
           </div>
