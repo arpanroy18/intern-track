@@ -3,6 +3,7 @@ import { Briefcase, MapPin, Plus, Trash2, Edit2, X, Loader, BarChart3, Clock, Fi
 import { Job, JobStats, JobStatus, Folder as FolderType } from './types';
 import { useAuth } from './contexts/AuthContext';
 import { JobApplicationService } from './services/jobApplicationService';
+import { ColorPicker } from './components/ColorPicker';
 import Cerebras from '@cerebras/cerebras_cloud_sdk';
 
 // Memoized JobCard component to prevent unnecessary re-renders
@@ -1476,15 +1477,11 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                   <label className="block text-sm font-medium text-gray-400 mb-2">
                     Color Theme
                   </label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      value={folderFormData.color}
-                      onChange={(e) => setFolderFormData({...folderFormData, color: e.target.value})}
-                      className="w-12 h-10 bg-slate-800/50 border border-slate-700 rounded-lg cursor-pointer"
-                    />
-                    <span className="text-sm text-gray-400">Choose a color to represent this season</span>
-                  </div>
+                  <ColorPicker
+                    color={folderFormData.color}
+                    onChange={(color) => setFolderFormData({...folderFormData, color})}
+                  />
+                  <span className="text-xs text-gray-500 mt-1 block">Choose a color to represent this season</span>
                 </div>
 
                 <div className="flex gap-3 pt-4">
