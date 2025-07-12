@@ -1839,12 +1839,18 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                     Color Theme
                   </label>
                   <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      value={editFolderFormData.color}
-                      onChange={(e) => setEditFolderFormData({...editFolderFormData, color: e.target.value})}
-                      className="w-12 h-10 bg-slate-800/50 border border-slate-700 rounded-lg cursor-pointer"
-                    />
+                    <div className="relative">
+                      <input
+                        type="color"
+                        value={editFolderFormData.color}
+                        onChange={(e) => setEditFolderFormData({...editFolderFormData, color: e.target.value})}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <div 
+                        className="w-12 h-12 rounded-full border-2 border-slate-700 cursor-pointer"
+                        style={{ backgroundColor: editFolderFormData.color }}
+                      />
+                    </div>
                     <span className="text-sm text-gray-400">Choose a color to represent this season</span>
                   </div>
                 </div>

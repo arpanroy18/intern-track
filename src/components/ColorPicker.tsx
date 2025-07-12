@@ -158,7 +158,7 @@ export function ColorPicker({
       >
         <div className="flex items-center gap-2">
           <div
-            className="w-4 h-4 rounded-full shadow-sm border border-slate-600"
+            className="w-5 h-5 rounded-full shadow-sm border-2 border-slate-600"
             style={{ backgroundColor: colorInput }}
           />
           <span className="text-sm">{trimColorString(colorInput)}</span>
@@ -226,7 +226,7 @@ export function ColorPicker({
                   placeholder="#RRGGBB or hsl(h, s%, l%)"
                 />
                 <motion.div
-                  className="w-8 h-8 rounded-md shadow-sm border border-slate-600"
+                  className="w-8 h-8 rounded-full shadow-sm border-2 border-slate-600"
                   style={{ backgroundColor: colorInput }}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
