@@ -63,7 +63,9 @@ export function ColorPicker({
   const [hsl, setHsl] = useState<[number, number, number]>([0, 0, 0])
   const [colorInput, setColorInput] = useState(color)
   const [isOpen, setIsOpen] = useState(false)
+  const [fixedPosition, setFixedPosition] = useState({ top: 0, left: 0, width: 0 })
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const handleColorChange = useCallback((newColor: string) => {
     const normalizedColor = normalizeColor(newColor)
@@ -86,6 +88,33 @@ export function ColorPicker({
     handleColorChange(color)
   }, [color, handleColorChange])
 
+  const calculateDropdownPosition = useCallback(() => {
+    if (!buttonRef.current) return
+
+    const buttonRect = buttonRef.current.getBoundingClientRect()
+    const viewportHeight = window.innerHeight
+    const dropdownHeight = 300 // Approximate height of the dropdown
+    const spaceBelow = viewportHeight - buttonRect.bottom - 20
+    const spaceAbove = buttonRect.top - 20
+
+    // Determine if we should position above or below
+    if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
+      // Position above
+      setFixedPosition({
+        top: buttonRect.top - dropdownHeight - 8,
+        left: buttonRect.left,
+        width: buttonRect.width
+      })
+    } else {
+      // Position below
+      setFixedPosition({
+        top: buttonRect.bottom + 8,
+        left: buttonRect.left,
+        width: buttonRect.width
+      })
+    }
+  }, [])
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -93,14 +122,23 @@ export function ColorPicker({
       }
     }
 
+    const handleResize = () => {
+      if (isOpen) {
+        calculateDropdownPosition()
+      }
+    }
+
     if (isOpen) {
+      calculateDropdownPosition()
       document.addEventListener('mousedown', handleClickOutside)
+      window.addEventListener('resize', handleResize)
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('resize', handleResize)
     }
-  }, [isOpen])
+  }, [isOpen, calculateDropdownPosition])
 
   const handleHueChange = (hue: number) => {
     const newHsl: [number, number, number] = [hue, hsl[1], hsl[2]]
@@ -152,6 +190,7 @@ export function ColorPicker({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 hover:bg-slate-800 focus:outline-none focus:border-purple-400 transition-all"
@@ -173,7 +212,15 @@ export function ColorPicker({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-2 p-3 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50"
+            className="fixed p-3 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl"
+            style={{
+              top: `${fixedPosition.top}px`,
+              left: `${fixedPosition.left}px`,
+              width: `${Math.max(fixedPosition.width, 280)}px`,
+              maxHeight: '300px',
+              overflowY: 'auto',
+              zIndex: 9999
+            }}
           >
             <div className="space-y-3">
               <motion.div
