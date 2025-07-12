@@ -1909,6 +1909,19 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                 <button
                   onClick={() => {
                     setShowErrorModal(false);
+                    setShowAIParseModal(false);
+                    setIsFromAIParse(false);
+                    setJobDescription('');
+                    setFormData({
+                      role: '',
+                      company: '',
+                      location: '',
+                      experienceRequired: '',
+                      skills: '',
+                      remote: false,
+                      notes: '',
+                      folderId: selectedFolder?.id || ''
+                    });
                     setShowAddModal(true);
                   }}
                   className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all"
