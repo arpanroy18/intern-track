@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BarChart3, PieChart, TrendingUp, Clock, MapPin, Building2, ArrowLeft, Target, CheckCircle, XCircle, Activity } from 'lucide-react';
+import { PieChart, TrendingUp, Clock, MapPin, Building2, ArrowLeft, Target, CheckCircle, XCircle, Activity } from 'lucide-react';
 import { Job, JobStatus, Folder as FolderType, JobStats } from '../types';
 import { JobApplicationService } from '../services/jobApplicationService';
 
@@ -178,23 +178,40 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading analytics...</div>
+      <div className="min-h-screen bg-slate-950 text-gray-100 relative overflow-hidden flex items-center justify-center">
+        {/* Advanced Background Effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.06),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,rgba(120,200,255,0.04),transparent_50%)]"></div>
+        <div className="text-white text-xl relative z-10">Loading analytics...</div>
       </div>
     );
   }
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Unable to load analytics data</div>
+      <div className="min-h-screen bg-slate-950 text-gray-100 relative overflow-hidden flex items-center justify-center">
+        {/* Advanced Background Effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.06),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,rgba(120,200,255,0.04),transparent_50%)]"></div>
+        <div className="text-white text-xl relative z-10">Unable to load analytics data</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-950 text-gray-100 p-6 relative overflow-hidden">
+      {/* Advanced Background Effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.06),transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,rgba(120,200,255,0.04),transparent_50%)]"></div>
+      {/* Floating Particles */}
+      <div className="absolute top-20 left-20 w-2 h-2 bg-purple-400/30 rounded-full animate-pulse"></div>
+      <div className="absolute top-40 right-32 w-1 h-1 bg-pink-400/40 rounded-full animate-pulse delay-1000"></div>
+      <div className="absolute bottom-32 left-1/4 w-1.5 h-1.5 bg-blue-400/30 rounded-full animate-pulse delay-2000"></div>
+      
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -309,26 +326,123 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
           {/* Monthly Applications Trend */}
           <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
             <div className="flex items-center gap-2 mb-6">
-              <BarChart3 className="w-5 h-5 text-blue-400" />
+              <TrendingUp className="w-5 h-5 text-blue-400" />
               <h3 className="text-lg font-semibold text-white">Monthly Application Trend</h3>
             </div>
-            <div className="space-y-2">
-              {stats.monthlyApplications.slice(-6).map((item) => {
-                const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count));
-                const width = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-                return (
-                  <div key={item.month} className="flex items-center gap-3">
-                    <span className="text-gray-300 text-sm w-16">{item.month}</span>
-                    <div className="flex-1 bg-slate-700/50 rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${width}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-white font-medium w-8">{item.count}</span>
-                  </div>
-                );
-              })}
+            <div className="relative h-48">
+              {stats.monthlyApplications.length > 0 ? (
+                <svg viewBox="0 0 400 150" className="w-full h-full">
+                  {/* Grid lines */}
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <line
+                      key={i}
+                      x1="0"
+                      y1={30 + i * 30}
+                      x2="400"
+                      y2={30 + i * 30}
+                      stroke="rgba(148, 163, 184, 0.1)"
+                      strokeWidth="1"
+                    />
+                  ))}
+                  
+                  {/* Y-axis labels */}
+                  {(() => {
+                    const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count));
+                    const stepSize = Math.ceil(maxCount / 4);
+                    return [0, 1, 2, 3, 4].map((i) => (
+                      <text
+                        key={i}
+                        x="10"
+                        y={150 - i * 30}
+                        fill="rgba(156, 163, 175, 0.7)"
+                        fontSize="10"
+                        textAnchor="start"
+                      >
+                        {i * stepSize}
+                      </text>
+                    ));
+                  })()}
+
+                  {/* Line path */}
+                  <path
+                    d={(() => {
+                      const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count));
+                      const monthsToShow = stats.monthlyApplications.slice(-6);
+                      const stepX = 320 / Math.max(monthsToShow.length - 1, 1);
+                      
+                      return monthsToShow.map((item, index) => {
+                        const x = 40 + index * stepX;
+                        const y = 150 - (item.count / maxCount) * 120;
+                        return index === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
+                      }).join(' ');
+                    })()}
+                    fill="none"
+                    stroke="url(#lineGradient)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+
+                  {/* Data points */}
+                  {(() => {
+                    const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count));
+                    const monthsToShow = stats.monthlyApplications.slice(-6);
+                    const stepX = 320 / Math.max(monthsToShow.length - 1, 1);
+                    
+                    return monthsToShow.map((item, index) => {
+                      const x = 40 + index * stepX;
+                      const y = 150 - (item.count / maxCount) * 120;
+                      return (
+                        <g key={index}>
+                          <circle
+                            cx={x}
+                            cy={y}
+                            r="4"
+                            fill="url(#pointGradient)"
+                            stroke="white"
+                            strokeWidth="2"
+                          />
+                          <text
+                            x={x}
+                            y="170"
+                            fill="rgba(156, 163, 175, 0.8)"
+                            fontSize="10"
+                            textAnchor="middle"
+                          >
+                            {item.month}
+                          </text>
+                          <text
+                            x={x}
+                            y={y - 10}
+                            fill="white"
+                            fontSize="11"
+                            textAnchor="middle"
+                            fontWeight="500"
+                          >
+                            {item.count}
+                          </text>
+                        </g>
+                      );
+                    });
+                  })()}
+
+                  {/* Gradients */}
+                  <defs>
+                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#3b82f6" />
+                      <stop offset="100%" stopColor="#8b5cf6" />
+                    </linearGradient>
+                    <linearGradient id="pointGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#60a5fa" />
+                      <stop offset="100%" stopColor="#a78bfa" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  No data available
+                </div>
+              )}
             </div>
           </div>
         </div>
