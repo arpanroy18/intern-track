@@ -1177,15 +1177,15 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                     <div className="text-sm text-gray-400">
                       Showing {paginationData.startIndex + 1} to {paginationData.endIndex} of {paginationData.totalItems} applications
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       <button
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="px-3 py-1 rounded-lg bg-slate-800 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700 transition-colors"
+                        className="px-3 py-2 text-sm text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800/50 rounded-lg transition-all duration-200"
                       >
                         Previous
                       </button>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 mx-2">
                         {Array.from({ length: paginationData.totalPages }, (_, i) => i + 1)
                           .filter(page => {
                             const current = currentPage;
@@ -1199,14 +1199,14 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                             return (
                               <React.Fragment key={page}>
                                 {showEllipsis && (
-                                  <span className="px-2 text-gray-500">...</span>
+                                  <span className="px-2 text-gray-600 text-sm">...</span>
                                 )}
                                 <button
                                   onClick={() => setCurrentPage(page)}
-                                  className={`px-3 py-1 rounded-lg transition-colors ${
+                                  className={`w-8 h-8 text-sm rounded-lg transition-all duration-200 ${
                                     currentPage === page
-                                      ? 'bg-purple-600 text-white'
-                                      : 'bg-slate-800 text-white hover:bg-slate-700'
+                                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                                      : 'text-gray-400 hover:text-white hover:bg-slate-800/50 border border-slate-700/50 hover:border-slate-600'
                                   }`}
                                 >
                                   {page}
@@ -1218,7 +1218,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                       <button
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationData.totalPages))}
                         disabled={currentPage === paginationData.totalPages}
-                        className="px-3 py-1 rounded-lg bg-slate-800 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700 transition-colors"
+                        className="px-3 py-2 text-sm text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800/50 rounded-lg transition-all duration-200"
                       >
                         Next
                       </button>
