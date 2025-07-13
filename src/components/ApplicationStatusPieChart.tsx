@@ -90,10 +90,10 @@ const ApplicationStatusPieChart: React.FC<ApplicationStatusPieChartProps> = ({ s
   };
 
   return (
-    <div className="flex items-start gap-4 h-60">
+    <div className="flex items-start gap-4 h-52">
       {/* Pie Chart */}
       <div className="flex-1 min-h-0">
-        <ResponsiveContainer width="100%" height={240}>
+        <ResponsiveContainer width="100%" height={200}>
           <PieChart>
             <Pie
               data={data}
@@ -101,7 +101,7 @@ const ApplicationStatusPieChart: React.FC<ApplicationStatusPieChartProps> = ({ s
               cy="50%"
               labelLine={false}
               label={renderCustomLabel}
-              outerRadius={70}
+              outerRadius={85}
               fill="#8884d8"
               dataKey="value"
               onMouseEnter={onPieEnter}

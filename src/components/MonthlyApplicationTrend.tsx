@@ -38,7 +38,7 @@ const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({ month
   };
 
   return (
-    <div className="w-full h-60">
+    <div className="w-full h-52">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={monthlyApplications}
