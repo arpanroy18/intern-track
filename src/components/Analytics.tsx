@@ -501,10 +501,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
                     <span className="text-gray-400 text-sm w-4 flex-shrink-0">#{index + 1}</span>
                     <span className="text-gray-300 truncate">{item.company}</span>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-white font-medium">{item.count}</span>
-                    <span className="text-green-400 text-sm">{formatPercentage(item.rate)}</span>
-                  </div>
+                  <span className="text-white font-medium flex-shrink-0">{item.count}</span>
                 </div>
               ))}
             </div>
