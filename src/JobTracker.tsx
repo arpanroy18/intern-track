@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Briefcase, Plus, X, Loader, BarChart3, Clock, FileText, TrendingUp, Building2, Calendar, ChevronRight, Sparkles, Search, Filter, LogOut, User, Settings, Wand2 } from 'lucide-react';
+import { Briefcase, Plus, X, Loader, Clock, FileText, TrendingUp, Building2, Calendar, Sparkles, Search, Filter, LogOut, User, Settings, Wand2, MapPin, Edit2, Trash2 } from 'lucide-react';
 import { Job, JobStatus, Folder as FolderType } from './types';
 import { useAuth } from './contexts/AuthContext';
 import { ColorPicker } from './components/ColorPicker';
@@ -20,8 +20,7 @@ const JobTracker = () => {
     showUserSettingsModal, setShowUserSettingsModal,
     showSeasonsManagementModal, setShowSeasonsManagementModal,
     showEditSeasonModal, setShowEditSeasonModal,
-    showAIParseModal, setShowAIParseModal,
-    showErrorModal, setShowErrorModal
+    showAIParseModal, setShowAIParseModal
   } = useModals();
 
   const { folders, selectedFolder, setSelectedFolder, createFolder, updateFolder, deleteFolder } = useFolders();

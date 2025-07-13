@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Cerebras from '@cerebras/cerebras_cloud_sdk';
-import { Job, Folder as FolderType } from '../types';
+import { Folder as FolderType } from '../types';
 
 export function useAIParsing(
     setFormData: React.Dispatch<React.SetStateAction<any>>,

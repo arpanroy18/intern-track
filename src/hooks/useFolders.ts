@@ -43,7 +43,7 @@ export function useFolders() {
         }
     }, [selectedFolder]);
 
-    const createFolder = useCallback(async (folderData: Omit<FolderType, 'id' | 'isActive'>) => {
+    const createFolder = useCallback(async (folderData: Omit<FolderType, 'id' | 'isActive' | 'createdAt' | 'updatedAt'>) => {
         try {
             const newFolder = await JobApplicationService.createFolder({ ...folderData, isActive: true });
             setFolders(prev => [...prev, newFolder]);
