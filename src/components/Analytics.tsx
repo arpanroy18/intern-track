@@ -85,7 +85,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
         rate: data.count > 0 ? (data.offers / data.count) * 100 : 0
       }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
+      .slice(0, 5);
 
     // Top locations
     const locationMap = new Map<string, number>();
@@ -97,7 +97,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
     const topLocations = Array.from(locationMap.entries())
       .map(([location, count]) => ({ location, count }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 8);
+      .slice(0, 5);
 
     // Top skills
     const skillMap = new Map<string, number>();
@@ -110,7 +110,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
     const topSkills = Array.from(skillMap.entries())
       .map(([skill, count]) => ({ skill, count }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 12);
+      .slice(0, 5);
 
     // Monthly applications - ensure we always show last 6 months
     const now = new Date();
