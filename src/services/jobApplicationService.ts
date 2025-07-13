@@ -45,6 +45,9 @@ const idMapping = new Map<number, string>();
 let nextId = 1;
 
 export class JobApplicationService {
+  static getIdMapping(): Map<number, string> {
+    return idMapping;
+  }
   static async getAllJobApplications(folderId?: string): Promise<Job[]> {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) throw new Error('User not authenticated');

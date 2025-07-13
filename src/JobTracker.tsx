@@ -25,7 +25,7 @@ const JobTracker = () => {
   } = useModals();
 
   const { folders, selectedFolder, setSelectedFolder, createFolder, updateFolder, deleteFolder } = useFolders();
-  const { jobs, allJobs, isLoading, addJob, deleteJob, updateJobStatus, stats } = useJobs(selectedFolder);
+  const { jobs, allJobs, isLoading, addJob, deleteJob, updateJobStatus, updateJob, stats } = useJobs(selectedFolder);
 
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -56,6 +56,19 @@ const JobTracker = () => {
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
+  });
+
+  const [isEditingJob, setIsEditingJob] = useState<boolean>(false);
+  const [editJobFormData, setEditJobFormData] = useState({
+    role: '',
+    company: '',
+    location: '',
+    experienceRequired: '',
+    skills: '',
+    remote: false,
+    notes: '',
+    folderId: '',
+    jobPostingUrl: ''
   });
 
   const [formData, setFormData] = useState({
@@ -214,6 +227,18 @@ const JobTracker = () => {
 
   const showJobDetails = useCallback((job: Job) => {
     setSelectedJob(job);
+    setEditJobFormData({
+      role: job.role,
+      company: job.company,
+      location: job.location,
+      experienceRequired: job.experienceRequired,
+      skills: job.skills.join(', '),
+      remote: job.remote,
+      notes: job.notes,
+      folderId: job.folderId || '',
+      jobPostingUrl: job.jobPostingUrl || ''
+    });
+    setIsEditingJob(false);
     setShowDetailsModal(true);
   }, [setShowDetailsModal]);
 
@@ -265,6 +290,38 @@ const JobTracker = () => {
       jobPostingUrl: ''
     });
   }, [setShowAddModal]);
+
+  const handleEditJob = useCallback(() => {
+    setIsEditingJob(true);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    if (selectedJob) {
+      setEditJobFormData({
+        role: selectedJob.role,
+        company: selectedJob.company,
+        location: selectedJob.location,
+        experienceRequired: selectedJob.experienceRequired,
+        skills: selectedJob.skills.join(', '),
+        remote: selectedJob.remote,
+        notes: selectedJob.notes,
+        folderId: selectedJob.folderId || '',
+        jobPostingUrl: selectedJob.jobPostingUrl || ''
+      });
+    }
+    setIsEditingJob(false);
+  }, [selectedJob]);
+
+  const handleSaveJob = useCallback(async () => {
+    if (!selectedJob || !editJobFormData.role.trim() || !editJobFormData.company.trim()) return;
+
+    await updateJob(selectedJob.id, {
+      ...editJobFormData,
+      skills: editJobFormData.skills ? editJobFormData.skills.split(',').map(s => s.trim()) : [],
+    });
+    
+    setIsEditingJob(false);
+  }, [selectedJob, editJobFormData, updateJob]);
 
   const showJobTimeline = useCallback((e: React.MouseEvent, job: Job) => {
     e.stopPropagation();
@@ -916,7 +973,10 @@ const JobTracker = () => {
         {showDetailsModal && selectedJob && (
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
-            onClick={() => setShowDetailsModal(false)}
+            onClick={() => {
+              setShowDetailsModal(false);
+              setIsEditingJob(false);
+            }}
           >
             <div 
               className="bg-slate-900 rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-slate-800 shadow-2xl"
@@ -936,68 +996,213 @@ const JobTracker = () => {
                     </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => setShowDetailsModal(false)}
-                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-400" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleEditJob}
+                    className="p-2 hover:bg-slate-800 rounded-lg transition-colors group"
+                    title="Edit application details"
+                  >
+                    <Edit2 className="w-5 h-5 text-gray-400 group-hover:text-purple-400" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowDetailsModal(false);
+                      setIsEditingJob(false);
+                    }}
+                    className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-400" />
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">Status</h3>
-                  <span className={`px-3 py-1.5 rounded-lg text-sm font-medium ${statusColors[selectedJob.status]}`}>
-                    {selectedJob.status}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">Experience Required</h3>
-                  <p>{selectedJob.experienceRequired}</p>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">Skills</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedJob.skills.map((skill, index) => (
-                      <span key={index} className="px-3 py-1.5 bg-slate-800 rounded-lg text-sm">
-                        {skill}
-                      </span>
-                    ))}
+              {isEditingJob ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Job Title *</label>
+                      <input
+                        type="text"
+                        value={editJobFormData.role}
+                        onChange={(e) => setEditJobFormData({...editJobFormData, role: e.target.value})}
+                        placeholder="e.g. Software Engineer"
+                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Company *</label>
+                      <input
+                        type="text"
+                        value={editJobFormData.company}
+                        onChange={(e) => setEditJobFormData({...editJobFormData, company: e.target.value})}
+                        placeholder="e.g. Google"
+                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      />
+                    </div>
                   </div>
-                </div>
-
-                {selectedJob.jobPostingUrl && (
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Location</label>
+                      <input
+                        type="text"
+                        value={editJobFormData.location}
+                        onChange={(e) => setEditJobFormData({...editJobFormData, location: e.target.value})}
+                        placeholder="e.g. San Francisco, CA"
+                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Experience Required</label>
+                      <input
+                        type="text"
+                        value={editJobFormData.experienceRequired}
+                        onChange={(e) => setEditJobFormData({...editJobFormData, experienceRequired: e.target.value})}
+                        placeholder="e.g. 2-3 years"
+                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  
                   <div>
-                    <h3 className="text-sm font-medium text-gray-400 mb-2">Job Posting</h3>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Skills (comma-separated)</label>
+                    <input
+                      type="text"
+                      value={editJobFormData.skills}
+                      onChange={(e) => setEditJobFormData({...editJobFormData, skills: e.target.value})}
+                      placeholder="e.g. React, TypeScript, Node.js"
+                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                    />
+                  </div>
+                  
+                  {folders.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-3 w-3" />
+                          Season
+                        </div>
+                      </label>
+                      <select
+                        value={editJobFormData.folderId}
+                        onChange={(e) => setEditJobFormData({...editJobFormData, folderId: e.target.value})}
+                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      >
+                        <option value="">No season (default)</option>
+                        {folders.map(folder => (
+                          <option key={folder.id} value={folder.id}>
+                            {folder.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={editJobFormData.remote}
+                        onChange={(e) => setEditJobFormData({...editJobFormData, remote: e.target.checked})}
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-sm text-gray-400">Remote work available</span>
+                    </label>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Job Posting URL</label>
+                    <input
+                      type="url"
+                      value={editJobFormData.jobPostingUrl}
+                      onChange={(e) => setEditJobFormData({...editJobFormData, jobPostingUrl: e.target.value})}
+                      placeholder="e.g. https://company.com/jobs/software-engineer"
+                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Notes</label>
+                    <textarea
+                      value={editJobFormData.notes}
+                      onChange={(e) => setEditJobFormData({...editJobFormData, notes: e.target.value})}
+                      placeholder="Additional notes about the role, responsibilities, benefits, etc."
+                      className="w-full h-24 bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 resize-none border border-slate-700 focus:border-purple-400 focus:outline-none"
+                    />
+                  </div>
+                  
+                  <div className="flex gap-3 justify-end pt-4">
                     <button
-                      onClick={() => window.open(selectedJob.jobPostingUrl, '_blank', 'noopener,noreferrer')}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg text-blue-400 hover:text-blue-300 transition-colors"
+                      onClick={handleCancelEdit}
+                      className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
                     >
-                      <ExternalLink className="w-4 h-4" />
-                      View Original Job Posting
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveJob}
+                      disabled={!editJobFormData.role.trim() || !editJobFormData.company.trim()}
+                      className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      Save Changes
                     </button>
                   </div>
-                )}
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">Status</h3>
+                    <span className={`px-3 py-1.5 rounded-lg text-sm font-medium ${statusColors[selectedJob.status]}`}>
+                      {selectedJob.status}
+                    </span>
+                  </div>
 
-                <div>
-                  <h3 className="text-sm font-medium text-gray-400 mb-2">Job Description Summary</h3>
-                  <div className="bg-slate-800 rounded-xl p-4">
-                    <p className="text-gray-300 leading-relaxed">{selectedJob.notes}</p>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">Experience Required</h3>
+                    <p>{selectedJob.experienceRequired}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">Skills</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedJob.skills.map((skill, index) => (
+                        <span key={index} className="px-3 py-1.5 bg-slate-800 rounded-lg text-sm">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {selectedJob.jobPostingUrl && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-400 mb-2">Job Posting</h3>
+                      <button
+                        onClick={() => window.open(selectedJob.jobPostingUrl, '_blank', 'noopener,noreferrer')}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg text-blue-400 hover:text-blue-300 transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Original Job Posting
+                      </button>
+                    </div>
+                  )}
+
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">Job Description Summary</h3>
+                    <div className="bg-slate-800 rounded-xl p-4">
+                      <p className="text-gray-300 leading-relaxed">{selectedJob.notes}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 text-sm text-gray-400">
+                    <Calendar className="w-4 h-4" />
+                    Applied on {selectedJob.dateApplied}
+                    {selectedJob.remote && (
+                      <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 rounded text-xs ml-2">
+                        Remote Available
+                      </span>
+                    )}
                   </div>
                 </div>
-
-                <div className="flex items-center gap-3 text-sm text-gray-400">
-                  <Calendar className="w-4 h-4" />
-                  Applied on {selectedJob.dateApplied}
-                  {selectedJob.remote && (
-                    <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 rounded text-xs ml-2">
-                      Remote Available
-                    </span>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         )}

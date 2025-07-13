@@ -72,6 +72,21 @@ export function useJobs(selectedFolder: FolderType | null) {
         }
     }, []);
 
+    const updateJob = useCallback(async (id: number, updates: Partial<Job>) => {
+        try {
+            // Get the database ID from the mapping
+            const dbId = JobApplicationService.getIdMapping().get(id);
+            if (!dbId) {
+                throw new Error('Job not found');
+            }
+            const updatedJob = await JobApplicationService.updateJobApplication(dbId, updates);
+            setAllJobs(prev => prev.map(job => job.id === id ? updatedJob : job));
+        } catch (error) {
+            console.error('Error updating job:', error);
+            alert('Failed to update job. Please try again.');
+        }
+    }, []);
+
     useEffect(() => {
         const filtered = selectedFolder?.id
             ? allJobs.filter(job => job.folderId === selectedFolder.id)
@@ -90,5 +105,5 @@ export function useJobs(selectedFolder: FolderType | null) {
         };
     }, [jobs]);
 
-    return { jobs, allJobs, isLoading, addJob, deleteJob, updateJobStatus, stats };
+    return { jobs, allJobs, isLoading, addJob, deleteJob, updateJobStatus, updateJob, stats };
 }
