@@ -112,17 +112,27 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
       .sort((a, b) => b.count - a.count)
       .slice(0, 12);
 
-    // Monthly applications
-    const monthMap = new Map<string, number>();
+    // Monthly applications - ensure we always show last 6 months
+    const now = new Date();
+    const last6Months: { month: string; count: number }[] = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+      last6Months.push({ month: monthKey, count: 0 });
+    }
+
+    // Count actual applications per month
     jobs.forEach(job => {
-      const month = new Date(job.dateApplied).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
-      monthMap.set(month, (monthMap.get(month) || 0) + 1);
+      const jobDate = new Date(job.dateApplied);
+      const monthKey = jobDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+      const monthEntry = last6Months.find(m => m.month === monthKey);
+      if (monthEntry) {
+        monthEntry.count++;
+      }
     });
 
-    const monthlyApplications = Array.from(monthMap.entries())
-      .map(([month, count]) => ({ month, count }))
-      .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime())
-      .slice(-12);
+    const monthlyApplications = last6Months;
 
     // Status distribution
     const statuses: JobStatus[] = ['Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'];
@@ -331,99 +341,128 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
             </div>
             <div className="relative h-48">
               {stats.monthlyApplications.length > 0 ? (
-                <svg viewBox="0 0 400 150" className="w-full h-full">
+                <svg viewBox="0 0 500 170" className="w-full h-full">
                   {/* Grid lines */}
                   {[0, 1, 2, 3, 4].map((i) => (
                     <line
                       key={i}
-                      x1="0"
-                      y1={30 + i * 30}
-                      x2="400"
-                      y2={30 + i * 30}
+                      x1="60"
+                      y1={40 + i * 25}
+                      x2="450"
+                      y2={40 + i * 25}
                       stroke="rgba(148, 163, 184, 0.1)"
                       strokeWidth="1"
                     />
                   ))}
                   
+                  {/* Y-axis */}
+                  <line
+                    x1="60"
+                    y1="40"
+                    x2="60"
+                    y2="140"
+                    stroke="rgba(148, 163, 184, 0.3)"
+                    strokeWidth="1"
+                  />
+                  
+                  {/* X-axis */}
+                  <line
+                    x1="60"
+                    y1="140"
+                    x2="450"
+                    y2="140"
+                    stroke="rgba(148, 163, 184, 0.3)"
+                    strokeWidth="1"
+                  />
+                  
                   {/* Y-axis labels */}
                   {(() => {
-                    const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count));
+                    const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count), 1);
                     const stepSize = Math.ceil(maxCount / 4);
                     return [0, 1, 2, 3, 4].map((i) => (
                       <text
                         key={i}
-                        x="10"
-                        y={150 - i * 30}
-                        fill="rgba(156, 163, 175, 0.7)"
-                        fontSize="10"
-                        textAnchor="start"
+                        x="50"
+                        y={145 - i * 25}
+                        fill="rgba(156, 163, 175, 0.8)"
+                        fontSize="12"
+                        textAnchor="end"
+                        dominantBaseline="middle"
                       >
                         {i * stepSize}
                       </text>
                     ));
                   })()}
 
-                  {/* Line path */}
-                  <path
-                    d={(() => {
-                      const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count));
-                      const monthsToShow = stats.monthlyApplications.slice(-6);
-                      const stepX = 320 / Math.max(monthsToShow.length - 1, 1);
-                      
-                      return monthsToShow.map((item, index) => {
-                        const x = 40 + index * stepX;
-                        const y = 150 - (item.count / maxCount) * 120;
-                        return index === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
-                      }).join(' ');
-                    })()}
-                    fill="none"
-                    stroke="url(#lineGradient)"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-
-                  {/* Data points */}
+                  {/* Line path and data points */}
                   {(() => {
-                    const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count));
-                    const monthsToShow = stats.monthlyApplications.slice(-6);
-                    const stepX = 320 / Math.max(monthsToShow.length - 1, 1);
+                    const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count), 1);
+                    const monthsToShow = stats.monthlyApplications; // Always 6 months
+                    const stepX = 390 / (monthsToShow.length - 1);
                     
-                    return monthsToShow.map((item, index) => {
-                      const x = 40 + index * stepX;
-                      const y = 150 - (item.count / maxCount) * 120;
-                      return (
-                        <g key={index}>
-                          <circle
-                            cx={x}
-                            cy={y}
-                            r="4"
-                            fill="url(#pointGradient)"
-                            stroke="white"
-                            strokeWidth="2"
-                          />
-                          <text
-                            x={x}
-                            y="170"
-                            fill="rgba(156, 163, 175, 0.8)"
-                            fontSize="10"
-                            textAnchor="middle"
-                          >
-                            {item.month}
-                          </text>
-                          <text
-                            x={x}
-                            y={y - 10}
-                            fill="white"
-                            fontSize="11"
-                            textAnchor="middle"
-                            fontWeight="500"
-                          >
-                            {item.count}
-                          </text>
-                        </g>
-                      );
-                    });
+                    // Generate line path
+                    const pathData = monthsToShow.map((item, index) => {
+                      const x = 60 + index * stepX;
+                      const y = 140 - (item.count / maxCount) * 100;
+                      return index === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
+                    }).join(' ');
+
+                    return (
+                      <g>
+                        {/* Line */}
+                        <path
+                          d={pathData}
+                          fill="none"
+                          stroke="url(#lineGradient)"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        
+                        {/* Data points and labels */}
+                        {monthsToShow.map((item, index) => {
+                          const x = 60 + index * stepX;
+                          const y = 140 - (item.count / maxCount) * 100;
+                          return (
+                            <g key={`${item.month}-${index}`}>
+                              {/* Data point */}
+                              <circle
+                                cx={x}
+                                cy={y}
+                                r="5"
+                                fill="url(#pointGradient)"
+                                stroke="white"
+                                strokeWidth="2"
+                              />
+                              
+                              {/* Value label above point */}
+                              <text
+                                x={x}
+                                y={y - 15}
+                                fill="white"
+                                fontSize="12"
+                                textAnchor="middle"
+                                fontWeight="600"
+                              >
+                                {item.count}
+                              </text>
+                              
+                              {/* Month label below x-axis */}
+                              <text
+                                x={x}
+                                y="155"
+                                fill="rgba(156, 163, 175, 0.9)"
+                                fontSize="11"
+                                textAnchor="middle"
+                                fontWeight="500"
+                              >
+                                {item.month}
+                              </text>
+                            </g>
+                          );
+                        })}
+                      </g>
+                    );
                   })()}
 
                   {/* Gradients */}
