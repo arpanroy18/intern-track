@@ -43,10 +43,10 @@ const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({ month
         <LineChart
           data={monthlyApplications}
           margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 20,
+            top: 10,
+            right: 20,
+            left: 10,
+            bottom: 10,
           }}
         >
           <CartesianGrid 
