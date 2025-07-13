@@ -70,6 +70,19 @@ export class JobApplicationService {
     return data.map(this.mapDatabaseFolderToFolder);
   }
 
+  static async checkFoldersTableExists(): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('folders')
+        .select('id')
+        .limit(1);
+      
+      return !error;
+    } catch {
+      return false;
+    }
+  }
+
   static async createFolder(folderData: Omit<Folder, 'id' | 'createdAt' | 'updatedAt'>): Promise<Folder> {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) throw new Error('User not authenticated');
@@ -88,7 +101,13 @@ export class JobApplicationService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Database error creating folder:', error);
+      if (error.code === '42P01') {
+        throw new Error('Folders table does not exist. Please run the folder.sql script in your Supabase dashboard.');
+      }
+      throw new Error(`Failed to create folder: ${error.message}`);
+    }
 
     return this.mapDatabaseFolderToFolder(data);
   }

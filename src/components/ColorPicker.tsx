@@ -38,6 +38,38 @@ const hexToHsl = (hex: string): [number, number, number] => {
   return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)]
 }
 
+const hslToHex = (h: number, s: number, l: number): string => {
+  const sNormalized = s / 100
+  const lNormalized = l / 100
+
+  const c = (1 - Math.abs(2 * lNormalized - 1)) * sNormalized
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1))
+  const m = lNormalized - c / 2
+
+  let r = 0, g = 0, b = 0
+
+  if (0 <= h && h < 60) {
+    r = c; g = x; b = 0
+  } else if (60 <= h && h < 120) {
+    r = x; g = c; b = 0
+  } else if (120 <= h && h < 180) {
+    r = 0; g = c; b = x
+  } else if (180 <= h && h < 240) {
+    r = 0; g = x; b = c
+  } else if (240 <= h && h < 300) {
+    r = x; g = 0; b = c
+  } else if (300 <= h && h < 360) {
+    r = c; g = 0; b = x
+  }
+
+  r = Math.round((r + m) * 255)
+  g = Math.round((g + m) * 255)
+  b = Math.round((b + m) * 255)
+
+  const toHex = (n: number) => n.toString(16).padStart(2, '0')
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase()
+}
+
 const normalizeColor = (color: string): string => {
   if (color.startsWith("#")) {
     return color.toUpperCase()
@@ -81,7 +113,9 @@ export function ColorPicker({
     }
 
     setHsl([h, s, l])
-    onChange(`hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`)
+    // Always send hex color to the parent component
+    const hexColor = hslToHex(h, s, l)
+    onChange(hexColor)
   }, [onChange])
 
   useEffect(() => {
@@ -143,7 +177,8 @@ export function ColorPicker({
   const handleHueChange = (hue: number) => {
     const newHsl: [number, number, number] = [hue, hsl[1], hsl[2]]
     setHsl(newHsl)
-    handleColorChange(`hsl(${newHsl[0]}, ${newHsl[1]}%, ${newHsl[2]}%)`)
+    const hexColor = hslToHex(newHsl[0], newHsl[1], newHsl[2])
+    onChange(hexColor)
   }
 
   const handleSaturationLightnessChange = (
@@ -156,7 +191,8 @@ export function ColorPicker({
     const l = Math.round(100 - (y / rect.height) * 100)
     const newHsl: [number, number, number] = [hsl[0], s, l]
     setHsl(newHsl)
-    handleColorChange(`hsl(${newHsl[0]}, ${newHsl[1]}%, ${newHsl[2]}%)`)
+    const hexColor = hslToHex(newHsl[0], newHsl[1], newHsl[2])
+    onChange(hexColor)
   }
 
   const handleColorInputChange = (

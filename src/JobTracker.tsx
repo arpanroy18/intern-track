@@ -565,7 +565,13 @@ const JobTracker = () => {
       setShowFolderModal(false);
     } catch (error) {
       console.error('Error creating folder:', error);
-      alert('Failed to create folder. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create folder. Please try again.';
+      
+      if (errorMessage.includes('Folders table does not exist')) {
+        alert('Database setup required: The folders table does not exist. Please run sql/folder_updates.sql in your Supabase dashboard. See DATABASE_SETUP.md for detailed instructions.');
+      } else {
+        alert(`Error creating folder: ${errorMessage}\n\nIf this is a database setup issue, please run sql/folder_updates.sql in your Supabase dashboard.`);
+      }
     }
   }, [folderFormData, folders]);
 
