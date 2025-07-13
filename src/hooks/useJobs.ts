@@ -72,7 +72,7 @@ export function useJobs(selectedFolder: FolderType | null) {
         }
     }, []);
 
-    const updateJob = useCallback(async (id: number, updates: Partial<Job>) => {
+    const updateJob = useCallback(async (id: number, updates: Partial<Job>): Promise<Job | null> => {
         try {
             // Get the database ID from the mapping
             const dbId = JobApplicationService.getIdMapping().get(id);
@@ -81,9 +81,11 @@ export function useJobs(selectedFolder: FolderType | null) {
             }
             const updatedJob = await JobApplicationService.updateJobApplication(dbId, updates);
             setAllJobs(prev => prev.map(job => job.id === id ? updatedJob : job));
+            return updatedJob;
         } catch (error) {
             console.error('Error updating job:', error);
             alert('Failed to update job. Please try again.');
+            return null;
         }
     }, []);
 

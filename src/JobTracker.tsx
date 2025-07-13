@@ -315,11 +315,14 @@ const JobTracker = () => {
   const handleSaveJob = useCallback(async () => {
     if (!selectedJob || !editJobFormData.role.trim() || !editJobFormData.company.trim()) return;
 
-    await updateJob(selectedJob.id, {
+    const updatedJob = await updateJob(selectedJob.id, {
       ...editJobFormData,
       skills: editJobFormData.skills ? editJobFormData.skills.split(',').map(s => s.trim()) : [],
     });
     
+    if (updatedJob) {
+      setSelectedJob(updatedJob);
+    }
     setIsEditingJob(false);
   }, [selectedJob, editJobFormData, updateJob]);
 
