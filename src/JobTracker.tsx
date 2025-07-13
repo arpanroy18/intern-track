@@ -258,6 +258,7 @@ StatsGrid.displayName = 'StatsGrid';
 const JobTracker = () => {
   const { signOut, user, updateEmail, updatePassword } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showDetailsModal, setShowDetailsModal] = useState<boolean>(false);
@@ -332,6 +333,14 @@ const JobTracker = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFolder]);
 
+  // Filter jobs when allJobs changes (for real-time updates)
+  useEffect(() => {
+    const filteredJobs = selectedFolder?.id 
+      ? allJobs.filter(job => job.folderId === selectedFolder.id)
+      : allJobs;
+    setJobs(filteredJobs);
+  }, [allJobs, selectedFolder?.id]);
+
   // Restore selected folder from localStorage after folders are loaded
   useEffect(() => {
     const savedFolderId = localStorage.getItem('selectedFolderId');
@@ -400,8 +409,15 @@ const JobTracker = () => {
   const loadJobs = async () => {
     try {
       setIsLoading(true);
-      const jobsData = await JobApplicationService.getAllJobApplications(selectedFolder?.id);
-      setJobs(jobsData);
+      // Load all jobs for folder counts
+      const allJobsData = await JobApplicationService.getAllJobApplications();
+      setAllJobs(allJobsData);
+      
+      // Filter jobs based on selected folder
+      const filteredJobs = selectedFolder?.id 
+        ? allJobsData.filter(job => job.folderId === selectedFolder.id)
+        : allJobsData;
+      setJobs(filteredJobs);
     } catch (error) {
       console.error('Error loading jobs:', error);
       alert('Failed to load job applications. Please try again.');
@@ -534,7 +550,7 @@ const JobTracker = () => {
       };
       
       const createdJob = await JobApplicationService.createJobApplication(newJob);
-      setJobs([...jobs, createdJob]);
+      setAllJobs([...allJobs, createdJob]);
       setFormData({
         role: '',
         company: '',
@@ -553,27 +569,27 @@ const JobTracker = () => {
     } finally {
       setIsProcessing(false);
     }
-  }, [formData, jobs, selectedFolder?.id]);
+  }, [formData, allJobs, selectedFolder?.id]);
 
   const deleteJob = useCallback(async (id: number) => {
     try {
       await JobApplicationService.deleteJobApplication(id);
-      setJobs(jobs.filter(job => job.id !== id));
+      setAllJobs(allJobs.filter(job => job.id !== id));
     } catch (error) {
       console.error('Error deleting job:', error);
       alert('Failed to delete job. Please try again.');
     }
-  }, [jobs]);
+  }, [allJobs]);
 
   const updateStatus = useCallback(async (id: number, status: JobStatus) => {
     try {
       const updatedJob = await JobApplicationService.updateJobStatus(id, status);
-      setJobs(jobs.map(job => job.id === id ? updatedJob : job));
+      setAllJobs(allJobs.map(job => job.id === id ? updatedJob : job));
     } catch (error) {
       console.error('Error updating job status:', error);
       alert('Failed to update job status. Please try again.');
     }
-  }, [jobs]);
+  }, [allJobs]);
 
   const showJobDetails = useCallback((job: Job) => {
     setSelectedJob(job);
@@ -958,11 +974,11 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full bg-gray-500" />
                           <span>All Applications</span>
-                          <span className="ml-auto text-xs text-gray-500">({jobs.length})</span>
+                          <span className="ml-auto text-xs text-gray-500">({allJobs.length})</span>
                         </div>
                       </button>
                       {folders.map(folder => {
-                        const folderJobCount = jobs.filter(job => job.folderId === folder.id).length;
+                        const folderJobCount = allJobs.filter(job => job.folderId === folder.id).length;
                         return (
                           <button
                             key={folder.id}
@@ -1851,7 +1867,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                               <div className="text-sm text-gray-400 truncate mt-1">{folder.description}</div>
                             )}
                             <div className="text-xs text-gray-500 mt-2">
-                              {jobs.filter(job => job.folderId === folder.id).length} applications
+                              {allJobs.filter(job => job.folderId === folder.id).length} applications
                             </div>
                           </div>
                         </div>
