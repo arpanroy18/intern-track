@@ -149,6 +149,16 @@ export class JobApplicationService {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) throw new Error('User not authenticated');
 
+    // First delete all job applications in this folder
+    const { error: jobsError } = await supabase
+      .from('job_applications')
+      .delete()
+      .eq('folder_id', id)
+      .eq('user_id', user.user.id);
+
+    if (jobsError) throw jobsError;
+
+    // Then delete the folder
     const { error } = await supabase
       .from('folders')
       .delete()

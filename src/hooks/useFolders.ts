@@ -69,7 +69,7 @@ export function useFolders() {
     }, []);
 
     const deleteFolder = useCallback(async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this folder? Jobs in this folder will not be deleted.')) {
+        if (window.confirm('Are you sure you want to delete this season? All job applications in this season will also be permanently deleted.')) {
             try {
                 await JobApplicationService.deleteFolder(id);
                 setFolders(prev => prev.filter(f => f.id !== id));
