@@ -45,7 +45,7 @@ const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({ month
           margin={{
             top: 10,
             right: 20,
-            left: 10,
+            left: -10,
             bottom: 10,
           }}
         >
