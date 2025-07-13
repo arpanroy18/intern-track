@@ -211,7 +211,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-gray-100 p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 text-gray-100 p-6 pb-24 relative overflow-auto">
       {/* Advanced Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.06),transparent_50%)]"></div>
@@ -487,7 +487,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
         </div>
 
         {/* Additional Analytics Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-visible">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-visible mt-8 mb-24">
           {/* Top Companies */}
           <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6 min-h-fit overflow-hidden">
             <div className="flex items-center gap-2 mb-6">
