@@ -279,6 +279,8 @@ const JobTracker = () => {
   const [showSeasonDropdown, setShowSeasonDropdown] = useState<boolean>(false);
   const [showSeasonsManagementModal, setShowSeasonsManagementModal] = useState<boolean>(false);
   const [showEditSeasonModal, setShowEditSeasonModal] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [editingFolder, setEditingFolder] = useState<FolderType | null>(null);
   const [showAIParseModal, setShowAIParseModal] = useState<boolean>(false);
   const [jobDescription, setJobDescription] = useState<string>('');
@@ -452,6 +454,29 @@ const JobTracker = () => {
     
     return filtered;
   }, [jobs, debouncedSearchTerm, selectedStatusFilter, searchJobs]);
+
+  // Memoized pagination calculations
+  const paginationData = useMemo(() => {
+    const jobsToDisplay = (debouncedSearchTerm || selectedStatusFilter !== 'All') ? filteredJobs : jobs;
+    const totalItems = jobsToDisplay.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedJobs = jobsToDisplay.slice(startIndex, endIndex);
+    
+    return {
+      jobs: paginatedJobs,
+      totalItems,
+      totalPages,
+      startIndex,
+      endIndex: Math.min(endIndex, totalItems)
+    };
+  }, [jobs, filteredJobs, debouncedSearchTerm, selectedStatusFilter, currentPage, itemsPerPage]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchTerm, selectedStatusFilter, selectedFolder]);
 
   // Memoized stats calculation
   const stats = useMemo(() => {
@@ -1044,11 +1069,30 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
         {/* Main Content Area */}
         <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
           <div className="p-3 border-b border-slate-800">
-            <h2 className="text-xl font-semibold flex items-center gap-2 ml-6">
-              <Briefcase className="w-5 h-5 text-purple-400" />
-              Applications
-              
-            </h2>
+            <div className="flex items-center justify-between ml-6 mr-6">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-purple-400" />
+                Applications
+              </h2>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-gray-400">Show</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1 text-white focus:outline-none focus:ring-2 focus:ring-purple-400"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span className="text-gray-400">per page</span>
+              </div>
+            </div>
           </div>
           
           {/* Applications List */}
@@ -1111,20 +1155,77 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                 </div>
               </div>
             ) : (
-              <div className="space-y-2">
-                {(debouncedSearchTerm || selectedStatusFilter !== 'All' ? filteredJobs : jobs).map((job, index) => (
-                  <JobCard
-                    key={job.id}
-                    job={job}
-                    index={index}
-                    statusColors={statusColors}
-                    onShowDetails={showJobDetails}
-                    onShowTimeline={showJobTimeline}
-                    onUpdateStatus={updateStatus}
-                    onDelete={deleteJob}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="space-y-2">
+                  {paginationData.jobs.map((job, index) => (
+                    <JobCard
+                      key={job.id}
+                      job={job}
+                      index={paginationData.startIndex + index}
+                      statusColors={statusColors}
+                      onShowDetails={showJobDetails}
+                      onShowTimeline={showJobTimeline}
+                      onUpdateStatus={updateStatus}
+                      onDelete={deleteJob}
+                    />
+                  ))}
+                </div>
+                
+                {/* Pagination Controls */}
+                {paginationData.totalPages > 1 && (
+                  <div className="mt-6 flex items-center justify-between border-t border-slate-800 pt-4">
+                    <div className="text-sm text-gray-400">
+                      Showing {paginationData.startIndex + 1} to {paginationData.endIndex} of {paginationData.totalItems} applications
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1 rounded-lg bg-slate-800 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700 transition-colors"
+                      >
+                        Previous
+                      </button>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: paginationData.totalPages }, (_, i) => i + 1)
+                          .filter(page => {
+                            const current = currentPage;
+                            return page === 1 || page === paginationData.totalPages || 
+                                   (page >= current - 1 && page <= current + 1);
+                          })
+                          .map((page, index, array) => {
+                            const prevPage = array[index - 1];
+                            const showEllipsis = prevPage && page - prevPage > 1;
+                            
+                            return (
+                              <React.Fragment key={page}>
+                                {showEllipsis && (
+                                  <span className="px-2 text-gray-500">...</span>
+                                )}
+                                <button
+                                  onClick={() => setCurrentPage(page)}
+                                  className={`px-3 py-1 rounded-lg transition-colors ${
+                                    currentPage === page
+                                      ? 'bg-purple-600 text-white'
+                                      : 'bg-slate-800 text-white hover:bg-slate-700'
+                                  }`}
+                                >
+                                  {page}
+                                </button>
+                              </React.Fragment>
+                            );
+                          })}
+                      </div>
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationData.totalPages))}
+                        disabled={currentPage === paginationData.totalPages}
+                        className="px-3 py-1 rounded-lg bg-slate-800 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700 transition-colors"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
