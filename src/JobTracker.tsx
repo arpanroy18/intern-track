@@ -6,6 +6,15 @@ import { JobApplicationService } from './services/jobApplicationService';
 import { ColorPicker } from './components/ColorPicker';
 import Cerebras from '@cerebras/cerebras_cloud_sdk';
 
+// Utility function to get current date in user's local timezone
+function getCurrentLocalDate(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 // Memoized JobCard component to prevent unnecessary re-renders
 const JobCard = React.memo(({ 
   job, 
@@ -488,11 +497,11 @@ const JobTracker = () => {
         remote: formData.remote,
         notes: formData.notes || 'No additional notes',
         status: 'Applied' as JobStatus,
-        dateApplied: new Date().toISOString().split('T')[0],
+        dateApplied: getCurrentLocalDate(),
         timeline: [
           {
             status: 'Applied' as JobStatus,
-            date: new Date().toISOString().split('T')[0],
+            date: getCurrentLocalDate(),
             note: 'Application submitted'
           }
         ],

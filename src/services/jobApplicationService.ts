@@ -1,6 +1,15 @@
 import { supabase } from '../lib/supabase';
 import { Job, JobStatus, TimelineEvent, Folder } from '../types';
 
+// Utility function to get current date in user's local timezone
+function getCurrentLocalDate(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export interface DatabaseJob {
   id: string;
   user_id: string;
@@ -248,7 +257,7 @@ export class JobApplicationService {
 
     const newTimelineEvent: TimelineEvent = {
       status,
-      date: new Date().toISOString().split('T')[0],
+      date: getCurrentLocalDate(),
       note: note || `Status changed to ${status}`
     };
 
