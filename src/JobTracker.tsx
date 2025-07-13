@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Briefcase, Plus, X, Loader, Clock, FileText, TrendingUp, Building2, Calendar, Sparkles, Search, Filter, LogOut, User, Settings, Wand2, MapPin, Edit2, Trash2, ExternalLink } from 'lucide-react';
+import { Briefcase, Plus, X, Loader, Clock, FileText, TrendingUp, Building2, Calendar, Sparkles, Search, Filter, LogOut, User, Settings, Wand2, MapPin, Edit2, Trash2, ExternalLink, BarChart3 } from 'lucide-react';
 import { Job, JobStatus, Folder as FolderType } from './types';
 import { useAuth } from './contexts/AuthContext';
 import { ColorPicker } from './components/ColorPicker';
 import { JobCard } from './components/JobCard';
 import { StatsGrid } from './components/StatsGrid';
+import Analytics from './components/Analytics';
 import { useJobs } from './hooks/useJobs';
 import { useFolders } from './hooks/useFolders';
 import { useModals } from './hooks/useModals';
@@ -33,6 +34,7 @@ const JobTracker = () => {
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [showSeasonDropdown, setShowSeasonDropdown] = useState<boolean>(false);
+  const [showAnalytics, setShowAnalytics] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [editingFolder, setEditingFolder] = useState<FolderType | null>(null);
@@ -313,6 +315,16 @@ const JobTracker = () => {
               
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-40 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2 z-50">
+                  <button
+                    onClick={() => {
+                      setShowAnalytics(true);
+                      setShowUserMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    Analytics
+                  </button>
                   <button
                     onClick={() => {
                       setShowUserSettingsModal(true);
@@ -1561,6 +1573,16 @@ const JobTracker = () => {
                 </div>
             </div>
         )}
+
+      {/* Analytics Dashboard */}
+      {showAnalytics && (
+        <div className="fixed inset-0 z-50">
+          <Analytics 
+            onBack={() => setShowAnalytics(false)}
+            folders={folders}
+          />
+        </div>
+      )}
       </div>
     </div>
   );
