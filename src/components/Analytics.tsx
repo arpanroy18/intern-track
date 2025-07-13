@@ -487,9 +487,9 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
         </div>
 
         {/* Additional Analytics Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-visible">
           {/* Top Companies */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
+          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6 min-h-fit overflow-hidden">
             <div className="flex items-center gap-2 mb-6">
               <Building2 className="w-5 h-5 text-green-400" />
               <h3 className="text-lg font-semibold text-white">Top Companies</h3>
@@ -497,11 +497,11 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
             <div className="space-y-3">
               {stats.topCompanies.slice(0, 6).map((item, index) => (
                 <div key={item.company} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400 text-sm w-4">#{index + 1}</span>
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-gray-400 text-sm w-4 flex-shrink-0">#{index + 1}</span>
                     <span className="text-gray-300 truncate">{item.company}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-white font-medium">{item.count}</span>
                     <span className="text-green-400 text-sm">{formatPercentage(item.rate)}</span>
                   </div>
@@ -511,7 +511,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
           </div>
 
           {/* Top Locations */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
+          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6 min-h-fit overflow-hidden">
             <div className="flex items-center gap-2 mb-6">
               <MapPin className="w-5 h-5 text-pink-400" />
               <h3 className="text-lg font-semibold text-white">Top Locations</h3>
@@ -519,54 +519,29 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
             <div className="space-y-3">
               {stats.topLocations.slice(0, 6).map((item, index) => (
                 <div key={item.location} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-400 text-sm w-4">#{index + 1}</span>
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-gray-400 text-sm w-4 flex-shrink-0">#{index + 1}</span>
                     <span className="text-gray-300 truncate">{item.location}</span>
                   </div>
-                  <span className="text-white font-medium">{item.count}</span>
+                  <span className="text-white font-medium flex-shrink-0">{item.count}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Remote vs Onsite & Top Skills */}
-          <div className="space-y-6">
-            {/* Remote vs Onsite */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Work Type Distribution</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Remote</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">{stats.remoteVsOnsite.remote}</span>
-                    <span className="text-blue-400 text-sm">
-                      {formatPercentage(stats.total > 0 ? (stats.remoteVsOnsite.remote / stats.total) * 100 : 0)}
-                    </span>
+          {/* Top Skills */}
+          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6 min-h-fit overflow-hidden">
+            <h3 className="text-lg font-semibold text-white mb-6">Top Skills</h3>
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {stats.topSkills.map((item, index) => (
+                <div key={item.skill} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-gray-400 text-sm w-4 flex-shrink-0">#{index + 1}</span>
+                    <span className="text-gray-300 truncate">{item.skill}</span>
                   </div>
+                  <span className="text-white font-medium flex-shrink-0">{item.count}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">On-site</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">{stats.remoteVsOnsite.onsite}</span>
-                    <span className="text-purple-400 text-sm">
-                      {formatPercentage(stats.total > 0 ? (stats.remoteVsOnsite.onsite / stats.total) * 100 : 0)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Top Skills Preview */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Top Skills</h3>
-              <div className="space-y-2">
-                {stats.topSkills.slice(0, 4).map((item) => (
-                  <div key={item.skill} className="flex items-center justify-between">
-                    <span className="text-gray-300 text-sm truncate">{item.skill}</span>
-                    <span className="text-white font-medium">{item.count}</span>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
         </div>
