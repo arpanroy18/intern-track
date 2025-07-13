@@ -1042,27 +1042,31 @@ const JobTracker = () => {
             onClick={() => setShowFolderModal(false)}
           >
             <div 
-              className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl"
+              className="bg-slate-900/95 backdrop-blur-xl rounded-2xl p-8 max-w-md w-full border border-slate-700/50 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-400/10 rounded-lg">
-                    <Calendar className="w-5 h-5 text-purple-400" />
+              <div className="flex justify-between items-center mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl border border-purple-400/20">
+                    <Calendar className="w-6 h-6 text-purple-400" />
                   </div>
-                  <h2 className="text-xl font-semibold">Create New Season</h2>
+                  <div>
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                      Create New Season
+                    </h2>
+                  </div>
                 </div>
                 <button
                   onClick={() => setShowFolderModal(false)}
-                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                  className="p-2 hover:bg-slate-800/50 rounded-xl transition-all duration-200 hover:scale-105"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-gray-400 hover:text-gray-300" />
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-sm font-semibold text-gray-300 mb-3">
                     Season Name
                   </label>
                   <input
@@ -1070,45 +1074,45 @@ const JobTracker = () => {
                     value={folderFormData.name}
                     onChange={(e) => setFolderFormData({...folderFormData, name: e.target.value})}
                     placeholder="e.g., Summer 2025, Fall 2025"
-                    className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400/60 focus:bg-slate-800/70 focus:ring-2 focus:ring-purple-400/20 transition-all duration-200"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-sm font-semibold text-gray-300 mb-3">
                     Description
                   </label>
                   <textarea
                     value={folderFormData.description}
                     onChange={(e) => setFolderFormData({...folderFormData, description: e.target.value})}
                     placeholder="Optional description for this season"
-                    className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400/60 focus:bg-slate-800/70 focus:ring-2 focus:ring-purple-400/20 transition-all duration-200 resize-none"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-sm font-semibold text-gray-300 mb-3">
                     Color Theme
                   </label>
                   <ColorPicker
                     color={folderFormData.color}
                     onChange={(color) => setFolderFormData({...folderFormData, color})}
                   />
-                  <span className="text-xs text-gray-500 mt-1 block">Choose a color to represent this season</span>
+                  <span className="text-xs text-gray-400 mt-2 block">Choose a color to represent this season</span>
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-4 pt-6">
                   <button
                     onClick={() => setShowFolderModal(false)}
-                    className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-gray-300 rounded-lg transition-colors"
+                    className="flex-1 px-6 py-3 bg-slate-800/60 hover:bg-slate-700/80 text-gray-300 rounded-xl transition-all duration-200 font-medium border border-slate-600/50 hover:border-slate-500/50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleCreateFolder}
                     disabled={!folderFormData.name.trim()}
-                    className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-purple-500/25 disabled:shadow-none"
                   >
                     Create Season
                   </button>
