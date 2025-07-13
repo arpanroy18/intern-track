@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PieChart, TrendingUp, Clock, MapPin, Building2, ArrowLeft, Target, CheckCircle, XCircle, Activity } from 'lucide-react';
+import { PieChart, TrendingUp, Clock, MapPin, Building2, ArrowLeft, Target, CheckCircle, XCircle, Activity, Zap } from 'lucide-react';
 import { Job, JobStatus, Folder as FolderType, JobStats } from '../types';
 import { JobApplicationService } from '../services/jobApplicationService';
 import ApplicationStatusPieChart from './ApplicationStatusPieChart';
@@ -371,7 +371,10 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
 
           {/* Top Skills */}
           <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6 min-h-fit overflow-hidden">
-            <h3 className="text-lg font-semibold text-white mb-6">Top Skills</h3>
+            <div className="flex items-center gap-2 mb-6">
+              <Zap className="w-5 h-5 text-yellow-400" />
+              <h3 className="text-lg font-semibold text-white">Top Skills</h3>
+            </div>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {stats.topSkills.map((item, index) => (
                 <div key={item.skill} className="flex items-center justify-between">
