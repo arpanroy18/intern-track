@@ -76,14 +76,11 @@ export const JobCard = React.memo(({
                         </div>
 
                         <div className="mt-2 flex items-center gap-2">
-                            {job.skills.slice(0, 3).map((skill, skillIndex) => (
+                            {job.skills.map((skill, skillIndex) => (
                                 <span key={skillIndex} className="px-2 py-1 bg-slate-700 rounded text-xs">
                                     {skill}
                                 </span>
                             ))}
-                            {job.skills.length > 3 && (
-                                <span className="text-xs text-gray-500">+{job.skills.length - 3} more</span>
-                            )}
                         </div>
                     </div>
                 </div>
