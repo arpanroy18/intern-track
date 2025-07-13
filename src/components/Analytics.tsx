@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { PieChart, TrendingUp, Clock, MapPin, Building2, ArrowLeft, Target, CheckCircle, XCircle, Activity } from 'lucide-react';
 import { Job, JobStatus, Folder as FolderType, JobStats } from '../types';
 import { JobApplicationService } from '../services/jobApplicationService';
+import ApplicationStatusPieChart from './ApplicationStatusPieChart';
+import MonthlyApplicationTrend from './MonthlyApplicationTrend';
 
 interface AnalyticsProps {
   onBack: () => void;
@@ -307,182 +309,23 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           {/* Application Status Distribution */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
-            <div className="flex items-center gap-2 mb-6">
+          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+            <div className="flex items-center gap-2 mb-3">
               <PieChart className="w-5 h-5 text-purple-400" />
               <h3 className="text-lg font-semibold text-white">Application Status Distribution</h3>
             </div>
-            <div className="space-y-3">
-              {stats.statusDistribution.map((item, index) => {
-                const colors = ['bg-blue-500', 'bg-yellow-500', 'bg-purple-500', 'bg-green-500', 'bg-red-500'];
-                return (
-                  <div key={item.status} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${colors[index % colors.length]}`}></div>
-                      <span className="text-gray-300">{item.status}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-white font-medium">{item.count}</span>
-                      <span className="text-gray-400 text-sm w-12">{formatPercentage(item.percentage)}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <ApplicationStatusPieChart statusDistribution={stats.statusDistribution} />
           </div>
 
           {/* Monthly Applications Trend */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6">
-            <div className="flex items-center gap-2 mb-6">
+          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+            <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="w-5 h-5 text-blue-400" />
               <h3 className="text-lg font-semibold text-white">Monthly Application Trend</h3>
             </div>
-            <div className="relative h-48">
-              {stats.monthlyApplications.length > 0 ? (
-                <svg viewBox="0 0 500 170" className="w-full h-full">
-                  {/* Grid lines */}
-                  {[0, 1, 2, 3, 4].map((i) => (
-                    <line
-                      key={i}
-                      x1="60"
-                      y1={40 + i * 25}
-                      x2="450"
-                      y2={40 + i * 25}
-                      stroke="rgba(148, 163, 184, 0.1)"
-                      strokeWidth="1"
-                    />
-                  ))}
-                  
-                  {/* Y-axis */}
-                  <line
-                    x1="60"
-                    y1="40"
-                    x2="60"
-                    y2="140"
-                    stroke="rgba(148, 163, 184, 0.3)"
-                    strokeWidth="1"
-                  />
-                  
-                  {/* X-axis */}
-                  <line
-                    x1="60"
-                    y1="140"
-                    x2="450"
-                    y2="140"
-                    stroke="rgba(148, 163, 184, 0.3)"
-                    strokeWidth="1"
-                  />
-                  
-                  {/* Y-axis labels */}
-                  {(() => {
-                    const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count), 1);
-                    const stepSize = Math.ceil(maxCount / 4);
-                    return [0, 1, 2, 3, 4].map((i) => (
-                      <text
-                        key={i}
-                        x="50"
-                        y={145 - i * 25}
-                        fill="rgba(156, 163, 175, 0.8)"
-                        fontSize="12"
-                        textAnchor="end"
-                        dominantBaseline="middle"
-                      >
-                        {i * stepSize}
-                      </text>
-                    ));
-                  })()}
-
-                  {/* Line path and data points */}
-                  {(() => {
-                    const maxCount = Math.max(...stats.monthlyApplications.map(m => m.count), 1);
-                    const monthsToShow = stats.monthlyApplications; // Always 6 months
-                    const stepX = 390 / (monthsToShow.length - 1);
-                    
-                    // Generate line path
-                    const pathData = monthsToShow.map((item, index) => {
-                      const x = 60 + index * stepX;
-                      const y = 140 - (item.count / maxCount) * 100;
-                      return index === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
-                    }).join(' ');
-
-                    return (
-                      <g>
-                        {/* Line */}
-                        <path
-                          d={pathData}
-                          fill="none"
-                          stroke="url(#lineGradient)"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        
-                        {/* Data points and labels */}
-                        {monthsToShow.map((item, index) => {
-                          const x = 60 + index * stepX;
-                          const y = 140 - (item.count / maxCount) * 100;
-                          return (
-                            <g key={`${item.month}-${index}`}>
-                              {/* Data point */}
-                              <circle
-                                cx={x}
-                                cy={y}
-                                r="5"
-                                fill="url(#pointGradient)"
-                                stroke="white"
-                                strokeWidth="2"
-                              />
-                              
-                              {/* Value label above point */}
-                              <text
-                                x={x}
-                                y={y - 15}
-                                fill="white"
-                                fontSize="12"
-                                textAnchor="middle"
-                                fontWeight="600"
-                              >
-                                {item.count}
-                              </text>
-                              
-                              {/* Month label below x-axis */}
-                              <text
-                                x={x}
-                                y="155"
-                                fill="rgba(156, 163, 175, 0.9)"
-                                fontSize="11"
-                                textAnchor="middle"
-                                fontWeight="500"
-                              >
-                                {item.month}
-                              </text>
-                            </g>
-                          );
-                        })}
-                      </g>
-                    );
-                  })()}
-
-                  {/* Gradients */}
-                  <defs>
-                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#3b82f6" />
-                      <stop offset="100%" stopColor="#8b5cf6" />
-                    </linearGradient>
-                    <linearGradient id="pointGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#60a5fa" />
-                      <stop offset="100%" stopColor="#a78bfa" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-400">
-                  No data available
-                </div>
-              )}
-            </div>
+            <MonthlyApplicationTrend monthlyApplications={stats.monthlyApplications} />
           </div>
         </div>
 
