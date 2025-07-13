@@ -64,7 +64,8 @@ const JobTracker = () => {
     skills: '',
     remote: false,
     notes: '',
-    folderId: ''
+    folderId: '',
+    jobPostingUrl: ''
   });
 
   const {
@@ -202,7 +203,8 @@ const JobTracker = () => {
       skills: '',
       remote: false,
       notes: '',
-      folderId: ''
+      folderId: '',
+      jobPostingUrl: ''
     });
     setShowAddModal(false);
     setIsFromAIParse(false);
@@ -257,7 +259,8 @@ const JobTracker = () => {
       skills: '',
       remote: false,
       notes: '',
-      folderId: ''
+      folderId: '',
+      jobPostingUrl: ''
     });
   }, [setShowAddModal]);
 
@@ -844,6 +847,17 @@ const JobTracker = () => {
                     />
                     <span className="text-sm text-gray-400">Remote work available</span>
                   </label>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Job Posting URL</label>
+                  <input
+                    type="url"
+                    value={formData.jobPostingUrl}
+                    onChange={(e) => setFormData({...formData, jobPostingUrl: e.target.value})}
+                    placeholder="e.g. https://company.com/jobs/software-engineer"
+                    className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                  />
                 </div>
                 
                 <div>

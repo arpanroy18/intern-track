@@ -29,6 +29,7 @@ export interface Job {
   dateApplied: string;
   timeline: TimelineEvent[];
   folderId?: string;
+  jobPostingUrl?: string;
 }
 
 export interface JobStats {

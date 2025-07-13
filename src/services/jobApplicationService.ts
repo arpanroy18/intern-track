@@ -24,6 +24,7 @@ export interface DatabaseJob {
   date_applied: string;
   timeline: TimelineEvent[];
   folder_id?: string;
+  job_posting_url?: string;
   created_at: string;
   updated_at: string;
 }
@@ -184,7 +185,8 @@ export class JobApplicationService {
       status: jobData.status,
       date_applied: jobData.dateApplied,
       timeline: jobData.timeline || [],
-      folder_id: jobData.folderId || null
+      folder_id: jobData.folderId || null,
+      job_posting_url: jobData.jobPostingUrl || null
     };
 
     const { data, error } = await supabase
@@ -215,6 +217,7 @@ export class JobApplicationService {
     if (updates.dateApplied !== undefined) databaseUpdates.date_applied = updates.dateApplied;
     if (updates.timeline !== undefined) databaseUpdates.timeline = updates.timeline;
     if (updates.folderId !== undefined) databaseUpdates.folder_id = updates.folderId;
+    if (updates.jobPostingUrl !== undefined) databaseUpdates.job_posting_url = updates.jobPostingUrl;
 
     const { data, error } = await supabase
       .from('job_applications')
@@ -309,7 +312,8 @@ export class JobApplicationService {
       status: dbJob.status,
       dateApplied: dbJob.date_applied,
       timeline: dbJob.timeline || [],
-      folderId: dbJob.folder_id
+      folderId: dbJob.folder_id,
+      jobPostingUrl: dbJob.job_posting_url
     };
   }
 
