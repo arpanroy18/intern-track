@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Building2, Calendar, ChevronRight, Clock, MapPin, Trash2 } from 'lucide-react';
+import { Building2, Calendar, ChevronRight, Clock, ExternalLink, MapPin, Trash2 } from 'lucide-react';
 import { Job, JobStatus } from '../types';
 
 // Memoized JobCard component to prevent unnecessary re-renders
@@ -36,6 +36,13 @@ export const JobCard = React.memo(({
     const handleShowTimeline = useCallback((e: React.MouseEvent) => {
         onShowTimeline(e, job);
     }, [job, onShowTimeline]);
+
+    const handleOpenJobPosting = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (job.jobPostingUrl) {
+            window.open(job.jobPostingUrl, '_blank', 'noopener,noreferrer');
+        }
+    }, [job.jobPostingUrl]);
 
     return (
         <div
@@ -86,6 +93,15 @@ export const JobCard = React.memo(({
                 </div>
 
                 <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    {job.jobPostingUrl && (
+                        <button
+                            onClick={handleOpenJobPosting}
+                            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                            title="Open Job Posting"
+                        >
+                            <ExternalLink className="w-4 h-4 text-blue-400" />
+                        </button>
+                    )}
                     <button
                         onClick={handleShowTimeline}
                         className="p-2 hover:bg-slate-700 rounded-lg transition-colors"

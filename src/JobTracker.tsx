@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Briefcase, Plus, X, Loader, Clock, FileText, TrendingUp, Building2, Calendar, Sparkles, Search, Filter, LogOut, User, Settings, Wand2, MapPin, Edit2, Trash2 } from 'lucide-react';
+import { Briefcase, Plus, X, Loader, Clock, FileText, TrendingUp, Building2, Calendar, Sparkles, Search, Filter, LogOut, User, Settings, Wand2, MapPin, Edit2, Trash2, ExternalLink } from 'lucide-react';
 import { Job, JobStatus, Folder as FolderType } from './types';
 import { useAuth } from './contexts/AuthContext';
 import { ColorPicker } from './components/ColorPicker';
@@ -955,6 +955,19 @@ const JobTracker = () => {
                     ))}
                   </div>
                 </div>
+
+                {selectedJob.jobPostingUrl && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">Job Posting</h3>
+                    <button
+                      onClick={() => window.open(selectedJob.jobPostingUrl, '_blank', 'noopener,noreferrer')}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      View Original Job Posting
+                    </button>
+                  </div>
+                )}
 
                 <div>
                   <h3 className="text-sm font-medium text-gray-400 mb-2">Job Description Summary</h3>
