@@ -1294,64 +1294,75 @@ const JobTracker = () => {
             onClick={() => setShowSeasonsManagementModal(false)}
           >
             <div 
-              className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-slate-800 shadow-2xl"
+              className="bg-slate-900/95 backdrop-blur-xl rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-slate-700/50 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-400/10 rounded-lg">
-                    <Settings className="w-5 h-5 text-purple-400" />
+              <div className="flex justify-between items-center mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl border border-purple-400/20">
+                    <Settings className="w-6 h-6 text-purple-400" />
                   </div>
-                  <h2 className="text-xl font-semibold">Manage Seasons</h2>
+                  <div>
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                      Manage Seasons
+                    </h2>
+                    <p className="text-gray-400 text-sm mt-1">Organize your job applications by recruitment seasons</p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setShowSeasonsManagementModal(false)}
-                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                  className="p-2 hover:bg-slate-800/80 rounded-xl transition-all duration-200"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-gray-400 hover:text-gray-300" />
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {folders.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Calendar className="w-8 h-8 text-gray-600" />
+                  <div className="text-center py-12">
+                    <div className="w-20 h-20 bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur rounded-2xl flex items-center justify-center mx-auto mb-6 border border-slate-600/30">
+                      <Calendar className="w-10 h-10 text-gray-500" />
                     </div>
-                    <p className="text-gray-500 mb-4">No seasons created yet</p>
+                    <h3 className="text-lg font-semibold text-gray-300 mb-2">No seasons created yet</h3>
+                    <p className="text-gray-500 mb-6 text-sm">Create your first season to start organizing applications</p>
                     <button
                       onClick={() => {
                         setShowSeasonsManagementModal(false);
                         setShowFolderModal(true);
                       }}
-                      className="text-purple-400 hover:text-purple-300 text-sm font-medium"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-purple-500/25"
                     >
-                      Create your first season →
+                      <Plus className="w-4 h-4" />
+                      Create your first season
                     </button>
                   </div>
                 ) : (
                   folders.map(folder => (
-                    <div key={folder.id} className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50 hover:border-slate-600 transition-all">
+                    <div key={folder.id} className="group bg-slate-800/40 backdrop-blur-sm rounded-xl p-5 border border-slate-700/30 hover:border-slate-600/50 hover:bg-slate-800/60 transition-all duration-300 shadow-lg hover:shadow-xl">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1">
+                        <div className="flex items-center gap-4 flex-1">
                           <div
-                            className="w-4 h-4 rounded-full flex-shrink-0"
+                            className="w-5 h-5 rounded-full flex-shrink-0 ring-2 ring-white/10 shadow-lg"
                             style={{ backgroundColor: folder.color }}
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="text-lg font-medium text-gray-200 truncate">{folder.name}</div>
+                            <div className="text-xl font-semibold text-white truncate group-hover:text-gray-100 transition-colors">
+                              {folder.name}
+                            </div>
                             {folder.description && (
-                              <div className="text-sm text-gray-400 truncate mt-1">{folder.description}</div>
+                              <div className="text-sm text-gray-400 truncate mt-1 group-hover:text-gray-300 transition-colors">
+                                {folder.description}
+                              </div>
                             )}
-                            <div className="text-xs text-gray-500 mt-2">
+                            <div className="text-xs text-gray-500 mt-3 font-medium">
                               {allJobs.filter(job => job.folderId === folder.id).length} applications
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleEditFolder(folder)}
-                            className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors"
+                            className="p-2.5 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded-xl transition-all duration-200"
                             title="Edit season"
                           >
                             <Edit2 className="h-4 w-4" />
@@ -1360,7 +1371,7 @@ const JobTracker = () => {
                             onClick={() => {
                               deleteFolder(folder.id);
                             }}
-                            className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                            className="p-2.5 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all duration-200"
                             title="Delete season"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -1373,15 +1384,15 @@ const JobTracker = () => {
               </div>
 
               {folders.length > 0 && (
-                <div className="mt-6 pt-4 border-t border-slate-700">
+                <div className="mt-8 pt-6 border-t border-slate-700/50">
                   <button
                     onClick={() => {
                       setShowSeasonsManagementModal(false);
                       setShowFolderModal(true);
                     }}
-                    className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
+                    className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl transition-all duration-200 font-semibold flex items-center justify-center gap-3 shadow-lg hover:shadow-purple-500/25 hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-5 h-5" />
                     Add New Season
                   </button>
                 </div>
