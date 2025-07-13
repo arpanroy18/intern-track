@@ -130,11 +130,11 @@ const ApplicationStatusPieChart: React.FC<ApplicationStatusPieChartProps> = ({ s
       </div>
       
       {/* Custom Legend */}
-      <div className="w-40 space-y-1">
+      <div className="w-40 space-y-0.5">
         {data.map((entry, index) => (
           <div 
             key={entry.name}
-            className={`flex items-center justify-between px-2 py-1.5 rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center justify-between px-2 py-1 rounded-lg transition-all cursor-pointer ${
               activeIndex === index ? 'bg-slate-700/50' : 'hover:bg-slate-700/30'
             }`}
             onMouseEnter={() => setActiveIndex(index)}
@@ -142,13 +142,13 @@ const ApplicationStatusPieChart: React.FC<ApplicationStatusPieChartProps> = ({ s
           >
             <div className="flex items-center gap-2">
               <div 
-                className="w-3 h-3 rounded-full flex-shrink-0" 
+                className="w-2.5 h-2.5 rounded-full flex-shrink-0" 
                 style={{ backgroundColor: COLORS[entry.name as keyof typeof COLORS] }}
               />
               <span className="text-gray-300 text-xs font-medium leading-tight">{entry.name}</span>
             </div>
             <div className="text-right">
-              <div className="text-white font-semibold text-sm">{entry.value}</div>
+              <div className="text-white font-semibold text-xs">{entry.value}</div>
               <div className="text-gray-400 text-xs leading-tight">{entry.percentage.toFixed(1)}%</div>
             </div>
           </div>
