@@ -1,4 +1,4 @@
-# InternTrack v4 - Job Application Tracker
+# InternTrack - Job Application Tracker
 
 A modern, AI-powered job application tracking system built with React, TypeScript, and Tailwind CSS.
 
