@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Building2, Calendar, ChevronRight, Clock, ExternalLink, MapPin, Trash2 } from 'lucide-react';
-import { Job, JobStatus } from '../types';
+import { Job, JobStatus, Folder } from '../types';
 
 // Memoized JobCard component to prevent unnecessary re-renders
 export const JobCard = React.memo(({
@@ -10,7 +10,9 @@ export const JobCard = React.memo(({
     onShowDetails,
     onShowTimeline,
     onUpdateStatus,
-    onDelete
+    onDelete,
+    folders,
+    showFolderInfo
 }: {
     job: Job;
     index: number;
@@ -19,6 +21,8 @@ export const JobCard = React.memo(({
     onShowTimeline: (e: React.MouseEvent, job: Job) => void;
     onUpdateStatus: (id: number, status: JobStatus) => void;
     onDelete: (id: number) => void;
+    folders: Folder[];
+    showFolderInfo?: boolean;
 }) => {
     const handleStatusChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
         onUpdateStatus(job.id, e.target.value as JobStatus);
@@ -44,6 +48,9 @@ export const JobCard = React.memo(({
         }
     }, [job.jobPostingUrl]);
 
+    // Find the folder for this job
+    const jobFolder = folders.find(folder => folder.id === job.folderId);
+
     return (
         <div
             className="bg-slate-800/50 rounded-xl p-3 hover:bg-slate-800 transition-all border border-slate-700/50 hover:border-slate-600 cursor-pointer"
@@ -60,6 +67,15 @@ export const JobCard = React.memo(({
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
                                 {job.status}
                             </span>
+                            {showFolderInfo && jobFolder && (
+                                <div className="flex items-center gap-1.5">
+                                    <div
+                                        className="w-2 h-2 rounded-full"
+                                        style={{ backgroundColor: jobFolder.color }}
+                                    />
+                                    <span className="text-xs text-gray-500 font-medium">{jobFolder.name}</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex items-center gap-6 text-sm text-gray-400">

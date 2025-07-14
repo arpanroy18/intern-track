@@ -7,8 +7,6 @@ const JobTracker = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showTimelineModal, setShowTimelineModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
-  const [jobDescription, setJobDescription] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editingData, setEditingData] = useState({});
   const [stats, setStats] = useState({
@@ -31,61 +29,7 @@ const JobTracker = () => {
     setStats(newStats);
   }, [jobs]);
 
-  const parseJobDescription = async (description) => {
-    const prompt = `
-Extract the following information from this job description and respond ONLY with a valid JSON object:
 
-Job Description:
-${description}
-
-Extract these fields:
-- role (job title)
-- company (company name)
-- experienceRequired (years of experience required, otherwise "Not specified")
-- skills (array of key skills mentioned, maximum 6)
-- remote (boolean - true if remote work is mentioned)
-- notes (comprehensive summary that captures ALL important information including responsibilities, requirements, nice-to-haves, benefits, and any other relevant details. Be thorough but concise)
-
-IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any other text, backticks, or markdown formatting.
-`;
-
-    try {
-      throw new Error('AI parsing not yet implemented');
-    } catch (error) {
-      console.error('Error parsing job description:', error);
-      throw new Error('Failed to parse job description');
-    }
-  };
-
-  const handleAddJob = async () => {
-    if (!jobDescription.trim()) return;
-
-    setIsProcessing(true);
-    try {
-      const parsedData = await parseJobDescription(jobDescription);
-      const newJob = {
-        id: Date.now(),
-        ...parsedData,
-        status: 'Applied',
-        dateApplied: new Date().toISOString().split('T')[0],
-        timeline: [
-          {
-            status: 'Applied',
-            date: new Date().toISOString().split('T')[0],
-            note: 'Application submitted'
-          }
-        ]
-      };
-      
-      setJobs([...jobs, newJob]);
-      setJobDescription('');
-      setShowAddModal(false);
-    } catch (error) {
-      alert('Failed to parse job description. Please try again.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   const deleteJob = (id) => {
     setJobs(jobs.filter(job => job.id !== id));
@@ -289,36 +233,12 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
                 </div>
               </div>
               
-              <textarea
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                placeholder="Paste the full job description here..."
-                className="w-full h-64 bg-slate-800 rounded-xl p-4 text-gray-100 placeholder-gray-500 resize-none mb-6 border border-slate-700 focus:border-purple-400 focus:outline-none"
-              />
-              
               <div className="flex gap-3 justify-end">
                 <button
                   onClick={() => setShowAddModal(false)}
                   className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
                 >
                   Cancel
-                </button>
-                <button
-                  onClick={handleAddJob}
-                  disabled={isProcessing || !jobDescription.trim()}
-                  className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader className="w-4 h-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="w-4 h-4" />
-                      Add Application
-                    </>
-                  )}
                 </button>
               </div>
             </div>

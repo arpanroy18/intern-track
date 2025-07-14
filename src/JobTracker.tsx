@@ -735,6 +735,8 @@ const JobTracker = () => {
                       onShowTimeline={showJobTimeline}
                       onUpdateStatus={updateJobStatus}
                       onDelete={deleteJob}
+                      folders={folders}
+                      showFolderInfo={!selectedFolder}
                     />
                   ))}
                 </div>
