@@ -41,7 +41,6 @@ ${description}
 Extract these fields:
 - role (job title)
 - company (company name)
-- location (job location)
 - experienceRequired (years of experience required, otherwise "Not specified")
 - skills (array of key skills mentioned, maximum 6)
 - remote (boolean - true if remote work is mentioned)
@@ -51,8 +50,7 @@ IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any ot
 `;
 
     try {
-      const response = await window.claude.complete(prompt);
-      return JSON.parse(response);
+      throw new Error('AI parsing not yet implemented');
     } catch (error) {
       console.error('Error parsing job description:', error);
       throw new Error('Failed to parse job description');

@@ -33,15 +33,16 @@ Job Description:
 ${jobDescription}
 
 Extract these fields:
-– role (only the core, standardized job title as it would appear in an HR system, stripping away levels, seniority, numbering, seasons, dates, or extra details; e.g., return “Software Engineer” instead of “Software Engineer I” or “Principal Associate, Software Engineer”, and “Software Developer” instead of “Software Developer (Fall 2025)”)
+- role (job title)
 - company (company name)
-- location (job location. Do not need to include other details. For example, Canada not Canada (Remote), just include the country and city if given.)
+- location (job location in the format "city, province/state" with no abbreviations, e.g., "Toronto, Ontario")
 - experienceRequired (years of experience required, otherwise "Not specified")
 - skills (array of key skills mentioned, maximum 6)
 - remote (boolean - true if remote work is mentioned)
 - notes (comprehensive summary that captures ALL important information including responsibilities, requirements, nice-to-haves, benefits, and any other relevant details. Be thorough but concise)
 
-IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any other text, backticks, or markdown formatting.`
+IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any other text, backticks, or markdown formatting.
+IMPORTANT: For the location field, strictly use the format "city, province/state" with no abbreviations (e.g., "Toronto, Ontario", not "Toronto, ON" or "Toronto, Canada").`
                     },
                     {
                         "role": "user",
