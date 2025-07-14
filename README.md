@@ -2,6 +2,8 @@
 
 A modern, AI-powered job application tracking system built with React, TypeScript, and Tailwind CSS.
 
+![InternTrack Preview](public/InternTrack%20Preview.png)
+
 ## Features
 
 - ✨ Beautiful dark mode UI with glassmorphism effects
