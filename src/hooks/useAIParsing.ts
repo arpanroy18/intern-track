@@ -2,6 +2,46 @@ import React, { useReducer, useCallback } from 'react';
 import Cerebras from '@cerebras/cerebras_cloud_sdk';
 import { Folder as FolderType } from '../types';
 
+// Static request configuration object to avoid recreation on each parsing call
+const STATIC_REQUEST_CONFIG = {
+    model: 'llama-4-scout-17b-16e-instruct',
+    stream: false,
+    max_completion_tokens: 2048,
+    temperature: 0.2,
+    top_p: 1,
+    response_format: { type: "json_object" as const }
+} as const;
+
+// Pre-computed system prompt template with efficient placeholder replacement
+const SYSTEM_PROMPT_TEMPLATE = `Extract the following information from this job description and respond ONLY with a valid JSON object:
+
+Job Description:
+{JOB_DESCRIPTION}
+
+Extract these fields:
+– role (only the core, standardized job title as it would appear in an HR system, stripping away levels, seniority, numbering, seasons, dates, or extra details; e.g., return "Software Engineer" instead of "Software Engineer I" or "Principal Associate, Software Engineer", and "Software Developer" instead of "Software Developer (Fall 2025)")
+- company (company name)
+- location (job location in the format "city, province/state" with no abbreviations, e.g., "Toronto, Ontario")
+- experienceRequired (years of experience required, otherwise "Not specified")
+- skills (array of key skills mentioned, maximum 6)
+- remote (boolean - true if remote work is mentioned)
+- notes (comprehensive summary that captures ALL important information including responsibilities, requirements, nice-to-haves, benefits, and any other relevant details. Be thorough but concise)
+
+IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any other text, backticks, or markdown formatting.
+IMPORTANT: For the location field, strictly use the format "city, province/state" with no abbreviations (e.g., "Toronto, Ontario", not "Toronto, ON" or "Toronto, Canada").`;
+
+// Optimized Cerebras client instance - reuse existing instance to avoid recreation
+let cerebrasClient: Cerebras | null = null;
+
+function getCerebrasClient(): Cerebras {
+    if (!cerebrasClient) {
+        cerebrasClient = new Cerebras({
+            apiKey: import.meta.env.VITE_CEREBRAS_API_KEY
+        });
+    }
+    return cerebrasClient;
+}
+
 // Consolidated state interface for optimized state management
 interface ParsingState {
     jobDescription: string;
@@ -91,42 +131,25 @@ export function useAIParsing(
         dispatch({ type: 'START_PARSING', payload: { startTime } });
 
         try {
-            const cerebras = new Cerebras({
-                apiKey: import.meta.env.VITE_CEREBRAS_API_KEY
-            });
+            // Use optimized Cerebras client instance to reuse existing instance
+            const cerebras = getCerebrasClient();
+
+            // Pre-compute system prompt with efficient placeholder replacement
+            const systemPrompt = SYSTEM_PROMPT_TEMPLATE.replace('{JOB_DESCRIPTION}', state.jobDescription);
 
             const completionCreateResponse = await cerebras.chat.completions.create({
                 messages: [
                     {
                         "role": "system",
-                        "content": `Extract the following information from this job description and respond ONLY with a valid JSON object:
-
-Job Description:
-${state.jobDescription}
-
-Extract these fields:
-– role (only the core, standardized job title as it would appear in an HR system, stripping away levels, seniority, numbering, seasons, dates, or extra details; e.g., return "Software Engineer" instead of "Software Engineer I" or "Principal Associate, Software Engineer", and "Software Developer" instead of "Software Developer (Fall 2025)")
-- company (company name)
-- location (job location in the format "city, province/state" with no abbreviations, e.g., "Toronto, Ontario")
-- experienceRequired (years of experience required, otherwise "Not specified")
-- skills (array of key skills mentioned, maximum 6)
-- remote (boolean - true if remote work is mentioned)
-- notes (comprehensive summary that captures ALL important information including responsibilities, requirements, nice-to-haves, benefits, and any other relevant details. Be thorough but concise)
-
-IMPORTANT: Your response MUST be ONLY a valid JSON object. DO NOT include any other text, backticks, or markdown formatting.
-IMPORTANT: For the location field, strictly use the format "city, province/state" with no abbreviations (e.g., "Toronto, Ontario", not "Toronto, ON" or "Toronto, Canada").`
+                        "content": systemPrompt
                     },
                     {
                         "role": "user",
                         "content": state.jobDescription
                     }
                 ],
-                model: 'llama-4-scout-17b-16e-instruct',
-                stream: false,
-                max_completion_tokens: 2048,
-                temperature: 0.2,
-                top_p: 1,
-                response_format: { type: "json_object" }
+                // Use static request configuration object to avoid recreation on each parsing call
+                ...STATIC_REQUEST_CONFIG
             });
             
             const content = (completionCreateResponse.choices as { message?: { content?: string } }[])?.[0]?.message?.content;
