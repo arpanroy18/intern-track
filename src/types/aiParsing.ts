@@ -74,8 +74,6 @@ export interface ParsingState {
   errorMessage: string;
   /** Whether the error modal should be displayed */
   showErrorModal: boolean;
-  /** Timestamp when parsing started (for performance tracking) */
-  parseStartTime: number | null;
   /** Current phase of the parsing operation */
   parsingPhase: ParsingPhase;
 }
@@ -86,7 +84,7 @@ export interface ParsingState {
  * specific state transition in the parsing workflow.
  */
 export type ParsingAction = 
-  | { type: 'START_PARSING'; payload: { startTime: number } }
+  | { type: 'START_PARSING' }
   | { type: 'SET_PARSING_PHASE'; payload: { phase: ParsingPhase } }
   | { type: 'PARSING_SUCCESS' }
   | { type: 'PARSING_ERROR'; payload: { error: string } }
@@ -94,58 +92,6 @@ export type ParsingAction =
   | { type: 'CLOSE_ERROR_MODAL' }
   | { type: 'RESET_STATE' };
 
-/**
- * Performance metrics interface for tracking parsing operation performance.
- * Used in development builds to monitor and optimize parsing performance.
- * 
- * @deprecated This interface will be removed in production builds as part
- * of the development code cleanup process.
- */
-export interface ParsingPerformanceMetrics {
-  /** Time spent preparing the API request (ms) */
-  requestPreparationTime: number;
-  /** Time spent on the actual API call (ms) */
-  apiCallTime: number;
-  /** Time spent processing the API response (ms) */
-  responseProcessingTime: number;
-  /** Time spent updating application state (ms) */
-  stateUpdateTime: number;
-  /** Total time for the entire parsing operation (ms) */
-  totalTime: number;
-  /** Memory usage statistics (optional, browser-dependent) */
-  memoryUsage?: {
-    /** Memory usage before parsing (bytes) */
-    before: number;
-    /** Memory usage after parsing (bytes) */
-    after: number;
-    /** Memory usage delta (bytes) */
-    delta: number;
-  };
-}
-
-/**
- * Performance timing markers for detailed performance analysis.
- * Used to track specific timing points throughout the parsing workflow.
- * 
- * @deprecated This interface will be removed in production builds as part
- * of the development code cleanup process.
- */
-export interface PerformanceTimings {
-  /** When the parsing operation started */
-  startTime: number;
-  /** When request preparation was completed */
-  requestPreparedTime?: number;
-  /** When the API call was initiated */
-  apiCallStartTime?: number;
-  /** When the API call completed */
-  apiCallEndTime?: number;
-  /** When response processing was completed */
-  responseProcessedTime?: number;
-  /** When state updates were completed */
-  stateUpdatedTime?: number;
-  /** When the entire operation finished */
-  endTime?: number;
-}
 
 /**
  * Default values for parsed job data to ensure consistent fallback behavior

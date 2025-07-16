@@ -89,7 +89,6 @@ export function sanitizeParsedJobData(data: ParsedJobData): ParsedJobData {
  */
 export function parseResponse(content: string): ParsedJobData {
   if (!content || typeof content !== 'string') {
-    console.warn('Invalid response content, using default data');
     return DEFAULT_PARSED_DATA;
   }
 
@@ -99,7 +98,6 @@ export function parseResponse(content: string): ParsedJobData {
     
     // Fast validation of API response structure - check essential fields exist
     if (typeof rawData !== 'object' || rawData === null) {
-      console.warn('Invalid response format: not an object, using default data');
       return DEFAULT_PARSED_DATA;
     }
     
@@ -123,8 +121,6 @@ export function parseResponse(content: string): ParsedJobData {
     return parsedData;
     
   } catch (parseError) {
-    console.warn('Failed to parse AI response JSON:', parseError);
-    
     // Attempt to extract JSON from potentially malformed response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -135,12 +131,11 @@ export function parseResponse(content: string): ParsedJobData {
           return parseResponse(JSON.stringify(extractedData));
         }
       } catch (extractError) {
-        console.warn('Failed to extract JSON from malformed response:', extractError);
+        // Silent fallback - no logging needed in production
       }
     }
     
     // Final fallback to default data to maintain functionality
-    console.warn('Using default parsed data due to parsing failures');
     return DEFAULT_PARSED_DATA;
   }
 }

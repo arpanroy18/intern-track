@@ -11,7 +11,8 @@ import { Folder as FolderType } from '../types';
 import { aiParsingService } from '../services/aiParsingService';
 import { 
     ParsingState, 
-    ParsingAction
+    ParsingAction,
+    OptimizedFormData
 } from '../types/aiParsing';
 import { mapResponseToFormData } from '../utils/jobDataParser';
 
@@ -32,7 +33,6 @@ const initialState: ParsingState = {
     isParsingAI: false,
     errorMessage: '',
     showErrorModal: false,
-    parseStartTime: null,
     parsingPhase: 'idle',
 };
 
@@ -52,7 +52,6 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
                 isParsingAI: true,
                 errorMessage: '',
                 showErrorModal: false,
-                parseStartTime: action.payload.startTime,
                 parsingPhase: 'starting',
             };
         case 'SET_PARSING_PHASE':
@@ -65,7 +64,6 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
                 ...state,
                 isParsingAI: false,
                 jobDescription: '',
-                parseStartTime: null,
                 parsingPhase: 'idle',
             };
         case 'PARSING_ERROR':
@@ -74,7 +72,6 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
                 isParsingAI: false,
                 errorMessage: action.payload.error,
                 showErrorModal: true,
-                parseStartTime: null,
                 parsingPhase: 'idle',
             };
         case 'UPDATE_DESCRIPTION':
@@ -110,7 +107,7 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
  * @returns Object containing parsing state and control functions
  */
 export function useAIParsing(
-    setFormData: React.Dispatch<React.SetStateAction<any>>,
+    setFormData: React.Dispatch<React.SetStateAction<OptimizedFormData>>,
     setShowAIParseModal: (show: boolean) => void,
     setShowAddModal: (show: boolean) => void,
     setIsFromAIParse: (isFromAI: boolean) => void,
@@ -148,8 +145,7 @@ export function useAIParsing(
         abortControllerRef.current = new AbortController();
         
         // Start parsing operation
-        const startTime = performance.now();
-        dispatch({ type: 'START_PARSING', payload: { startTime } });
+        dispatch({ type: 'START_PARSING' });
 
         // Set processing phase for UI feedback
         dispatch({ type: 'SET_PARSING_PHASE', payload: { phase: 'processing' } });
@@ -177,7 +173,6 @@ export function useAIParsing(
             setShowAddModal(true);
             
         } catch (error) {
-            console.error('Error parsing job with AI:', error);
             const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
             
             // Handle parsing error
