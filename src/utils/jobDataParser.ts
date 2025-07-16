@@ -9,6 +9,40 @@
 import { ParsedJobData, OptimizedFormData, DEFAULT_PARSED_DATA } from '../types/aiParsing';
 
 /**
+ * Production-appropriate logging for data parsing issues
+ */
+class DataParsingLogger {
+  /**
+   * Logs parsing fallbacks for monitoring without debug overhead
+   */
+  static logParsingFallback(reason: string, context?: Record<string, unknown>): void {
+    const logData = {
+      event: 'parsing_fallback',
+      reason,
+      timestamp: new Date().toISOString(),
+      context
+    };
+    
+    // Use console.warn for production fallback logging
+    console.warn('[Data Parsing Fallback]', logData);
+  }
+
+  /**
+   * Logs successful parsing recoveries for monitoring
+   */
+  static logParsingRecovery(method: string, context?: Record<string, unknown>): void {
+    const logData = {
+      event: 'parsing_recovery',
+      method,
+      timestamp: new Date().toISOString(),
+      context
+    };
+    
+    console.info('[Data Parsing Recovery]', logData);
+  }
+}
+
+/**
  * Type guard to validate if an unknown object conforms to the ParsedJobData interface.
  * Performs comprehensive validation of all required fields and their types.
  * 
@@ -80,15 +114,20 @@ export function sanitizeParsedJobData(data: ParsedJobData): ParsedJobData {
 }
 
 /**
- * Parses and validates a JSON response string from the AI service.
- * Handles malformed JSON, missing fields, and provides fallback data.
+ * Parses and validates a JSON response string from the AI service with comprehensive error handling.
+ * Implements multiple fallback strategies and recovery mechanisms for robust data processing.
  * This function was moved from the AI service to centralize data processing logic.
  * 
  * @param content - The raw JSON string response from the AI service
  * @returns A validated ParsedJobData object with fallback values for invalid fields
+ * @throws Error only for completely unrecoverable parsing failures
  */
 export function parseResponse(content: string): ParsedJobData {
   if (!content || typeof content !== 'string') {
+    DataParsingLogger.logParsingFallback('empty_or_invalid_content', { 
+      contentType: typeof content,
+      contentLength: content?.length || 0
+    });
     return DEFAULT_PARSED_DATA;
   }
 
@@ -121,21 +160,70 @@ export function parseResponse(content: string): ParsedJobData {
     return parsedData;
     
   } catch (parseError) {
-    // Attempt to extract JSON from potentially malformed response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
+    DataParsingLogger.logParsingFallback('json_parse_error', {
+      contentLength: content.length,
+      errorMessage: parseError instanceof Error ? parseError.message : 'unknown'
+    });
+
+    // Enhanced recovery strategies for malformed JSON
+    
+    // Strategy 1: Extract JSON object from response
+    const jsonObjectMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonObjectMatch) {
       try {
-        const extractedData = JSON.parse(jsonMatch[0]);
+        const extractedData = JSON.parse(jsonObjectMatch[0]);
         if (typeof extractedData === 'object' && extractedData !== null) {
-          // Recursively call parseResponse with the extracted JSON
+          DataParsingLogger.logParsingRecovery('json_object_extraction');
           return parseResponse(JSON.stringify(extractedData));
         }
       } catch (extractError) {
-        // Silent fallback - no logging needed in production
+        // Continue to next strategy
+      }
+    }
+
+    // Strategy 2: Extract JSON array if object fails
+    const jsonArrayMatch = content.match(/\[[\s\S]*]/);
+    if (jsonArrayMatch) {
+      try {
+        const extractedArray = JSON.parse(jsonArrayMatch[0]);
+        if (Array.isArray(extractedArray) && extractedArray.length > 0) {
+          // Use first element if it's an object
+          const firstElement = extractedArray[0];
+          if (typeof firstElement === 'object' && firstElement !== null) {
+            DataParsingLogger.logParsingRecovery('json_array_extraction');
+            return parseResponse(JSON.stringify(firstElement));
+          }
+        }
+      } catch (extractError) {
+        // Continue to next strategy
+      }
+    }
+
+    // Strategy 3: Attempt to clean and parse common formatting issues
+    const cleanedContent = content
+      .replace(/^[^{[]*/, '') // Remove leading non-JSON characters
+      .replace(/[^}]]*$/, '') // Remove trailing non-JSON characters
+      .replace(/\n|\r/g, ' ') // Replace newlines with spaces
+      .trim();
+    
+    if (cleanedContent && cleanedContent !== content) {
+      try {
+        const cleanedData = JSON.parse(cleanedContent);
+        if (typeof cleanedData === 'object' && cleanedData !== null) {
+          DataParsingLogger.logParsingRecovery('content_cleaning');
+          return parseResponse(JSON.stringify(cleanedData));
+        }
+      } catch (cleanError) {
+        // Continue to fallback
       }
     }
     
-    // Final fallback to default data to maintain functionality
+    // Final fallback with comprehensive logging
+    DataParsingLogger.logParsingFallback('all_recovery_strategies_failed', {
+      contentPreview: content.substring(0, 200),
+      originalError: parseError instanceof Error ? parseError.message : 'unknown'
+    });
+    
     return DEFAULT_PARSED_DATA;
   }
 }

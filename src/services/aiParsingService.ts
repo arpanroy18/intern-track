@@ -11,6 +11,69 @@ import { ParsedJobData, STATIC_REQUEST_CONFIG, SYSTEM_PROMPT_TEMPLATE } from '..
 import { parseResponse } from '../utils/jobDataParser';
 
 /**
+ * Error types for production-grade error handling and classification
+ */
+export enum ParseError {
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  API_ERROR = 'API_ERROR',
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  ABORT_ERROR = 'ABORT_ERROR',
+  CONFIGURATION_ERROR = 'CONFIGURATION_ERROR',
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR'
+}
+
+/**
+ * Enhanced error class for structured error handling with context
+ */
+export class AIParsingError extends Error {
+  constructor(
+    public readonly type: ParseError,
+    message: string,
+    public readonly originalError?: Error,
+    public readonly context?: Record<string, unknown>
+  ) {
+    super(message);
+    this.name = 'AIParsingError';
+  }
+}
+
+/**
+ * Production-appropriate error logger with minimal performance impact
+ */
+class ErrorLogger {
+  /**
+   * Logs error with context for debugging without debug overhead
+   */
+  static logError(error: AIParsingError, additionalContext?: Record<string, unknown>): void {
+    // In production, we log structured error data for monitoring systems
+    const errorData = {
+      type: error.type,
+      message: error.message,
+      timestamp: new Date().toISOString(),
+      context: { ...error.context, ...additionalContext }
+    };
+    
+    // Use console.error for production error logging (picked up by monitoring)
+    console.error('[AI Parsing Error]', errorData);
+  }
+}
+
+/**
+ * Utility function to determine if an error is retryable
+ */
+function isRetryableError(error: AIParsingError): boolean {
+  return error.type === ParseError.NETWORK_ERROR || 
+         error.type === ParseError.API_ERROR;
+}
+
+/**
+ * Utility function to add delay for retry logic with exponential backoff
+ */
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Singleton Cerebras client instance to avoid recreation and optimize performance.
  * The client is lazily initialized on first use and reused for all subsequent requests.
  */
@@ -47,30 +110,98 @@ function getCerebrasClient(): Cerebras {
  */
 export class AIParsingService {
   /**
-   * Parses a job description using AI and returns structured job data.
+   * Parses a job description using AI with retry logic and comprehensive error handling.
    * 
    * This method handles the complete parsing workflow:
    * - Validates input parameters
+   * - Implements retry logic for transient failures
    * - Prepares the AI prompt with job description
    * - Makes the API request with optimized configuration
    * - Processes and validates the response
-   * - Handles errors gracefully with fallback data
+   * - Handles errors gracefully with structured error reporting
    * 
    * @param description - The job description text to parse
    * @param signal - Optional AbortSignal for request cancellation
    * @returns Promise that resolves to parsed job data
-   * @throws Error if the description is empty or API request fails critically
+   * @throws AIParsingError with detailed error classification and context
    */
-  async parseJobDescription(description: string, signal?: AbortSignal): Promise<ParsedJobData> {
-    // Input validation
+  async parseJobDescription(
+    description: string, 
+    signal?: AbortSignal
+  ): Promise<ParsedJobData> {
+    return this.parseWithRetry(description, signal, 2);
+  }
+
+  /**
+   * Internal method that implements the parsing logic with retry mechanism.
+   * Separated for better testability and cleaner error handling.
+   * 
+   * @param description - The job description text to parse
+   * @param signal - Optional AbortSignal for request cancellation
+   * @param maxRetries - Maximum number of retry attempts for transient failures
+   */
+  private async parseWithRetry(
+    description: string,
+    signal: AbortSignal | undefined,
+    maxRetries: number
+  ): Promise<ParsedJobData> {
+    // Input validation with structured error handling
     if (!description?.trim()) {
-      throw new Error('Job description cannot be empty');
+      const validationError = new AIParsingError(
+        ParseError.VALIDATION_ERROR,
+        'Job description cannot be empty',
+        undefined,
+        { descriptionLength: description?.length || 0 }
+      );
+      ErrorLogger.logError(validationError);
+      throw validationError;
     }
 
     // Check if the request was already aborted
     if (signal?.aborted) {
-      throw new Error('Request was aborted before starting');
+      const abortError = new AIParsingError(
+        ParseError.ABORT_ERROR,
+        'Request was aborted before starting'
+      );
+      throw abortError;
     }
+
+    // Retry logic with exponential backoff
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await this.executeParsing(description, signal, attempt);
+      } catch (error) {
+        // Don't retry if request was aborted or if it's the last attempt
+        if (error instanceof AIParsingError && 
+           (error.type === ParseError.ABORT_ERROR || 
+            attempt === maxRetries || 
+            !isRetryableError(error))) {
+          throw error;
+        }
+
+        // Add delay before retry with exponential backoff
+        if (attempt < maxRetries) {
+          const delayMs = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s...
+          await delay(delayMs);
+        }
+      }
+    }
+
+    // This should never be reached, but included for type safety
+    throw new AIParsingError(
+      ParseError.UNKNOWN_ERROR,
+      'Parsing failed after all retry attempts'
+    );
+  }
+
+  /**
+   * Executes a single parsing attempt with comprehensive error handling.
+   */
+  private async executeParsing(
+    description: string,
+    signal?: AbortSignal,
+    attempt: number = 0
+  ): Promise<ParsedJobData> {
 
     try {
       // Get the optimized Cerebras client instance
@@ -81,7 +212,10 @@ export class AIParsingService {
 
       // Check for abort signal before making the API call
       if (signal?.aborted) {
-        throw new Error('Request was aborted during preparation');
+        throw new AIParsingError(
+          ParseError.ABORT_ERROR,
+          'Request was aborted during preparation'
+        );
       }
 
       // Make the API request with static configuration for optimal performance
@@ -102,32 +236,85 @@ export class AIParsingService {
 
       // Check for abort signal after API call
       if (signal?.aborted) {
-        throw new Error('Request was aborted during processing');
+        throw new AIParsingError(
+          ParseError.ABORT_ERROR,
+          'Request was aborted during processing'
+        );
       }
 
       // Fast validation of API response structure before processing
       const content = (completionCreateResponse.choices as { message?: { content?: string } }[])?.[0]?.message?.content;
       
       if (!content) {
-        throw new Error('No response content from AI service');
+        throw new AIParsingError(
+          ParseError.API_ERROR,
+          'No response content from AI service',
+          undefined,
+          { attempt, responseStructure: 'missing_content' }
+        );
       }
 
-      // Process and validate the response content
-      return parseResponse(content);
+      // Process and validate the response content with enhanced error context
+      try {
+        return parseResponse(content);
+      } catch (parseError) {
+        throw new AIParsingError(
+          ParseError.VALIDATION_ERROR,
+          'Failed to parse AI response content',
+          parseError instanceof Error ? parseError : undefined,
+          { attempt, contentLength: content.length }
+        );
+      }
 
     } catch (error) {
+      // Enhanced error handling with proper classification and context
+      const context = {
+        descriptionLength: description.length,
+        hasAbortSignal: !!signal,
+        wasAborted: signal?.aborted
+      };
+
       // Handle abort errors specifically
       if (signal?.aborted || (error instanceof Error && error.message.includes('aborted'))) {
-        throw new Error('Parsing request was cancelled');
+        const abortError = new AIParsingError(
+          ParseError.ABORT_ERROR,
+          'Parsing request was cancelled',
+          error instanceof Error ? error : undefined,
+          context
+        );
+        ErrorLogger.logError(abortError);
+        throw abortError;
       }
 
-      // Handle API errors with context
+      // Handle network/API errors
       if (error instanceof Error) {
-        throw new Error(`AI parsing failed: ${error.message}`);
+        // Classify error type based on error characteristics
+        let errorType = ParseError.API_ERROR;
+        if (error.message.includes('fetch') || error.message.includes('network')) {
+          errorType = ParseError.NETWORK_ERROR;
+        } else if (error.message.includes('API key') || error.message.includes('configuration')) {
+          errorType = ParseError.CONFIGURATION_ERROR;
+        }
+
+        const apiError = new AIParsingError(
+          errorType,
+          `AI parsing failed: ${error.message}`,
+          error,
+          context
+        );
+        ErrorLogger.logError(apiError);
+        throw apiError;
       }
 
       // Handle unknown errors
-      throw new Error('Unknown error occurred during AI parsing');
+      const unknownError = new AIParsingError(
+        ParseError.UNKNOWN_ERROR,
+        'Unknown error occurred during AI parsing',
+        undefined,
+        context
+      );
+      ErrorLogger.logError(unknownError);
+      throw unknownError;
     }
   }
 }

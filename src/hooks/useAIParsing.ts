@@ -8,7 +8,7 @@
 
 import React, { useReducer, useCallback, useEffect, useRef } from 'react';
 import { Folder as FolderType } from '../types';
-import { aiParsingService } from '../services/aiParsingService';
+import { aiParsingService, AIParsingError, ParseError } from '../services/aiParsingService';
 import { 
     ParsingState, 
     ParsingAction,
@@ -192,12 +192,35 @@ export function useAIParsing(
             // Don't handle errors if request was aborted
             if (signal.aborted) return;
             
-            const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
+            // Enhanced error handling with proper classification
+            let errorMsg = 'Unknown error occurred';
             
-            // Handle parsing error
+            if (error instanceof AIParsingError) {
+                // Use structured error message based on error type
+                switch (error.type) {
+                    case ParseError.NETWORK_ERROR:
+                        errorMsg = 'Network connection failed. Please check your internet connection and try again.';
+                        break;
+                    case ParseError.API_ERROR:
+                        errorMsg = 'AI service is temporarily unavailable. Please try again in a moment.';
+                        break;
+                    case ParseError.VALIDATION_ERROR:
+                        errorMsg = 'The job description could not be processed. Please try with a different description.';
+                        break;
+                    case ParseError.CONFIGURATION_ERROR:
+                        errorMsg = 'AI service configuration error. Please contact support.';
+                        break;
+                    default:
+                        errorMsg = 'An unexpected error occurred. Please try again.';
+                }
+            } else if (error instanceof Error) {
+                errorMsg = error.message;
+            }
+            
+            // Handle parsing error with enhanced messaging
             dispatch({ 
                 type: 'PARSING_ERROR', 
-                payload: { error: `Failed to parse job description: ${errorMsg}` }
+                payload: { error: errorMsg }
             });
         } finally {
             // Only nullify if it's the current controller
