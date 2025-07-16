@@ -49,11 +49,13 @@ interface ParsingState {
     errorMessage: string;
     showErrorModal: boolean;
     parseStartTime: number | null;
+    parsingPhase: 'idle' | 'starting' | 'processing' | 'completing';
 }
 
 // Action types for the reducer
 type ParsingAction = 
     | { type: 'START_PARSING'; payload: { startTime: number } }
+    | { type: 'SET_PARSING_PHASE'; payload: { phase: 'idle' | 'starting' | 'processing' | 'completing' } }
     | { type: 'PARSING_SUCCESS' }
     | { type: 'PARSING_ERROR'; payload: { error: string } }
     | { type: 'UPDATE_DESCRIPTION'; payload: { description: string } }
@@ -67,6 +69,7 @@ const initialState: ParsingState = {
     errorMessage: '',
     showErrorModal: false,
     parseStartTime: null,
+    parsingPhase: 'idle',
 };
 
 // Reducer for consolidated state management with batched updates
@@ -79,6 +82,12 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
                 errorMessage: '',
                 showErrorModal: false,
                 parseStartTime: action.payload.startTime,
+                parsingPhase: 'starting',
+            };
+        case 'SET_PARSING_PHASE':
+            return {
+                ...state,
+                parsingPhase: action.payload.phase,
             };
         case 'PARSING_SUCCESS':
             return {
@@ -86,6 +95,7 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
                 isParsingAI: false,
                 jobDescription: '',
                 parseStartTime: null,
+                parsingPhase: 'idle',
             };
         case 'PARSING_ERROR':
             return {
@@ -94,6 +104,7 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
                 errorMessage: action.payload.error,
                 showErrorModal: true,
                 parseStartTime: null,
+                parsingPhase: 'idle',
             };
         case 'UPDATE_DESCRIPTION':
             return {
@@ -126,9 +137,14 @@ export function useAIParsing(
     const handleAIParseJob = useCallback(async () => {
         if (!state.jobDescription.trim()) return;
 
-        // Start parsing with performance timing for optional monitoring during development
+        // Immediate loading state activation (sub-50ms) - start parsing with performance timing
         const startTime = performance.now();
         dispatch({ type: 'START_PARSING', payload: { startTime } });
+
+        // Use requestAnimationFrame to ensure immediate UI feedback within sub-50ms
+        requestAnimationFrame(() => {
+            dispatch({ type: 'SET_PARSING_PHASE', payload: { phase: 'processing' } });
+        });
 
         try {
             // Use optimized Cerebras client instance to reuse existing instance
@@ -136,6 +152,9 @@ export function useAIParsing(
 
             // Pre-compute system prompt with efficient placeholder replacement
             const systemPrompt = SYSTEM_PROMPT_TEMPLATE.replace('{JOB_DESCRIPTION}', state.jobDescription);
+
+            // Transition to processing phase for smooth state transitions
+            dispatch({ type: 'SET_PARSING_PHASE', payload: { phase: 'processing' } });
 
             const completionCreateResponse = await cerebras.chat.completions.create({
                 messages: [
@@ -157,6 +176,9 @@ export function useAIParsing(
             if (!content) {
                 throw new Error('No response from AI service');
             }
+
+            // Transition to completing phase for smooth state transitions
+            dispatch({ type: 'SET_PARSING_PHASE', payload: { phase: 'completing' } });
 
             const parsedData = JSON.parse(content);
             
@@ -214,6 +236,7 @@ export function useAIParsing(
         jobDescription: state.jobDescription,
         setJobDescription,
         isParsingAI: state.isParsingAI,
+        parsingPhase: state.parsingPhase,
         handleAIParseJob,
         errorMessage: state.errorMessage,
         showErrorModal: state.showErrorModal,

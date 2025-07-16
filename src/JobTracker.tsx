@@ -10,6 +10,7 @@ import { useJobs } from './hooks/useJobs';
 import { useFolders } from './hooks/useFolders';
 import { useModals } from './hooks/useModals';
 import { useAIParsing } from './hooks/useAIParsing';
+import { OptimizedLoadingIndicator } from './components/OptimizedLoadingIndicator';
 
 const JobTracker = () => {
   const { signOut, user, updateEmail, updatePassword } = useAuth();
@@ -87,6 +88,7 @@ const JobTracker = () => {
     jobDescription,
     setJobDescription,
     isParsingAI,
+    parsingPhase,
     handleAIParseJob,
     errorMessage,
     showErrorModal: showAIErrorModal,
@@ -1494,8 +1496,11 @@ const JobTracker = () => {
                     onChange={(e) => setJobDescription(e.target.value)}
                     placeholder="Paste the job description here..."
                     className="w-full h-64 bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 resize-none border border-slate-700 focus:border-blue-400 focus:outline-none"
+                    disabled={isParsingAI}
                   />
                 </div>
+                
+
                 
                 <div className="bg-slate-800/50 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -1521,13 +1526,13 @@ const JobTracker = () => {
                 <button
                   onClick={handleAIParseJob}
                   disabled={isParsingAI || !jobDescription.trim()}
-                  className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[180px] justify-center"
                 >
                   {isParsingAI ? (
-                    <>
-                      <Loader className="w-4 h-4 animate-spin" />
-                      Parsing...
-                    </>
+                    <OptimizedLoadingIndicator 
+                      phase={parsingPhase} 
+                      isActive={isParsingAI} 
+                    />
                   ) : (
                     <>
                       <Wand2 className="w-4 h-4" />
