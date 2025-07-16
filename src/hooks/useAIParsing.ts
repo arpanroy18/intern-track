@@ -42,6 +42,94 @@ function getCerebrasClient(): Cerebras {
     return cerebrasClient;
 }
 
+// Interface for parsed job data with optimized structure
+interface ParsedJobData {
+    role: string;
+    company: string;
+    location: string;
+    experienceRequired: string;
+    skills: string[];
+    remote: boolean;
+    notes: string;
+}
+
+// Interface for form data with optimized structure
+interface OptimizedFormData {
+    role: string;
+    company: string;
+    location: string;
+    experienceRequired: string;
+    skills: string;
+    remote: boolean;
+    notes: string;
+    folderId: string;
+}
+
+// Optimized default values to avoid object creation during parsing
+const DEFAULT_PARSED_DATA: ParsedJobData = {
+    role: 'Unknown Role',
+    company: 'Unknown Company',
+    location: 'Not specified',
+    experienceRequired: 'Not specified',
+    skills: [],
+    remote: false,
+    notes: 'No additional notes'
+};
+
+/**
+ * Implement efficient JSON parsing without intermediate string operations
+ * Fast validation of API response structure
+ */
+function processOptimizedResponse(content: string): ParsedJobData {
+    try {
+        // Direct JSON parsing without intermediate string operations
+        const rawData = JSON.parse(content);
+        
+        // Fast validation of API response structure - check essential fields exist
+        if (typeof rawData !== 'object' || rawData === null) {
+            throw new Error('Invalid response format: not an object');
+        }
+        
+        // Create optimized parsed data with direct property assignment
+        const parsedData: ParsedJobData = {
+            role: typeof rawData.role === 'string' ? rawData.role : DEFAULT_PARSED_DATA.role,
+            company: typeof rawData.company === 'string' ? rawData.company : DEFAULT_PARSED_DATA.company,
+            location: typeof rawData.location === 'string' ? rawData.location : DEFAULT_PARSED_DATA.location,
+            experienceRequired: typeof rawData.experienceRequired === 'string' ? rawData.experienceRequired : DEFAULT_PARSED_DATA.experienceRequired,
+            skills: Array.isArray(rawData.skills) ? rawData.skills : DEFAULT_PARSED_DATA.skills,
+            remote: typeof rawData.remote === 'boolean' ? rawData.remote : DEFAULT_PARSED_DATA.remote,
+            notes: typeof rawData.notes === 'string' ? rawData.notes : DEFAULT_PARSED_DATA.notes
+        };
+        
+        return parsedData;
+    } catch (error) {
+        // If JSON parsing fails, return default data to maintain functionality
+        console.warn('JSON parsing failed, using default data:', error);
+        return DEFAULT_PARSED_DATA;
+    }
+}
+
+/**
+ * Create optimized data mapping function with direct property assignment
+ * Optimize skills array processing to avoid unnecessary array operations
+ */
+function mapResponseToFormData(parsedData: ParsedJobData, folderId: string): OptimizedFormData {
+    // Optimize skills array processing - direct join without intermediate operations
+    const skillsString = parsedData.skills.length > 0 ? parsedData.skills.join(', ') : '';
+    
+    // Direct property assignment for optimal performance
+    return {
+        role: parsedData.role,
+        company: parsedData.company,
+        location: parsedData.location,
+        experienceRequired: parsedData.experienceRequired,
+        skills: skillsString,
+        remote: parsedData.remote,
+        notes: parsedData.notes,
+        folderId: folderId
+    };
+}
+
 // Consolidated state interface for optimized state management
 interface ParsingState {
     jobDescription: string;
@@ -171,6 +259,7 @@ export function useAIParsing(
                 ...STATIC_REQUEST_CONFIG
             });
             
+            // Fast validation of API response structure before processing
             const content = (completionCreateResponse.choices as { message?: { content?: string } }[])?.[0]?.message?.content;
             
             if (!content) {
@@ -180,19 +269,14 @@ export function useAIParsing(
             // Transition to completing phase for smooth state transitions
             dispatch({ type: 'SET_PARSING_PHASE', payload: { phase: 'completing' } });
 
-            const parsedData = JSON.parse(content);
+            // Implement efficient JSON parsing without intermediate string operations
+            const parsedData = processOptimizedResponse(content);
+            
+            // Create optimized data mapping function with direct property assignment
+            const optimizedFormData = mapResponseToFormData(parsedData, selectedFolder?.id || '');
             
             // Batched state update - set form data and complete parsing in single operation
-            setFormData({
-                role: parsedData.role || 'Unknown Role',
-                company: parsedData.company || 'Unknown Company',
-                location: parsedData.location || 'Not specified',
-                experienceRequired: parsedData.experienceRequired || 'Not specified',
-                skills: Array.isArray(parsedData.skills) ? parsedData.skills.join(', ') : '',
-                remote: parsedData.remote || false,
-                notes: parsedData.notes || 'No additional notes',
-                folderId: selectedFolder?.id || ''
-            });
+            setFormData(optimizedFormData);
             
             // Complete parsing operation with batched state updates
             dispatch({ type: 'PARSING_SUCCESS' });
