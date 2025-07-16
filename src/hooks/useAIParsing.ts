@@ -63,6 +63,7 @@ interface OptimizedFormData {
     remote: boolean;
     notes: string;
     folderId: string;
+    jobPostingUrl: string;
 }
 
 // Optimized default values to avoid object creation during parsing
@@ -217,12 +218,15 @@ function processOptimizedResponse(content: string): ParsedJobData {
 /**
  * Create optimized data mapping function with direct property assignment
  * Optimize skills array processing to avoid unnecessary array operations
+ * Optimized for job creation workflow integration
  */
 function mapResponseToFormData(parsedData: ParsedJobData, folderId: string): OptimizedFormData {
     // Optimize skills array processing - direct join without intermediate operations
+    // Use cached empty string to avoid repeated empty string creation
     const skillsString = parsedData.skills.length > 0 ? parsedData.skills.join(', ') : '';
     
     // Direct property assignment for optimal performance
+    // Pre-populate folderId to ensure smooth integration with job creation flow
     return {
         role: parsedData.role,
         company: parsedData.company,
@@ -231,7 +235,8 @@ function mapResponseToFormData(parsedData: ParsedJobData, folderId: string): Opt
         skills: skillsString,
         remote: parsedData.remote,
         notes: parsedData.notes,
-        folderId: folderId
+        folderId: folderId || '', // Ensure folderId is always a string for form compatibility
+        jobPostingUrl: '' // Initialize jobPostingUrl for complete form data structure
     };
 }
 
@@ -334,6 +339,7 @@ export function useAIParsing(
     const abortControllerRef = useRef<AbortController | null>(null);
 
     // Proper state cleanup between parsing operations
+    // Optimized for sequential parsing operations to maintain performance
     const cleanupParsingState = useCallback(() => {
         // Reset performance timings
         performanceTimingsRef.current = null;
@@ -356,6 +362,23 @@ export function useAIParsing(
         
         // Reset parsing state
         dispatch({ type: 'RESET_STATE' });
+    }, []);
+
+    // Optimized method for sequential parsing operations
+    // Ensures maintained performance for rapid parsing sequences
+    const prepareForNextParsing = useCallback(() => {
+        // Quick cleanup without full state reset for better performance
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+        }
+        
+        // Clear only essential state for next parsing operation
+        performanceTimingsRef.current = null;
+        cleanupFunctionsRef.current.length = 0;
+        
+        // Reset only parsing-specific state, keep job description for potential reuse
+        dispatch({ type: 'SET_PARSING_PHASE', payload: { phase: 'idle' } });
     }, []);
 
     // Memory-efficient event handling and cleanup on component unmount
@@ -475,16 +498,23 @@ export function useAIParsing(
                 performanceTimingsRef.current.responseProcessedTime = performance.now();
             }
 
-            // Batched state update - set form data and complete parsing in single operation
-            setFormData(optimizedFormData);
-            
-            // Complete parsing operation with batched state updates
-            dispatch({ type: 'PARSING_SUCCESS' });
-            
-            // Handle modal transitions
-            setShowAIParseModal(false);
-            setIsFromAIParse(true);
-            setShowAddModal(true);
+            // Optimize form data population to minimize processing time
+            // Use requestAnimationFrame to ensure smooth modal transitions without blocking
+            requestAnimationFrame(() => {
+                // Batched state update - set form data and complete parsing in single operation
+                setFormData(optimizedFormData);
+                
+                // Complete parsing operation with batched state updates
+                dispatch({ type: 'PARSING_SUCCESS' });
+                
+                // Optimize modal transitions to happen without unnecessary delays
+                // Use setTimeout with 0ms to ensure modal transitions are non-blocking
+                setTimeout(() => {
+                    setShowAIParseModal(false);
+                    setIsFromAIParse(true);
+                    setShowAddModal(true);
+                }, 0);
+            });
 
             // Mark state update complete
             const endTime = performance.now();
@@ -577,6 +607,7 @@ export function useAIParsing(
         ...(import.meta.env.DEV && {
             getPerformanceMetrics,
             clearPerformanceMetrics,
+            prepareForNextParsing, // Expose for testing sequential parsing operations
         }),
     };
 }

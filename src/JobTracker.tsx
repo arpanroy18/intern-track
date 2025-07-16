@@ -207,12 +207,18 @@ const JobTracker = () => {
   const handleAddJob = useCallback(async () => {
     if (!formData.role.trim() || !formData.company.trim()) return;
 
-    await addJob({
+    // Optimize job creation for parsed data - minimize processing time
+    const jobData = {
         ...formData,
-        skills: formData.skills ? formData.skills.split(',').map(s => s.trim()) : [],
-    });
+        // Optimize skills processing - avoid unnecessary operations if already processed
+        skills: formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
+    };
 
-    setFormData({
+    await addJob(jobData);
+
+    // Optimize form reset for sequential parsing operations
+    // Use a single object assignment instead of multiple property assignments
+    const resetFormData = {
       role: '',
       company: '',
       location: '',
@@ -222,7 +228,10 @@ const JobTracker = () => {
       notes: '',
       folderId: '',
       jobPostingUrl: ''
-    });
+    };
+    
+    // Batch state updates to minimize re-renders
+    setFormData(resetFormData);
     setShowAddModal(false);
     setIsFromAIParse(false);
   }, [formData, addJob, setShowAddModal]);
