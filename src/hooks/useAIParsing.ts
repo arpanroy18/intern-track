@@ -2,11 +2,10 @@ import React, { useReducer, useCallback, useEffect, useRef } from 'react';
 import { Folder as FolderType } from '../types';
 import { aiParsingService } from '../services/aiParsingService';
 import { 
-    ParsedJobData, 
-    OptimizedFormData, 
     ParsingState, 
     ParsingAction 
 } from '../types/aiParsing';
+import { mapResponseToFormData } from '../utils/jobDataParser';
 
 // Performance monitoring interfaces for development-time tracking
 interface ParsingPerformanceMetrics {
@@ -115,30 +114,7 @@ class PerformanceLogger {
 
 
 
-/**
- * Create optimized data mapping function with direct property assignment
- * Optimize skills array processing to avoid unnecessary array operations
- * Optimized for job creation workflow integration
- */
-function mapResponseToFormData(parsedData: ParsedJobData, folderId: string): OptimizedFormData {
-    // Optimize skills array processing - direct join without intermediate operations
-    // Use cached empty string to avoid repeated empty string creation
-    const skillsString = parsedData.skills.length > 0 ? parsedData.skills.join(', ') : '';
-    
-    // Direct property assignment for optimal performance
-    // Pre-populate folderId to ensure smooth integration with job creation flow
-    return {
-        role: parsedData.role,
-        company: parsedData.company,
-        location: parsedData.location,
-        experienceRequired: parsedData.experienceRequired,
-        skills: skillsString,
-        remote: parsedData.remote,
-        notes: parsedData.notes,
-        folderId: folderId || '', // Ensure folderId is always a string for form compatibility
-        jobPostingUrl: '' // Initialize jobPostingUrl for complete form data structure
-    };
-}
+
 
 
 
