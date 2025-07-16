@@ -9,11 +9,36 @@
 import { ParsedJobData, OptimizedFormData, DEFAULT_PARSED_DATA } from '../types/aiParsing';
 
 /**
- * Production-appropriate logging for data parsing issues
+ * Production-focused logging utility for data parsing operations and fallback scenarios.
+ * 
+ * Designed to provide monitoring insights without impacting runtime performance.
+ * The logger captures critical parsing events that inform system health and
+ * help identify patterns in AI response quality and recovery effectiveness.
+ * 
+ * **Logging Strategy:**
+ * - Uses structured JSON output for monitoring system integration
+ * - Includes contextual metadata for debugging without sensitive data exposure
+ * - Timestamps all events for temporal analysis and alerting
+ * - Categorizes events for appropriate log level routing
+ * @internal
  */
 class DataParsingLogger {
   /**
-   * Logs parsing fallbacks for monitoring without debug overhead
+   * Logs parsing fallback events for system monitoring and quality analysis.
+   * 
+   * These events indicate when the primary parsing strategy failed and the system
+   * fell back to default values. 
+   * 
+   * @param reason - Specific reason for the fallback (e.g., 'json_parse_error', 'empty_content')
+   * @param context - Additional contextual information for debugging and analysis
+   * 
+   * @example
+   * ```typescript
+   * DataParsingLogger.logParsingFallback('malformed_json', {
+   *   contentLength: response.length,
+   *   hasExpectedFields: false
+   * });
+   * ```
    */
   static logParsingFallback(reason: string, context?: Record<string, unknown>): void {
     const logData = {
@@ -28,7 +53,17 @@ class DataParsingLogger {
   }
 
   /**
-   * Logs successful parsing recoveries for monitoring
+   * Logs successful parsing recovery events for system resilience monitoring.
+   * @param method - The recovery method that succeeded (e.g., 'json_extraction', 'content_cleaning')
+   * @param context - Additional context about the recovery operation
+   * 
+   * @example
+   * ```typescript
+   * DataParsingLogger.logParsingRecovery('json_object_extraction', {
+   *   originalLength: malformedContent.length,
+   *   extractedLength: cleanContent.length
+   * });
+   * ```
    */
   static logParsingRecovery(method: string, context?: Record<string, unknown>): void {
     const logData = {
@@ -114,13 +149,23 @@ export function sanitizeParsedJobData(data: ParsedJobData): ParsedJobData {
 }
 
 /**
- * Parses and validates a JSON response string from the AI service with comprehensive error handling.
- * Implements multiple fallback strategies and recovery mechanisms for robust data processing.
- * This function was moved from the AI service to centralize data processing logic.
+ * Parses and validates AI service responses with multi-layer fallback strategies.
  * 
- * @param content - The raw JSON string response from the AI service
- * @returns A validated ParsedJobData object with fallback values for invalid fields
- * @throws Error only for completely unrecoverable parsing failures
+ * This function implements a sophisticated parsing pipeline designed to handle the inherent
+ * unpredictability of AI-generated content. The approach prioritizes data extraction over
+ * strict validation, ensuring the application remains functional even with imperfect AI responses.
+ * 
+ * @param content - Raw string response from AI service (may be malformed JSON)
+ * @returns Validated ParsedJobData object with fallback values for any invalid/missing fields
+ * 
+ * @example
+ * ```typescript
+ * // Handles various response formats:
+ * parseResponse('{"role":"Engineer",...}'); // Clean JSON
+ * parseResponse('Here is the data: {"role":"Engineer",...}'); // Embedded JSON
+ * parseResponse('[{"role":"Engineer",...}]'); // Array format
+ * parseResponse('corrupted{"role":"Engineer'); // Malformed/truncated
+ * ```
  */
 export function parseResponse(content: string): ParsedJobData {
   if (!content || typeof content !== 'string') {
@@ -132,29 +177,51 @@ export function parseResponse(content: string): ParsedJobData {
   }
 
   try {
-    // Direct JSON parsing without intermediate string operations for performance
+    // Primary parsing strategy: Direct JSON parsing for optimal performance
+    // We trim whitespace as AI responses often have leading/trailing spaces
     const rawData = JSON.parse(content.trim());
     
-    // Fast validation of API response structure - check essential fields exist
+    // Fail-fast validation: Ensure we received an object structure
+    // This prevents downstream errors when accessing properties
     if (typeof rawData !== 'object' || rawData === null) {
       return DEFAULT_PARSED_DATA;
     }
     
-    // Create parsed data with direct property assignment and type validation
-    // Use fallback values for any invalid or missing fields
+    // Defensive data extraction with fallback values for each field
+    // This approach ensures we can extract partial data even from incomplete AI responses
     const parsedData: ParsedJobData = {
-      role: typeof rawData.role === 'string' && rawData.role.trim() ? rawData.role.trim() : DEFAULT_PARSED_DATA.role,
-      company: typeof rawData.company === 'string' && rawData.company.trim() ? rawData.company.trim() : DEFAULT_PARSED_DATA.company,
-      location: typeof rawData.location === 'string' && rawData.location.trim() ? rawData.location.trim() : DEFAULT_PARSED_DATA.location,
-      experienceRequired: typeof rawData.experienceRequired === 'string' ? rawData.experienceRequired.trim() || DEFAULT_PARSED_DATA.experienceRequired : DEFAULT_PARSED_DATA.experienceRequired,
+      // Role: Core identifier for the job position, must be non-empty string
+      role: typeof rawData.role === 'string' && rawData.role.trim() ? 
+        rawData.role.trim() : DEFAULT_PARSED_DATA.role,
+      
+      // Company: Critical for job identification, fallback to unknown if missing
+      company: typeof rawData.company === 'string' && rawData.company.trim() ? 
+        rawData.company.trim() : DEFAULT_PARSED_DATA.company,
+      
+      // Location: Important for filtering, standardized format expected
+      location: typeof rawData.location === 'string' && rawData.location.trim() ? 
+        rawData.location.trim() : DEFAULT_PARSED_DATA.location,
+      
+      // Experience: Can be empty string, so we only check type and provide fallback
+      experienceRequired: typeof rawData.experienceRequired === 'string' ? 
+        rawData.experienceRequired.trim() || DEFAULT_PARSED_DATA.experienceRequired : 
+        DEFAULT_PARSED_DATA.experienceRequired,
+      
+      // Skills: Complex array processing with business rule enforcement
       skills: Array.isArray(rawData.skills) ? 
         rawData.skills
-          .filter((skill: unknown): skill is string => typeof skill === 'string' && skill.trim().length > 0)
-          .map((skill: string) => skill.trim())
-          .slice(0, 6) // Limit to maximum 6 skills as per business rules
+          .filter((skill: unknown): skill is string => 
+            typeof skill === 'string' && skill.trim().length > 0) // Remove invalid entries
+          .map((skill: string) => skill.trim()) // Normalize whitespace
+          .slice(0, 6) // Business rule: Maximum 6 skills to prevent UI overflow
         : DEFAULT_PARSED_DATA.skills,
+      
+      // Remote: Boolean flag with strict type checking for reliability
       remote: typeof rawData.remote === 'boolean' ? rawData.remote : DEFAULT_PARSED_DATA.remote,
-      notes: typeof rawData.notes === 'string' ? rawData.notes.trim() || DEFAULT_PARSED_DATA.notes : DEFAULT_PARSED_DATA.notes
+      
+      // Notes: Comprehensive job details, can be empty but should be string
+      notes: typeof rawData.notes === 'string' ? 
+        rawData.notes.trim() || DEFAULT_PARSED_DATA.notes : DEFAULT_PARSED_DATA.notes
     };
     
     return parsedData;

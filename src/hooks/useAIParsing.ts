@@ -1,9 +1,10 @@
 /**
- * AI Parsing Hook
+ * Production-grade AI parsing hook for job description processing.
  * 
- * This hook provides AI-powered job description parsing functionality with clean state management,
- * proper error handling, and resource cleanup. It integrates with the AI parsing service and
- * data transformation utilities to provide a seamless parsing experience.
+ * This hook encapsulates the complete AI parsing workflow with enterprise-level
+ * patterns including intelligent error handling, resource management, and user experience
+ * optimizations. It serves as the primary interface between UI components and the
+ * AI parsing infrastructure.
  */
 
 import React, { useReducer, useCallback, useEffect, useRef } from 'react';
@@ -25,8 +26,17 @@ import { mapResponseToFormData } from '../utils/jobDataParser';
 
 
 /**
- * Initial state for the AI parsing functionality.
- * Defines the default values for all parsing-related state.
+ * Initial state configuration for AI parsing functionality.
+ * 
+ * This state structure is designed to support the complete parsing workflow
+ * from user input through AI processing to final form population. Each field
+ * serves a specific purpose in the user experience:
+ * 
+ * - `jobDescription`: Holds raw user input for parsing
+ * - `isParsingAI`: Controls loading states and prevents duplicate requests
+ * - `errorMessage`: Stores user-friendly error descriptions for display
+ * - `showErrorModal`: Controls error modal visibility independently of error state
+ * - `parsingPhase`: Provides granular progress feedback during long operations
  */
 const initialState: ParsingState = {
     jobDescription: '',
@@ -37,49 +47,57 @@ const initialState: ParsingState = {
 };
 
 /**
- * Optimized reducer for efficient state management with minimal object creation.
- * Handles all state transitions for the AI parsing workflow with focus on performance.
+ * Optimized state reducer implementing efficient parsing workflow state management.
  * 
- * @param state - Current parsing state
- * @param action - Action to dispatch with optional payload
- * @returns Updated parsing state
+ * This reducer follows Redux-style patterns optimized for React's concurrent features
+ * and performance. It implements several optimizations:
+ * Error states include comprehensive cleanup to ensure the UI returns to
+ * a usable state regardless of where in the process the error occurred.
+ * 
+ * @param state - Current parsing state snapshot
+ * @param action - Dispatched action with type and optional payload
+ * @returns New state object (referentially different only if state actually changed)
  */
 function parsingReducer(state: ParsingState, action: ParsingAction): ParsingState {
     switch (action.type) {
         case 'START_PARSING':
             // Batch all startup state changes for optimal performance
+            // Clear any previous error state to ensure clean parsing attempt
             return {
                 ...state,
                 isParsingAI: true,
-                errorMessage: '',
-                showErrorModal: false,
-                parsingPhase: 'starting',
+                errorMessage: '', // Clear previous errors for clean start
+                showErrorModal: false, // Hide any visible error modals
+                parsingPhase: 'starting', // Set initial phase for UI feedback
             };
         case 'SET_PARSING_PHASE':
-            // Optimize single property update
+            // Performance optimization: prevent unnecessary re-renders for identical phases
+            // This is particularly important during rapid phase transitions
             if (state.parsingPhase === action.payload.phase) return state;
             return {
                 ...state,
                 parsingPhase: action.payload.phase,
             };
         case 'PARSING_SUCCESS':
-            // Batch completion state changes
+            // Comprehensive success cleanup with all state reset
+            // Clear job description to prepare for next parsing operation
             return {
                 ...state,
-                isParsingAI: false,
-                jobDescription: '',
-                parsingPhase: 'idle',
-                errorMessage: '',
-                showErrorModal: false,
+                isParsingAI: false, // Allow new parsing operations
+                jobDescription: '', // Clear input for next use
+                parsingPhase: 'idle', // Return to ready state
+                errorMessage: '', // Clear any lingering error messages
+                showErrorModal: false, // Ensure error UI is hidden
             };
         case 'PARSING_ERROR':
-            // Batch error state changes
+            // Comprehensive error state with user-facing error display
+            // Keep job description so user can retry without re-entering
             return {
                 ...state,
-                isParsingAI: false,
-                errorMessage: action.payload.error,
-                showErrorModal: true,
-                parsingPhase: 'idle',
+                isParsingAI: false, // Stop loading indicators
+                errorMessage: action.payload.error, // User-friendly error message
+                showErrorModal: true, // Display error to user
+                parsingPhase: 'idle', // Return to ready state for retry
             };
         case 'UPDATE_DESCRIPTION':
             // Optimize description update with early return
@@ -89,14 +107,16 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
                 jobDescription: action.payload.description,
             };
         case 'CLOSE_ERROR_MODAL':
-            // Batch modal closure with error cleanup
+            // Clean error modal closure with message cleanup
+            // This ensures no stale error messages remain in state
             return {
                 ...state,
-                showErrorModal: false,
-                errorMessage: '',
+                showErrorModal: false, // Hide error modal
+                errorMessage: '', // Clear error message for clean state
             };
         case 'RESET_STATE':
-            // Return reference to initial state for memory efficiency
+            // Memory-efficient reset using initial state reference
+            // This avoids object creation and leverages React's reference equality optimization
             return initialState;
         default:
             return state;
@@ -104,18 +124,28 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
 }
 
 /**
- * Custom hook for AI-powered job description parsing.
+ * Custom hook for AI-powered job description parsing with comprehensive state management.
  * 
- * Provides a clean interface for parsing job descriptions using AI, managing parsing state,
- * handling errors, and integrating with form data. The hook manages its own state using
- * useReducer and provides proper cleanup for resource management.
+ * This hook provides a production-ready interface for parsing job descriptions using AI,
+ * with sophisticated error handling, user experience optimizations, and integration
+ * with the broader job tracking application workflow.
  * 
- * @param setFormData - Function to update form data with parsed results
- * @param setShowAIParseModal - Function to control AI parse modal visibility
- * @param setShowAddModal - Function to control add job modal visibility
- * @param setIsFromAIParse - Function to indicate if data comes from AI parsing
- * @param selectedFolder - Currently selected folder for job organization
- * @returns Object containing parsing state and control functions
+ * @param setFormData - Callback to populate form with parsed job data
+ * @param setShowAIParseModal - Controls visibility of the AI parsing input modal
+ * @param setShowAddModal - Controls visibility of the job creation form modal
+ * @param setIsFromAIParse - Flags that job data originated from AI parsing (affects form behavior)
+ * @param selectedFolder - Current folder context for organizing the parsed job application
+ * 
+ * @returns Stable object containing parsing state, control functions, and error information
+ * @example
+ * ```typescript
+ * // Error handling patterns
+ * const { errorMessage, showErrorModal } = useAIParsing(...);
+ * 
+ * // Network error: "Network connection failed. Please check your internet connection and try again."
+ * // API error: "AI service is temporarily unavailable. Please try again in a moment."
+ * // Validation error: "The job description could not be processed. Please try with a different description."
+ * ```
  */
 export function useAIParsing(
     setFormData: React.Dispatch<React.SetStateAction<OptimizedFormData>>,

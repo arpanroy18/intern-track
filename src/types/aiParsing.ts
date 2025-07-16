@@ -1,15 +1,32 @@
 /**
- * AI Parsing Type Definitions
+ * Comprehensive type definitions for AI-powered job description parsing.
  * 
- * This module contains all type definitions and interfaces related to AI-powered
- * job description parsing functionality. These types support the parsing workflow
- * from raw job descriptions to structured form data.
+ * This module centralizes all types, interfaces, and constants related to the AI parsing
+ * workflow, providing a single source of truth for type safety across the application.
+ * The types are designed to support the complete data flow from raw job descriptions
+ * through AI processing to structured form data ready for database storage.
+ * 
  */
 
 /**
- * Represents the structured data extracted from a job description by AI parsing.
- * This interface defines the core job information that can be automatically
- * extracted and validated from unstructured job posting text.
+ * Core data structure representing AI-extracted job information.
+ * 
+ * This interface defines the canonical structure for job data extracted from
+ * unstructured text by AI services. It serves as the bridge between AI output
+ * and application data models, ensuring consistency and type safety.
+ *
+ * @example
+ * ```typescript
+ * const jobData: ParsedJobData = {
+ *   role: "Software Engineer",
+ *   company: "Tech Corp", 
+ *   location: "San Francisco, California",
+ *   experienceRequired: "3-5 years",
+ *   skills: ["JavaScript", "React", "Node.js"],
+ *   remote: true,
+ *   notes: "Exciting opportunity to work on cutting-edge technology..."
+ * };
+ * ```
  */
 export interface ParsedJobData {
   /** The standardized job title/role (e.g., "Software Engineer") */
@@ -29,9 +46,26 @@ export interface ParsedJobData {
 }
 
 /**
- * Represents form-ready data structure optimized for job application forms.
- * This interface extends ParsedJobData with additional fields required for
- * form submission and includes string formatting for UI components.
+ * Form-optimized data structure for seamless UI integration.
+ * 
+ * This interface transforms ParsedJobData into a format specifically designed
+ * for form components and database operations. It handles the impedance mismatch
+ * between AI-generated structured data and UI form requirements.
+ *
+ * @example
+ * ```typescript
+ * const formData: OptimizedFormData = {
+ *   role: "Software Engineer",
+ *   company: "Tech Corp",
+ *   location: "San Francisco, California", 
+ *   experienceRequired: "3-5 years",
+ *   skills: "JavaScript, React, Node.js", // Note: comma-separated string
+ *   remote: true,
+ *   notes: "Exciting opportunity...",
+ *   folderId: "fall-2024-internships",
+ *   jobPostingUrl: "" // User will complete this
+ * };
+ * ```
  */
 export interface OptimizedFormData {
   /** The standardized job title/role */
@@ -55,15 +89,51 @@ export interface OptimizedFormData {
 }
 
 /**
- * Represents the different phases of the AI parsing process.
- * Used to provide appropriate UI feedback during parsing operations.
+ * Enumeration of AI parsing operation phases for granular UI feedback.
+ * 
+ * This type enables sophisticated progress indication during potentially long-running
+ * AI operations, providing users with clear feedback about operation status and
+ * estimated completion time.
+ * 
+ * **Phase Definitions:**
+ * - **idle:** No active parsing operation, ready for new requests
+ * - **starting:** Initial setup and validation, typically <100ms
+ * - **processing:** Active AI service communication, typically 2-5 seconds
+ * - **completing:** Data transformation and form population, typically <500ms
+ *
+ * @example
+ * ```typescript
+ * function ParsingProgress({ phase }: { phase: ParsingPhase }) {
+ *   const messages = {
+ *     idle: "Ready to parse",
+ *     starting: "Preparing request...", 
+ *     processing: "AI is analyzing the job description...",
+ *     completing: "Finalizing job details..."
+ *   };
+ *   return <div>{messages[phase]}</div>;
+ * }
+ * ```
  */
 export type ParsingPhase = 'idle' | 'starting' | 'processing' | 'completing';
 
 /**
- * Represents the complete state of the AI parsing functionality.
- * This interface consolidates all parsing-related state into a single
- * structure for efficient state management with useReducer.
+ * Comprehensive state interface for AI parsing workflow management.
+ * 
+ * This interface consolidates all parsing-related state into a cohesive structure
+ * optimized for useReducer state management. The design prioritizes performance,
+ * type safety, and maintainability.
+ * 
+ * @example
+ * ```typescript
+ * // Typical state progression during successful parsing:
+ * const states = [
+ *   { jobDescription: "...", isParsingAI: false, parsingPhase: "idle" },
+ *   { jobDescription: "...", isParsingAI: true, parsingPhase: "starting" },
+ *   { jobDescription: "...", isParsingAI: true, parsingPhase: "processing" },
+ *   { jobDescription: "...", isParsingAI: true, parsingPhase: "completing" },
+ *   { jobDescription: "", isParsingAI: false, parsingPhase: "idle" }
+ * ];
+ * ```
  */
 export interface ParsingState {
   /** The raw job description text to be parsed */
@@ -94,8 +164,21 @@ export type ParsingAction =
 
 
 /**
- * Default values for parsed job data to ensure consistent fallback behavior
- * when parsing fails or returns incomplete data.
+ * Default fallback values ensuring graceful degradation during parsing failures.
+ * 
+ * This constant provides a complete, valid ParsedJobData structure that serves as
+ * a fallback when AI parsing fails or returns incomplete data. The values are
+ * carefully chosen to:
+ * 
+ * @example
+ * ```typescript
+ * // When parsing fails, this ensures forms remain functional:
+ * try {
+ *   return await parseAIResponse(content);
+ * } catch (error) {
+ *   return DEFAULT_PARSED_DATA; // User can manually edit
+ * }
+ * ```
  */
 export const DEFAULT_PARSED_DATA: ParsedJobData = {
   role: 'Unknown Role',

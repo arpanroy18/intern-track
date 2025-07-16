@@ -11,7 +11,19 @@ import { ParsedJobData, STATIC_REQUEST_CONFIG, SYSTEM_PROMPT_TEMPLATE } from '..
 import { parseResponse } from '../utils/jobDataParser';
 
 /**
- * Error types for production-grade error handling and classification
+ * Enumeration of error types for production-grade error handling and classification.
+ * Used to categorize different failure modes in AI parsing operations for appropriate
+ * handling strategies, user messaging, and monitoring/alerting systems.
+ * 
+ * @public
+ * @example
+ * ```typescript
+ * if (error.type === ParseError.NETWORK_ERROR) {
+ *   // Implement retry strategy
+ * } else if (error.type === ParseError.VALIDATION_ERROR) {
+ *   // Fall back to defaults
+ * }
+ * ```
  */
 export enum ParseError {
   NETWORK_ERROR = 'NETWORK_ERROR',
@@ -23,7 +35,27 @@ export enum ParseError {
 }
 
 /**
- * Enhanced error class for structured error handling with context
+ * Enhanced error class that provides structured error handling with rich context information.
+ * Extends the native Error class to include error classification, original error chaining,
+ * and contextual metadata for debugging and monitoring purposes.
+ * 
+ * This design enables:
+ * - Systematic error classification for appropriate handling strategies
+ * - Error context preservation for debugging without performance impact
+ * - Structured logging compatible with monitoring and alerting systems
+ * - Error recovery patterns based on error type
+ * 
+ * @public
+ * @example
+ * ```typescript
+ * try {
+ *   await parseJobDescription(description);
+ * } catch (error) {
+ *   if (error instanceof AIParsingError) {
+ *     console.error('Parsing failed:', error.type, error.context);
+ *   }
+ * }
+ * ```
  */
 export class AIParsingError extends Error {
   constructor(
@@ -38,11 +70,34 @@ export class AIParsingError extends Error {
 }
 
 /**
- * Production-appropriate error logger with minimal performance impact
+ * Production-appropriate error logger designed for minimal performance impact.
+ * Provides structured logging that integrates with monitoring systems while
+ * avoiding debug overhead in production environments.
+ * 
+ * Design principles:
+ * - Structured JSON output for monitoring system consumption
+ * - Minimal runtime overhead through static methods
+ * - Context-rich logging without exposing sensitive information
+ * - Compatible with standard logging aggregation tools
+ * 
+ * @internal
  */
 class ErrorLogger {
   /**
-   * Logs error with context for debugging without debug overhead
+   * Logs structured error information for production monitoring and debugging.
+   * Combines error classification with contextual metadata to provide actionable
+   * insights for system monitoring and troubleshooting.
+   * 
+   * @param error - The AIParsingError instance containing classified error information
+   * @param additionalContext - Optional additional context specific to the error occurrence
+   * 
+   * @example
+   * ```typescript
+   * ErrorLogger.logError(aiParsingError, { 
+   *   userId: 'user123', 
+   *   jobDescriptionLength: 1500 
+   * });
+   * ```
    */
   static logError(error: AIParsingError, additionalContext?: Record<string, unknown>): void {
     // In production, we log structured error data for monitoring systems
@@ -59,7 +114,24 @@ class ErrorLogger {
 }
 
 /**
- * Utility function to determine if an error is retryable
+ * Determines whether an error represents a transient failure that should be retried.
+ * Uses error classification to distinguish between permanent failures (validation, configuration)
+ * and temporary issues (network, API availability) that may resolve on retry.
+ * 
+ * This function is crucial for implementing intelligent retry strategies that avoid
+ * wasting resources on non-recoverable errors while providing resilience for transient issues.
+ * 
+ * @param error - The classified AI parsing error to evaluate
+ * @returns True if the error represents a transient failure suitable for retry
+ * 
+ * @example
+ * ```typescript
+ * if (isRetryableError(error) && attemptCount < maxRetries) {
+ *   // Implement exponential backoff and retry
+ * } else {
+ *   // Handle as permanent failure
+ * }
+ * ```
  */
 function isRetryableError(error: AIParsingError): boolean {
   return error.type === ParseError.NETWORK_ERROR || 
@@ -67,7 +139,19 @@ function isRetryableError(error: AIParsingError): boolean {
 }
 
 /**
- * Utility function to add delay for retry logic with exponential backoff
+ * Creates a promise-based delay for implementing exponential backoff in retry logic.
+ * Used to space out retry attempts to avoid overwhelming services and to allow
+ * transient issues time to resolve.
+ * 
+ * @param ms - The delay duration in milliseconds
+ * @returns Promise that resolves after the specified delay
+ * 
+ * @example
+ * ```typescript
+ * // Exponential backoff: 1s, 2s, 4s
+ * const delayMs = Math.pow(2, attemptNumber) * 1000;
+ * await delay(delayMs);
+ * ```
  */
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -80,12 +164,23 @@ function delay(ms: number): Promise<void> {
 let cerebrasClient: Cerebras | null = null;
 
 /**
- * Gets or creates the Cerebras client instance.
- * Uses singleton pattern to ensure efficient resource usage and avoid
- * unnecessary client recreations during the application lifecycle.
+ * Gets or creates the singleton Cerebras client instance with lazy initialization.
  * 
- * @returns The Cerebras client instance
- * @throws Error if the API key is not configured
+ * Implements the singleton pattern to optimize resource usage by reusing a single
+ * client instance across all parsing operations. This approach provides several benefits:
+ * - Reduces memory footprint by avoiding duplicate client instances
+ * - Maintains connection pooling and client-side optimizations
+ * - Ensures consistent configuration across all API calls
+ * - Lazy initialization delays client creation until first use
+ * 
+ * @returns The configured Cerebras client instance ready for API calls
+ * @throws {AIParsingError} If the API key environment variable is not configured
+ * 
+ * @example
+ * ```typescript
+ * const client = getCerebrasClient();
+ * const response = await client.chat.completions.create(params);
+ * ```
  */
 function getCerebrasClient(): Cerebras {
   if (!cerebrasClient) {
@@ -104,9 +199,29 @@ function getCerebrasClient(): Cerebras {
 
 
 /**
- * AI Parsing Service class that handles job description parsing using Cerebras AI.
- * Provides a clean, testable interface for AI-powered job data extraction with
- * proper error handling, abort signal support, and performance optimization.
+ * Production-grade AI parsing service for extracting structured job data from unstructured descriptions.
+ * 
+ * This service encapsulates all AI-related functionality and provides a clean, testable interface
+ * for job description parsing. It implements enterprise patterns including:
+ * 
+ * 
+ * @public
+ * @example
+ * ```typescript
+ * const service = new AIParsingService();
+ * 
+ * try {
+ *   const jobData = await service.parseJobDescription(
+ *     'Software Engineer at Tech Corp...', 
+ *     abortSignal
+ *   );
+ *   console.log('Parsed job:', jobData);
+ * } catch (error) {
+ *   if (error instanceof AIParsingError) {
+ *     handleClassifiedError(error);
+ *   }
+ * }
+ * ```
  */
 export class AIParsingService {
   /**
@@ -133,12 +248,21 @@ export class AIParsingService {
   }
 
   /**
-   * Internal method that implements the parsing logic with retry mechanism.
-   * Separated for better testability and cleaner error handling.
+   * Internal implementation of parsing logic with intelligent retry mechanism.
+   * 
+   * **Error Classification:**
+   * Each error is analyzed and classified to determine the appropriate response:
+   * - NETWORK_ERROR, API_ERROR: Retryable with backoff
+   * - VALIDATION_ERROR, CONFIGURATION_ERROR: Immediate failure
+   * - ABORT_ERROR: Immediate termination
    * 
    * @param description - The job description text to parse
    * @param signal - Optional AbortSignal for request cancellation
    * @param maxRetries - Maximum number of retry attempts for transient failures
+   * @returns Promise resolving to structured job data
+   * @throws {AIParsingError} Classified error with context for appropriate handling
+   * 
+   * @internal
    */
   private async parseWithRetry(
     description: string,
@@ -195,7 +319,21 @@ export class AIParsingService {
   }
 
   /**
-   * Executes a single parsing attempt with comprehensive error handling.
+   * Executes a single parsing attempt with comprehensive error handling and monitoring.
+   * 
+   * This method handles the core parsing workflow:
+   * Each error includes contextual information for debugging:
+   * - Attempt number for retry analysis
+   * - Content length for payload analysis
+   * - Response structure for API issue diagnosis
+   * 
+   * @param description - The job description text to parse
+   * @param signal - Optional AbortSignal for request cancellation
+   * @param attempt - Current attempt number (0-based) for context and logging
+   * @returns Promise resolving to validated and structured job data
+   * @throws {AIParsingError} Classified error with rich context for debugging
+   * 
+   * @internal
    */
   private async executeParsing(
     description: string,
