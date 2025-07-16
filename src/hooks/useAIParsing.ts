@@ -37,8 +37,8 @@ const initialState: ParsingState = {
 };
 
 /**
- * Reducer for consolidated state management with batched updates.
- * Handles all state transitions for the AI parsing workflow.
+ * Optimized reducer for efficient state management with minimal object creation.
+ * Handles all state transitions for the AI parsing workflow with focus on performance.
  * 
  * @param state - Current parsing state
  * @param action - Action to dispatch with optional payload
@@ -47,6 +47,7 @@ const initialState: ParsingState = {
 function parsingReducer(state: ParsingState, action: ParsingAction): ParsingState {
     switch (action.type) {
         case 'START_PARSING':
+            // Batch all startup state changes for optimal performance
             return {
                 ...state,
                 isParsingAI: true,
@@ -55,18 +56,24 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
                 parsingPhase: 'starting',
             };
         case 'SET_PARSING_PHASE':
+            // Optimize single property update
+            if (state.parsingPhase === action.payload.phase) return state;
             return {
                 ...state,
                 parsingPhase: action.payload.phase,
             };
         case 'PARSING_SUCCESS':
+            // Batch completion state changes
             return {
                 ...state,
                 isParsingAI: false,
                 jobDescription: '',
                 parsingPhase: 'idle',
+                errorMessage: '',
+                showErrorModal: false,
             };
         case 'PARSING_ERROR':
+            // Batch error state changes
             return {
                 ...state,
                 isParsingAI: false,
@@ -75,17 +82,21 @@ function parsingReducer(state: ParsingState, action: ParsingAction): ParsingStat
                 parsingPhase: 'idle',
             };
         case 'UPDATE_DESCRIPTION':
+            // Optimize description update with early return
+            if (state.jobDescription === action.payload.description) return state;
             return {
                 ...state,
                 jobDescription: action.payload.description,
             };
         case 'CLOSE_ERROR_MODAL':
+            // Batch modal closure with error cleanup
             return {
                 ...state,
                 showErrorModal: false,
                 errorMessage: '',
             };
         case 'RESET_STATE':
+            // Return reference to initial state for memory efficiency
             return initialState;
         default:
             return state;
@@ -119,30 +130,32 @@ export function useAIParsing(
     // Ref for abort controller to handle request cancellation
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    // Cleanup function for proper resource management
+    // Optimized cleanup function focusing on essential resource management only
     const cleanupParsingState = useCallback(() => {
-        // Abort any ongoing API requests
+        // Abort any ongoing API requests for immediate resource cleanup
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
             abortControllerRef.current = null;
         }
         
-        // Reset parsing state
+        // Reset state efficiently using reducer
         dispatch({ type: 'RESET_STATE' });
     }, []);
 
-    // Cleanup on component unmount to prevent memory leaks
+    // Essential cleanup on unmount - prevent memory leaks and abort in-flight requests
     useEffect(() => {
-        return () => {
-            cleanupParsingState();
-        };
+        return cleanupParsingState;
     }, [cleanupParsingState]);
 
     const handleAIParseJob = useCallback(async () => {
         if (!state.jobDescription.trim()) return;
 
-        // Create abort controller for request cancellation
+        // Cleanup any existing controller and create new one for optimal memory usage
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
         abortControllerRef.current = new AbortController();
+        const signal = abortControllerRef.current.signal;
         
         // Start parsing operation
         dispatch({ type: 'START_PARSING' });
@@ -151,11 +164,14 @@ export function useAIParsing(
         dispatch({ type: 'SET_PARSING_PHASE', payload: { phase: 'processing' } });
 
         try {
-            // Use the AI parsing service with abort signal support
+            // Use the AI parsing service with optimized signal handling
             const parsedData = await aiParsingService.parseJobDescription(
                 state.jobDescription,
-                abortControllerRef.current?.signal
+                signal
             );
+
+            // Check if request was aborted before continuing
+            if (signal.aborted) return;
 
             // Transition to completing phase
             dispatch({ type: 'SET_PARSING_PHASE', payload: { phase: 'completing' } });
@@ -173,6 +189,9 @@ export function useAIParsing(
             setShowAddModal(true);
             
         } catch (error) {
+            // Don't handle errors if request was aborted
+            if (signal.aborted) return;
+            
             const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
             
             // Handle parsing error
@@ -181,15 +200,15 @@ export function useAIParsing(
                 payload: { error: `Failed to parse job description: ${errorMsg}` }
             });
         } finally {
-            // Clean up abort controller
-            if (abortControllerRef.current) {
+            // Only nullify if it's the current controller
+            if (abortControllerRef.current && abortControllerRef.current.signal === signal) {
                 abortControllerRef.current = null;
             }
         }
     }, [state.jobDescription, selectedFolder, setFormData, setIsFromAIParse, setShowAIParseModal, setShowAddModal]);
 
     /**
-     * Updates the job description text in the parsing state.
+     * Optimized job description setter with memory-efficient updates.
      * 
      * @param description - The new job description text
      */
@@ -198,7 +217,7 @@ export function useAIParsing(
     }, []);
 
     /**
-     * Controls the visibility of the error modal.
+     * Optimized error modal controller with conditional dispatch.
      * 
      * @param show - Whether to show the error modal (only false is handled)
      */
@@ -208,7 +227,8 @@ export function useAIParsing(
         }
     }, []);
 
-    return {
+    // Return memoized object for stable reference and optimized re-renders
+    return React.useMemo(() => ({
         jobDescription: state.jobDescription,
         setJobDescription,
         isParsingAI: state.isParsingAI,
@@ -217,5 +237,14 @@ export function useAIParsing(
         errorMessage: state.errorMessage,
         showErrorModal: state.showErrorModal,
         setShowErrorModal,
-    };
+    }), [
+        state.jobDescription,
+        state.isParsingAI,
+        state.parsingPhase,
+        state.errorMessage,
+        state.showErrorModal,
+        setJobDescription,
+        handleAIParseJob,
+        setShowErrorModal
+    ]);
 }
