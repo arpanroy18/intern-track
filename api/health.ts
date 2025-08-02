@@ -15,12 +15,15 @@ const supabase = createClient(SUPABASE_URL as string, SUPABASE_ANON_KEY as strin
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { secret } = req.query;
   if (secret !== HEALTH_SECRET) {
+    console.log(`[HEALTH] Unauthorized access attempt at ${new Date().toISOString()}`);
     return res.status(401).json({ error: 'Unauthorized' });
   }
   // Query a single record from a table (e.g., jobs)
   const { data, error } = await supabase.from('jobs').select('*').limit(1);
   if (error) {
+    console.log(`[HEALTH] Supabase query failed at ${new Date().toISOString()}: ${error.message}`);
     return res.status(500).json({ error: 'Supabase query failed', details: error.message });
   }
+  console.log(`[HEALTH] Health check successful at ${new Date().toISOString()}`);
   return res.status(200).json({ status: 'ok', data });
 }
