@@ -2,5 +2,39 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "functions": {
+    "api/health.ts": {
+      "maxDuration": 10
+    },
+    "api/ping.ts": {
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/health",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/api/ping",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/ping?secret=${HEALTH_SECRET}",
+      "schedule": "0 12 * * *"
+    }
+  ]
 }
