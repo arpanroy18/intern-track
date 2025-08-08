@@ -646,8 +646,8 @@ const JobTracker = () => {
         <StatsGrid stats={stats} />
 
         {/* Main Content Area */}
-        <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-          <div className="p-3 border-b border-slate-800">
+        <div className="bg-[#FAF6ED] rounded-2xl border border-[#E5D8C7] overflow-hidden text-[#2F1F12]">
+          <div className="p-3 border-b border-[#E5D8C7]">
             <div className="flex items-center justify-between ml-6 mr-6">
               <h2 className="text-xl font-semibold flex items-center gap-2">
                 <Briefcase className="w-5 h-5 text-purple-400" />
@@ -754,7 +754,7 @@ const JobTracker = () => {
                 
                 {/* Pagination Controls */}
                 {paginationData.totalPages > 1 && (
-                  <div className="mt-6 flex items-center justify-between border-t border-slate-800 pt-4">
+                  <div className="mt-6 flex items-center justify-between border-t border-[#E5D8C7] pt-4">
                     <div className="text-sm text-gray-400">
                       Showing {paginationData.startIndex + 1} to {paginationData.endIndex} of {paginationData.totalItems} applications
                     </div>
