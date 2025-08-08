@@ -603,18 +603,18 @@ const JobTracker = () => {
               </div>
             </div>
             
-            {/* Add Application Button */}
+            {/* Add Application Buttons */}
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowAIParseModal(true)}
-                className="bg-[#6b7c2c] hover:bg-[#475a25] text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg border-2 border-[#3a4a1a]"
+                className="h-12 px-5 rounded-2xl text-sm font-medium bg-[#6b7c2c] hover:bg-[#475a25] text-white flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg border-2 border-[#3a4a1a]"
               >
                 <Wand2 className="w-4 h-4" />
                 Parse with AI
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="bg-[#6b7c2c] hover:bg-[#475a25] text-white px-5 py-2.5 rounded-2xl flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg border-2 border-[#3a4a1a]"
+                className="h-12 px-5 rounded-2xl text-sm font-medium bg-[#6b7c2c] hover:bg-[#475a25] text-white flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg border-2 border-[#3a4a1a]"
               >
                 <Sparkles className="w-4 h-4" />
                 Add Application
