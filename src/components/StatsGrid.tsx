@@ -41,10 +41,11 @@ export const StatsGrid = React.memo(({ stats }: { stats: JobStats }) => {
         switch (color) {
             case 'amber':
                 return {
-                    bg: 'bg-[#f6efdf]',
-                    border: 'border-[#eadfc7]',
-                    text: 'text-[#7d5a1e]',
-                    circle: 'bg-[#d29f4e]',
+                     bg: 'bg-[#efeae2]',
+                    border: 'border-yellow-100',
+                    text: 'text-[#2b1e1a]',
+                    circle: 'bg-[#2b1e1a]',
+                   
                 } as const;
             case 'purple':
                 return {
@@ -69,17 +70,17 @@ export const StatsGrid = React.memo(({ stats }: { stats: JobStats }) => {
                 } as const;
             case 'yellow':
                 return {
-                    bg: 'bg-yellow-50',
-                    border: 'border-yellow-100',
-                    text: 'text-yellow-500',
-                    circle: 'bg-yellow-300',
+                    bg: 'bg-[#f6efdf]',
+                    border: 'border-[#eadfc7]',
+                    text: 'text-[#7d5a1e]',
+                    circle: 'bg-[#d29f4e]',
                 } as const;
             case 'green':
                 return {
-                    bg: 'bg-green-50',
+                    bg: 'bg-[#eef0e6]',
                     border: 'border-green-100',
-                    text: 'text-[#7c8e46]',
-                    circle: 'bg-[#7c8e46]',
+                    text: 'text-[#445018]',
+                    circle: 'bg-[#6b7b2c]',
                 } as const;
             default:
                 return {
