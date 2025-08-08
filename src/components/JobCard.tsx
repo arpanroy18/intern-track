@@ -128,7 +128,7 @@ export const JobCard = React.memo(({
                     <select
                         value={job.status}
                         onChange={handleStatusChange}
-                        className="bg-[#F7EFE1] border border-[#D6C7B2] rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-[#9B7B5F] text-[#2F1F12]"
+                         className="bg-[#F7EFE1] border border-[#D6C7B2] rounded-lg px-3 py-1.5 text-sm font-lora focus:outline-none focus:border-[#9B7B5F] text-[#2F1F12]"
                     >
                         <option value="Applied">Applied</option>
                         <option value="Online Assessment">Online Assessment</option>
