@@ -353,7 +353,7 @@ const JobTracker = () => {
 
 
   return (
-    <div className="min-h-screen bg-slate-950 text-gray-100 p-6 relative overflow-hidden">
+    <div className="min-h-screen #EDE9DF text-gray-100 p-6 relative overflow-hidden">
       {/* Advanced Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.06),transparent_50%)]"></div>
