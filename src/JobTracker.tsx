@@ -1211,11 +1211,6 @@ const JobTracker = () => {
                   <div className="flex items-center gap-3 text-sm text-gray-400">
                     <Calendar className="w-4 h-4" />
                     Applied on {selectedJob.dateApplied}
-                    {selectedJob.remote && (
-                      <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 rounded text-xs ml-2">
-                        Remote Available
-                      </span>
-                    )}
                   </div>
                 </div>
               )}
