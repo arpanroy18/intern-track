@@ -1181,7 +1181,7 @@ const JobTracker = () => {
                     <h3 className="text-sm font-medium text-gray-400 mb-2">Skills</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedJob.skills.map((skill, index) => (
-                        <span key={index} className="px-3 py-1.5 bg-slate-800 rounded-lg text-sm">
+                        <span key={index} className="px-3 py-1.5 bg-slate-800 rounded-lg text-sm font-semibold">
                           {skill}
                         </span>
                       ))}
