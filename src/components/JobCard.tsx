@@ -53,17 +53,17 @@ export const JobCard = React.memo(({
 
     return (
         <div
-            className="bg-slate-800/50 rounded-xl p-3 hover:bg-slate-800 transition-all border border-slate-700/50 hover:border-slate-600 cursor-pointer"
+            className="bg-[#FFFDF7] rounded-xl p-5 hover:bg-[#F2E9DD] transition-all border border-[#E5D8C7] hover:border-[#D9CBB7] cursor-pointer text-[#2F1F12] shadow-sm"
             onClick={handleShowDetails}
         >
             <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
-                    <div className="flex-shrink-0 w-8 h-8 bg-slate-700/50 rounded-lg flex items-center justify-center mt-0.5">
-                        <span className="text-sm font-medium text-gray-400">{index + 1}</span>
+                    <div className="flex-shrink-0 w-8 h-8 bg-[#EADFCC] rounded-lg flex items-center justify-center mt-0.5">
+                        <span className="text-sm font-medium text-[#6B5B53]">{index + 1}</span>
                     </div>
                     <div className="flex-1">
                         <div className="flex items-center gap-4 mb-2">
-                            <h3 className="text-lg font-medium">{job.role}</h3>
+                            <h3 className="text-lg font-medium text-[#2F1F12]">{job.role}</h3>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
                                 {job.status}
                             </span>
@@ -73,12 +73,12 @@ export const JobCard = React.memo(({
                                         className="w-2 h-2 rounded-full"
                                         style={{ backgroundColor: jobFolder.color }}
                                     />
-                                    <span className="text-xs text-gray-500 font-medium">{jobFolder.name}</span>
+                                    <span className="text-xs text-[#8B6E5A] font-medium">{jobFolder.name}</span>
                                 </div>
                             )}
                         </div>
 
-                        <div className="flex items-center gap-6 text-sm text-gray-400">
+                        <div className="flex items-center gap-6 text-sm text-[#6B5B53]">
                             <div className="flex items-center gap-2">
                                 <Building2 className="w-4 h-4" />
                                 {job.company}
@@ -87,7 +87,7 @@ export const JobCard = React.memo(({
                                 <MapPin className="w-4 h-4" />
                                 {job.location}
                                 {job.remote && (
-                                    <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 rounded text-xs ml-1">
+                                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs ml-1">
                                         Remote
                                     </span>
                                 )}
@@ -100,7 +100,7 @@ export const JobCard = React.memo(({
 
                         <div className="mt-2 flex items-center gap-2">
                             {job.skills.map((skill, skillIndex) => (
-                                <span key={skillIndex} className="px-2 py-1 bg-slate-700 rounded text-xs">
+                                <span key={skillIndex} className="px-2 py-1 bg-[#EEE7DA] text-[#3F2F2F] rounded text-xs border border-[#D8CBB5]">
                                     {skill}
                                 </span>
                             ))}
@@ -112,23 +112,23 @@ export const JobCard = React.memo(({
                     {job.jobPostingUrl && (
                         <button
                             onClick={handleOpenJobPosting}
-                            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                            className="p-2 hover:bg-[#E8DCC8] rounded-lg transition-colors"
                             title="Open Job Posting"
                         >
-                            <ExternalLink className="w-4 h-4 text-blue-400" />
+                            <ExternalLink className="w-4 h-4 text-[#8B6E5A]" />
                         </button>
                     )}
                     <button
                         onClick={handleShowTimeline}
-                        className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                        className="p-2 hover:bg-[#E8DCC8] rounded-lg transition-colors"
                         title="View Timeline"
                     >
-                        <Clock className="w-4 h-4 text-purple-400" />
+                        <Clock className="w-4 h-4 text-[#8B6E5A]" />
                     </button>
                     <select
                         value={job.status}
                         onChange={handleStatusChange}
-                        className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-purple-400"
+                        className="bg-[#F7EFE1] border border-[#D6C7B2] rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-[#9B7B5F] text-[#2F1F12]"
                     >
                         <option value="Applied">Applied</option>
                         <option value="Online Assessment">Online Assessment</option>
@@ -138,11 +138,11 @@ export const JobCard = React.memo(({
                     </select>
                     <button
                         onClick={handleDelete}
-                        className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                        className="p-2 hover:bg-[#E8DCC8] rounded-lg transition-colors"
                     >
-                        <Trash2 className="w-4 h-4 text-gray-400" />
+                        <Trash2 className="w-4 h-4 text-[#8B6E5A]" />
                     </button>
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-[#8B6E5A]" />
                 </div>
             </div>
         </div>
