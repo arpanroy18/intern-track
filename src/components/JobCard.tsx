@@ -58,12 +58,12 @@ export const JobCard = React.memo(({
         >
             <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
-                    <div className="flex-shrink-0 w-8 h-8 bg-[#EADFCC] rounded-lg flex items-center justify-center mt-0.5">
-                        <span className="text-sm font-medium text-[#6B5B53]">{index + 1}</span>
+                    <div className="flex-shrink-0 w-7 h-7 bg-[#2b1f1a] rounded-full border border-[#2b1f1a] shadow-sm mt-0.5 flex items-center justify-center">
+                        <span className="text-xs font-semibold text-[#FFFDF7]">{index + 1}</span>
                     </div>
                     <div className="flex-1">
                         <div className="flex items-center gap-4 mb-2">
-                            <h3 className="text-lg font-medium text-[#2F1F12] font-lora">{job.role}</h3>
+                            <h3 className="text-lg font-semibold text-[#2F1F12] font-lora">{job.role}</h3>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
                                 {job.status}
                             </span>
