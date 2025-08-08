@@ -430,22 +430,22 @@ const JobTracker = () => {
 
               {/* Search Bar */}
               <div className="relative flex-1 max-w-md">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                  <Search className="h-5 w-5 text-gray-700" />
                 </div>
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by company, role, or notes..."
-                  className="w-full h-11 pl-10 pr-4 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                  placeholder="Search by company, role, or tag"
+                  className="w-full h-12 pl-12 pr-4 bg-stone-100/90 border border-stone-200/60 rounded-full text-gray-700 placeholder-gray-500 focus:outline-none focus:border-stone-300 focus:bg-stone-50 transition-all duration-200 shadow-sm backdrop-blur-sm relative z-0"
                 />
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm('')}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
                   >
-                    <X className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                    <X className="h-4 w-4 text-gray-500 hover:text-gray-700 transition-colors" />
                   </button>
                 )}
               </div>
@@ -454,10 +454,10 @@ const JobTracker = () => {
               <div className="relative filter-container">
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`filter-button h-11 px-4 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  className={`filter-button h-12 px-4 rounded-2xl text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-sm backdrop-blur-sm ${
                     showFilters || selectedStatusFilter !== 'All'
-                      ? 'bg-blue-500 text-white shadow-lg'
-                      : 'bg-slate-800/50 text-gray-400 hover:bg-slate-800 hover:text-gray-300 border border-slate-700'
+                      ? 'bg-stone-600 text-stone-50 shadow-md'
+                      : 'bg-stone-100/90 text-gray-600 hover:bg-stone-200/90 hover:text-gray-700 border border-stone-200/60'
                   }`}
                 >
                   <Filter className="h-4 w-4" />
@@ -475,8 +475,8 @@ const JobTracker = () => {
                     ? 'opacity-100 translate-x-0 pointer-events-auto' 
                     : 'opacity-0 -translate-x-4 pointer-events-none'
                 }`}>
-                  <div className="bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-lg shadow-2xl ring-1 ring-slate-600/20">
-                    <div className="flex items-center h-11 px-3 gap-2">
+                  <div className="bg-stone-50/95 backdrop-blur-md border border-stone-200/80 rounded-xl shadow-xl ring-1 ring-stone-200/40">
+                    <div className="flex items-center h-12 px-3 gap-2">
                       {(['All', 'Applied', 'Online Assessment', 'Interview', 'Offer', 'Closed'] as const).map((status) => (
                         <button
                           key={status}
@@ -484,10 +484,10 @@ const JobTracker = () => {
                             setSelectedStatusFilter(status);
                             setShowFilters(false);
                           }}
-                          className={`h-8 px-3 rounded-md text-sm font-medium whitespace-nowrap transition-all ${
+                          className={`h-8 px-3 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                             selectedStatusFilter === status
-                              ? 'bg-blue-500 text-white shadow-md'
-                              : 'bg-slate-700/50 text-gray-300 hover:bg-slate-600 hover:text-white'
+                              ? 'bg-stone-600 text-stone-50 shadow-md'
+                              : 'bg-stone-200/70 text-gray-600 hover:bg-stone-300/80 hover:text-gray-700'
                           }`}
                         >
                           {status}
@@ -502,7 +502,7 @@ const JobTracker = () => {
               <div className="relative season-dropdown">
                 <button
                   onClick={() => setShowSeasonDropdown(!showSeasonDropdown)}
-                  className="flex items-center gap-2 px-3 py-2.5 h-11 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg transition-all text-sm"
+                  className="flex items-center gap-2 px-4 py-2.5 h-12 bg-stone-100/90 hover:bg-stone-200/90 border border-stone-200/60 hover:border-stone-300 rounded-2xl transition-all duration-200 text-sm shadow-sm backdrop-blur-sm"
                 >
                   {selectedFolder ? (
                     <>
@@ -510,19 +510,19 @@ const JobTracker = () => {
                         className="w-2 h-2 rounded-full"
                         style={{ backgroundColor: selectedFolder.color }}
                       />
-                      <span className="text-gray-200">{selectedFolder.name}</span>
+                      <span className="text-gray-700">{selectedFolder.name}</span>
                     </>
                   ) : (
-                    <span className="text-gray-400">All Applications</span>
+                    <span className="text-gray-600">All Applications</span>
                   )}
-                  <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
                 {/* Season Dropdown */}
                 {showSeasonDropdown && (
-                  <div className="absolute top-full mt-1 left-0 min-w-48 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl z-50">
+                  <div className="absolute top-full mt-1 left-0 min-w-48 bg-stone-50/95 backdrop-blur-sm border border-stone-200/80 rounded-xl shadow-xl z-50 ring-1 ring-stone-200/40">
                     {/* Season Options */}
                     <div className="py-1">
                       <button
@@ -530,8 +530,8 @@ const JobTracker = () => {
                           setSelectedFolder(null);
                           setShowSeasonDropdown(false);
                         }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-700/50 transition-colors ${
-                          !selectedFolder ? 'text-purple-400 bg-slate-700/30' : 'text-gray-300'
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-stone-200/60 transition-colors duration-200 ${
+                          !selectedFolder ? 'text-stone-700 bg-stone-200/50 font-medium' : 'text-gray-600'
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -549,8 +549,8 @@ const JobTracker = () => {
                               setSelectedFolder(folder);
                               setShowSeasonDropdown(false);
                             }}
-                            className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-700/50 transition-colors ${
-                              selectedFolder?.id === folder.id ? 'text-purple-400 bg-slate-700/30' : 'text-gray-300'
+                            className={`w-full text-left px-3 py-2 text-sm hover:bg-stone-200/60 transition-colors duration-200 ${
+                              selectedFolder?.id === folder.id ? 'text-stone-700 bg-stone-200/50 font-medium' : 'text-gray-600'
                             }`}
                           >
                             <div className="flex items-center gap-2">
