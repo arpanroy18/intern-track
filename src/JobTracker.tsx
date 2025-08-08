@@ -1000,7 +1000,7 @@ const JobTracker = () => {
             >
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h2 className="text-2xl font-semibold mb-2">{selectedJob.role}</h2>
+                  <h2 className="text-2xl font-semibold mb-2 font-lora">{selectedJob.role}</h2>
                   <div className="flex items-center gap-4 text-gray-400">
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4" />

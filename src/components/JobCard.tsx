@@ -63,7 +63,7 @@ export const JobCard = React.memo(({
                     </div>
                     <div className="flex-1">
                         <div className="flex items-center gap-4 mb-2">
-                            <h3 className="text-lg font-medium text-[#2F1F12]">{job.role}</h3>
+                            <h3 className="text-lg font-medium text-[#2F1F12] font-lora">{job.role}</h3>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
                                 {job.status}
                             </span>
