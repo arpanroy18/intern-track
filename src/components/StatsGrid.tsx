@@ -55,7 +55,7 @@ export const StatsGrid = React.memo(({ stats }: { stats: JobStats }) => {
                                     <p className="text-[#7d5a1e] text-sm font-semibold tracking-wide">
                                         {stat.label}
                                     </p>
-                                    <p className="text-5xl font-bold text-[#7d5a1e] drop-shadow-none mt-3">
+                                    <p className="text-4xl font-bold font-lora text-[#7d5a1e] drop-shadow-none mt-3">
                                         {stat.value}
                                     </p>
                                 </div>
@@ -79,7 +79,7 @@ export const StatsGrid = React.memo(({ stats }: { stats: JobStats }) => {
                                     <p className="text-[#7d5a1e] text-sm font-semibold tracking-wide">
                                         {stat.label}
                                     </p>
-                                    <p className="text-5xl font-bold text-[#7d5a1e] drop-shadow-none mt-3">
+                                    <p className="text-4xl font-bold font-lora text-[#7d5a1e] drop-shadow-none mt-3">
                                         {stat.value}
                                     </p>
                                 </div>
