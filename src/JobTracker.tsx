@@ -741,7 +741,6 @@ const JobTracker = () => {
                       key={job.id}
                       job={job}
                       index={paginationData.startIndex + index}
-                      statusColors={statusColors}
                       onShowDetails={showJobDetails}
                       onShowTimeline={showJobTimeline}
                       onUpdateStatus={updateJobStatus}

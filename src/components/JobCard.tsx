@@ -6,7 +6,6 @@ import { Job, JobStatus, Folder } from '../types';
 export const JobCard = React.memo(({
     job,
     index,
-    statusColors,
     onShowDetails,
     onShowTimeline,
     onUpdateStatus,
@@ -16,7 +15,6 @@ export const JobCard = React.memo(({
 }: {
     job: Job;
     index: number;
-    statusColors: Record<JobStatus, string>;
     onShowDetails: (job: Job) => void;
     onShowTimeline: (e: React.MouseEvent, job: Job) => void;
     onUpdateStatus: (id: number, status: JobStatus) => void;
@@ -64,9 +62,6 @@ export const JobCard = React.memo(({
                     <div className="flex-1">
                         <div className="flex items-center gap-4 mb-2">
                             <h3 className="text-lg font-semibold text-[#2F1F12] font-lora">{job.role}</h3>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[job.status]}`}>
-                                {job.status}
-                            </span>
                             {showFolderInfo && jobFolder && (
                                 <div className="flex items-center gap-1.5">
                                     <div
