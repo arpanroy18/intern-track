@@ -55,10 +55,10 @@ export const StatsGrid = React.memo(({ stats }: { stats: JobStats }) => {
                 } as const;
             case 'blue':
                 return {
-                    bg: 'bg-blue-50',
+                    bg: 'bg-[#e8eff5]',
                     border: 'border-blue-100',
-                    text: 'text-[#64798a]',
-                    circle: 'bg-[#6e97ab]',
+                    text: 'text-[#2d4253]',
+                    circle: 'bg-[#3f6a86]',
                 } as const;
             case 'orange':
                 return {
