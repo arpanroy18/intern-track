@@ -426,10 +426,10 @@ const JobTracker = () => {
 
           {/* Search Bar, Filter Toggle, Season Selector, and Add Application Button */}
           <div className="flex gap-3 items-center justify-between relative">
-            <div className="flex gap-3 items-center">
+            <div className="flex gap-3 items-center flex-1">
 
               {/* Search Bar */}
-              <div className="relative flex-1 max-w-md">
+              <div className="relative flex-1" style={{ maxWidth: '350px' }}>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                   <Search className="h-5 w-5 text-gray-700" />
                 </div>
