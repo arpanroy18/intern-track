@@ -68,7 +68,7 @@ export const JobCard = React.memo(({
                                         className="w-2 h-2 rounded-full"
                                         style={{ backgroundColor: jobFolder.color }}
                                     />
-                                    <span className="text-xs text-[#8B6E5A] font-medium">{jobFolder.name}</span>
+                                     <span className="text-xs text-[#8B6E5A] font-medium font-lora">{jobFolder.name}</span>
                                 </div>
                             )}
                         </div>
