@@ -1224,25 +1224,25 @@ const JobTracker = () => {
             onClick={() => setShowTimelineModal(false)}
           >
             <div 
-              className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl"
+              className="bg-[#F7EFE1] rounded-2xl p-6 max-w-md w-full border border-[#D6C7B2] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h2 className="text-xl font-semibold mb-1">Application Timeline</h2>
-                  <p className="text-sm text-gray-400">{selectedJob.role} at {selectedJob.company}</p>
+                  <h2 className="text-xl font-semibold font-lora text-[#2F1F12] mb-1">Application Timeline</h2>
+                  <p className="text-sm text-[#8B6E5A]">{selectedJob.role} at {selectedJob.company}</p>
                 </div>
                 <button
                   onClick={() => setShowTimelineModal(false)}
-                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[#E8DCC8] rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-[#8B6E5A]" />
                 </button>
               </div>
 
               <div className="relative">
                 {/* Timeline line */}
-                <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-400/50 via-purple-400/30 to-transparent"></div>
+                <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-[#D6C7B2]"></div>
                 
                 {/* Timeline events */}
                 <div className="space-y-6">
@@ -1251,35 +1251,35 @@ const JobTracker = () => {
                       {/* Timeline dot */}
                       <div className="relative z-10">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                          event.status === 'Applied' ? 'bg-blue-400/10' :
-                          event.status === 'Online Assessment' ? 'bg-orange-400/10' :
-                          event.status === 'Interview' ? 'bg-yellow-400/10' :
-                          event.status === 'Offer' ? 'bg-green-400/10' :
-                          'bg-red-400/10'
+                          event.status === 'Applied' ? 'bg-[#e8eff5]' :
+                          event.status === 'Online Assessment' ? 'bg-[#efe6de]' :
+                          event.status === 'Interview' ? 'bg-[#f6efdf]' :
+                          event.status === 'Offer' ? 'bg-[#eef0e6]' :
+                          'bg-[#f3e6e6]'
                         }`}>
-                          {event.status === 'Applied' && <FileText className="w-5 h-5 text-blue-400" />}
-                          {event.status === 'Online Assessment' && <Clock className="w-5 h-5 text-orange-400" />}
-                          {event.status === 'Interview' && <Clock className="w-5 h-5 text-yellow-400" />}
-                          {event.status === 'Offer' && <TrendingUp className="w-5 h-5 text-green-400" />}
-                          {event.status === 'Closed' && <X className="w-5 h-5 text-red-400" />}
+                          {event.status === 'Applied' && <FileText className="w-5 h-5 text-[#3f6a86]" />}
+                          {event.status === 'Online Assessment' && <Clock className="w-5 h-5 text-[#a36b54]" />}
+                          {event.status === 'Interview' && <Clock className="w-5 h-5 text-[#d29f4e]" />}
+                          {event.status === 'Offer' && <TrendingUp className="w-5 h-5 text-[#6b7b2c]" />}
+                          {event.status === 'Closed' && <X className="w-5 h-5 text-[#a65a5a]" />}
                         </div>
                       </div>
                       
                       {/* Event content */}
-                      <div className="flex-1 bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                      <div className="flex-1 bg-[#EFEAE2] rounded-xl p-4 border border-[#E1D8C9]">
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-sm font-medium ${
-                            event.status === 'Applied' ? 'text-blue-400' :
-                            event.status === 'Online Assessment' ? 'text-orange-400' :
-                            event.status === 'Interview' ? 'text-yellow-400' :
-                            event.status === 'Offer' ? 'text-green-400' :
-                            'text-red-400'
+                          <span className={`text-sm font-medium font-lora ${
+                            event.status === 'Applied' ? 'text-[#2d4253]' :
+                            event.status === 'Online Assessment' ? 'text-[#6f4b3e]' :
+                            event.status === 'Interview' ? 'text-[#7d5a1e]' :
+                            event.status === 'Offer' ? 'text-[#445018]' :
+                            'text-[#7b3b3b]'
                           }`}>
                             {event.status}
                           </span>
-                          <span className="text-xs text-gray-500">{event.date}</span>
+                          <span className="text-xs text-[#8B6E5A]">{event.date}</span>
                         </div>
-                        <p className="text-sm text-gray-400">{event.note}</p>
+                        <p className="text-sm text-[#6B5B4A]">{event.note}</p>
                       </div>
                     </div>
                   ))}
