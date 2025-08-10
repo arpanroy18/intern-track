@@ -1375,49 +1375,49 @@ const JobTracker = () => {
 
         {showUserSettingsModal && (
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
             onClick={() => setShowUserSettingsModal(false)}
           >
             <div 
-              className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl"
+              className="bg-[#FFFDF7] backdrop-blur-sm rounded-3xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto border border-[#E5D8C7] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-400/10 rounded-lg">
-                    <Settings className="w-5 h-5 text-purple-400" />
+                  <div className="p-2.5 bg-[#2b1e1a] rounded-2xl shadow-sm">
+                    <Settings className="w-5 h-5 text-[#FFFDF7]" />
                   </div>
-                  <h2 className="text-xl font-semibold">User Settings</h2>
+                  <h2 className="text-xl font-bold text-[#2F1F12] font-lora">User Settings</h2>
                 </div>
                 <button
                   onClick={() => setShowUserSettingsModal(false)}
-                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[#F2E9DD] rounded-xl transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-[#8B6E5A]" />
                 </button>
               </div>
 
               <div className="space-y-6">
                 {/* Email Section */}
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Change Email</h3>
+                  <h3 className="text-lg font-semibold text-[#2F1F12] mb-4 font-lora">Change Email</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
+                      <label className="block text-sm font-medium text-[#2F1F12] mb-2 font-lora">
                         New Email
                       </label>
                       <input
                         type="email"
                         value={userSettingsFormData.email}
                         onChange={(e) => setUserSettingsFormData({...userSettingsFormData, email: e.target.value})}
-                        placeholder="Enter new email address"
-                        className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                        placeholder={user?.email || "Enter new email address"}
+                        className="w-full px-3 py-3 bg-[#F7F3E9] border border-[#E5D8C7] rounded-xl text-[#2F1F12] placeholder-[#8B6E5A] focus:outline-none focus:border-[#2b1e1a] focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                       />
                     </div>
                     <button
                       onClick={handleUpdateEmail}
                       disabled={!userSettingsFormData.email || userSettingsFormData.email === user?.email}
-                      className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+                      className="w-full py-2.5 px-4 bg-[#6b7c2c] hover:bg-[#475a25] disabled:bg-[#8B6E5A] disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium font-lora text-sm border-2 border-[#3a4a1a] disabled:border-[#8B6E5A]"
                     >
                       Update Email
                     </button>
@@ -1426,10 +1426,10 @@ const JobTracker = () => {
 
                 {/* Password Section */}
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Change Password</h3>
+                  <h3 className="text-lg font-semibold text-[#2F1F12] mb-4 font-lora">Change Password</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
+                      <label className="block text-sm font-medium text-[#2F1F12] mb-2 font-lora">
                         New Password
                       </label>
                       <input
@@ -1437,11 +1437,11 @@ const JobTracker = () => {
                         value={userSettingsFormData.newPassword}
                         onChange={(e) => setUserSettingsFormData({...userSettingsFormData, newPassword: e.target.value})}
                         placeholder="Enter new password"
-                        className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                        className="w-full px-3 py-3 bg-[#F7F3E9] border border-[#E5D8C7] rounded-xl text-[#2F1F12] placeholder-[#8B6E5A] focus:outline-none focus:border-[#2b1e1a] focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
+                      <label className="block text-sm font-medium text-[#2F1F12] mb-2 font-lora">
                         Confirm New Password
                       </label>
                       <input
@@ -1449,13 +1449,13 @@ const JobTracker = () => {
                         value={userSettingsFormData.confirmPassword}
                         onChange={(e) => setUserSettingsFormData({...userSettingsFormData, confirmPassword: e.target.value})}
                         placeholder="Confirm new password"
-                        className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-slate-800 transition-all"
+                        className="w-full px-3 py-3 bg-[#F7F3E9] border border-[#E5D8C7] rounded-xl text-[#2F1F12] placeholder-[#8B6E5A] focus:outline-none focus:border-[#2b1e1a] focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                       />
                     </div>
                     <button
                       onClick={handleUpdatePassword}
                       disabled={!userSettingsFormData.newPassword || !userSettingsFormData.confirmPassword}
-                      className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+                      className="w-full py-2.5 px-4 bg-[#6b7c2c] hover:bg-[#475a25] disabled:bg-[#8B6E5A] disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium font-lora text-sm border-2 border-[#3a4a1a] disabled:border-[#8B6E5A]"
                     >
                       Update Password
                     </button>
