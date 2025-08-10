@@ -88,9 +88,11 @@ const trimColorString = (color: string, maxLength: number = 20): string => {
 export function ColorPicker({
   color,
   onChange,
+  variant = 'dark',
 }: {
   color: string
   onChange: (color: string) => void
+  variant?: 'light' | 'dark'
 }) {
   const [hsl, setHsl] = useState<[number, number, number]>([0, 0, 0])
   const [colorInput, setColorInput] = useState(color)
@@ -98,6 +100,21 @@ export function ColorPicker({
   const [fixedPosition, setFixedPosition] = useState({ top: 0, left: 0, width: 0 })
   const dropdownRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
+
+  const isLight = variant === 'light'
+
+  const buttonClasses = isLight
+    ? 'w-full flex items-center justify-between px-3 py-2 bg-[#F7F3E9] border border-[#E5D8C7] rounded-xl text-[#2F1F12] hover:bg-[#F2E9DD] focus:outline-none focus:border-[#2b1e1a] focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all'
+    : 'w-full flex items-center justify-between px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 hover:bg-slate-800 focus:outline-none focus:border-purple-400 transition-all'
+
+  const swatchBorderClass = isLight ? 'border-[#E5D8C7]' : 'border-slate-600'
+  const dropdownClasses = isLight
+    ? 'fixed p-3 bg-white border border-[#E5D8C7] rounded-xl shadow-2xl'
+    : 'fixed p-3 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl'
+  const panelBorderClass = isLight ? 'border-[#E5D8C7]' : 'border-slate-700'
+  const inputFieldClasses = isLight
+    ? 'flex-grow bg-[#F7F3E9] border border-[#E5D8C7] rounded-md text-sm h-8 px-2 text-[#2F1F12] placeholder-[#8B6E5A] focus:outline-none focus:border-[#2b1e1a] focus:ring-1 focus:ring-[#2b1e1a]/10'
+    : 'flex-grow bg-slate-800/50 border border-slate-700 rounded-md text-sm h-8 px-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400'
 
   const handleColorChange = useCallback((newColor: string) => {
     const normalizedColor = normalizeColor(newColor)
@@ -229,11 +246,11 @@ export function ColorPicker({
         ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 hover:bg-slate-800 focus:outline-none focus:border-purple-400 transition-all"
+        className={buttonClasses}
       >
         <div className="flex items-center gap-2">
           <div
-            className="w-5 h-5 rounded-full shadow-sm border-2 border-slate-600"
+            className={`w-5 h-5 rounded-full shadow-sm border-2 ${swatchBorderClass}`}
             style={{ backgroundColor: colorInput }}
           />
           <span className="text-sm">{trimColorString(colorInput)}</span>
@@ -248,7 +265,7 @@ export function ColorPicker({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed p-3 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl"
+            className={dropdownClasses}
             style={{
               top: `${fixedPosition.top}px`,
               left: `${fixedPosition.left}px`,
@@ -260,7 +277,7 @@ export function ColorPicker({
           >
             <div className="space-y-3">
               <motion.div
-                className="w-full h-40 rounded-lg cursor-crosshair relative overflow-hidden border border-slate-700"
+                className={`w-full h-40 rounded-lg cursor-crosshair relative overflow-hidden border ${panelBorderClass}`}
                 style={{
                   background: `
                     linear-gradient(to top, rgba(0, 0, 0, 1), transparent),
@@ -305,11 +322,11 @@ export function ColorPicker({
                   type="text"
                   value={colorInput}
                   onChange={handleColorInputChange}
-                  className="flex-grow bg-slate-800/50 border border-slate-700 rounded-md text-sm h-8 px-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-purple-400"
+                  className={inputFieldClasses}
                   placeholder="#RRGGBB or hsl(h, s%, l%)"
                 />
                 <motion.div
-                  className="w-8 h-8 rounded-full shadow-sm border-2 border-slate-600"
+                  className={`w-8 h-8 rounded-full shadow-sm border-2 ${swatchBorderClass}`}
                   style={{ backgroundColor: colorInput }}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -322,7 +339,7 @@ export function ColorPicker({
                     <motion.button
                       key={preset}
                       type="button"
-                      className="w-8 h-8 rounded-full relative border border-slate-600"
+                      className={`w-8 h-8 rounded-full relative border ${swatchBorderClass}`}
                       style={{ backgroundColor: preset }}
                       onClick={() => handleColorChange(preset)}
                       whileHover={{ scale: 1.2, zIndex: 1 }}
