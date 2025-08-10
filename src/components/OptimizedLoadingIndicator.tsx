@@ -26,7 +26,7 @@ export const OptimizedLoadingIndicator: React.FC<OptimizedLoadingIndicatorProps>
         return {
           icon: <Loader className="w-4 h-4 animate-spin" />,
           text: 'AI is analyzing...',
-          color: 'text-purple-400'
+          color: 'text-white'
         };
       case 'completing':
         return {

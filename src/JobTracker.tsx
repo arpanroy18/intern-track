@@ -1469,64 +1469,76 @@ const JobTracker = () => {
         {/* AI Parse Modal */}
         {showAIParseModal && (
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-6 z-50"
             onClick={() => setShowAIParseModal(false)}
           >
             <div 
-              className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full border border-slate-800 shadow-2xl"
+              className="bg-[#FFFDF7] backdrop-blur-sm rounded-3xl p-8 max-w-2xl w-full border border-[#E5D8C7] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-blue-400/10 rounded-xl">
-                  <Wand2 className="w-6 h-6 text-blue-400" />
+              <div className="flex items-start gap-4 mb-8">
+                <div className="p-3 bg-[#2b1e1a] rounded-2xl shadow-sm">
+                  <Wand2 className="w-7 h-7 text-[#FFFDF7]" />
                 </div>
-                <div>
-                  <h2 className="text-xl font-semibold">Parse Job with AI</h2>
-                  <p className="text-gray-500 text-sm">Paste a job description and let AI extract the details</p>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-[#2F1F12] mb-1 font-lora">Parse Job with AI</h2>
+                  <p className="text-[#8B6E5A] text-base">Paste a job description and let AI extract the details</p>
                 </div>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-base font-medium text-[#2F1F12] mb-3 font-lora">
                     Job Description
                   </label>
                   <textarea
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                     placeholder="Paste the job description here..."
-                    className="w-full h-64 bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 resize-none border border-slate-700 focus:border-blue-400 focus:outline-none"
+                    className="w-full h-72 bg-[#F7F3E9] backdrop-blur-sm rounded-2xl p-4 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-2 focus:ring-[#2b1e1a]/10 transition-all"
                     disabled={isParsingAI}
                   />
                 </div>
                 
 
                 
-                <div className="bg-slate-800/50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm font-medium text-gray-300">What the AI will extract:</span>
+                <div className="bg-[#F2E9DD] backdrop-blur-sm rounded-2xl p-5 border border-[#E5D8C7]">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Sparkles className="w-5 h-5 text-[#2b1e1a]" />
+                    <span className="text-base font-medium text-[#2F1F12] font-lora">What the AI will extract:</span>
                   </div>
-                  <div className="text-sm text-gray-400 space-y-1">
-                    <p>• Job title and company name</p>
-                    <p>• Location and remote work options</p>
-                    <p>• Required skills and experience</p>
-                    <p>• Comprehensive job summary</p>
+                  <div className="text-[#2F1F12] space-y-2">
+                    <p className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-[#2b1e1a] rounded-full"></span>
+                      Job title and company name
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-[#2b1e1a] rounded-full"></span>
+                      Location and remote work options
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-[#2b1e1a] rounded-full"></span>
+                      Required skills and experience
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-[#2b1e1a] rounded-full"></span>
+                      Comprehensive job summary
+                    </p>
                   </div>
                 </div>
               </div>
               
-              <div className="flex gap-3 justify-end mt-6">
+              <div className="flex gap-4 justify-end mt-8">
                 <button
                   onClick={() => setShowAIParseModal(false)}
-                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                  className="px-6 py-3 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-2xl transition-all duration-200 font-medium border border-[#E5D8C7] font-lora"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAIParseJob}
                   disabled={isParsingAI || !jobDescription.trim()}
-                  className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[180px] justify-center"
+                  className="px-6 py-3 bg-[#6b7c2c] hover:bg-[#475a25] text-white rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[200px] justify-center font-medium shadow-lg font-lora border-2 border-[#3a4a1a]"
                 >
                   {isParsingAI ? (
                     <OptimizedLoadingIndicator 
