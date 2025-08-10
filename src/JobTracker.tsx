@@ -644,21 +644,21 @@ const JobTracker = () => {
 
         {/* Main Content Area */}
         <div className="bg-[#FAF6ED] rounded-2xl border border-[#E5D8C7] overflow-hidden text-[#2F1F12]">
-          <div className="p-3 border-b border-[#E5D8C7]">
-            <div className="flex items-center justify-between ml-6 mr-6">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-purple-400" />
+          <div className="px-6 py-4 border-b border-[#E5D8C7]">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold flex items-center gap-2 text-[#2F1F12] ml-1.5">
+                <Briefcase className="w-5 h-5 text-[#8B6E5A]" />
                 Applications
               </h2>
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-gray-400">Show</span>
+                <span className="text-[#8B6E5A]">Show</span>
                 <select
                   value={itemsPerPage}
                   onChange={(e) => {
                     setItemsPerPage(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1 text-white focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="bg-[#F7F3E9] border border-[#E5D8C7] rounded-xl px-3 py-1 text-[#2F1F12] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 focus:border-[#2b1e1a]"
                 >
                   <option value={5}>5</option>
                   <option value={10}>10</option>
@@ -666,7 +666,7 @@ const JobTracker = () => {
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span className="text-gray-400">per page</span>
+                <span className="text-[#8B6E5A]">per page</span>
               </div>
             </div>
           </div>
@@ -751,14 +751,14 @@ const JobTracker = () => {
                 {/* Pagination Controls */}
                 {paginationData.totalPages > 1 && (
                   <div className="mt-6 flex items-center justify-between border-t border-[#E5D8C7] pt-4">
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-[#8B6E5A]">
                       Showing {paginationData.startIndex + 1} to {paginationData.endIndex} of {paginationData.totalItems} applications
                     </div>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="px-3 py-2 text-sm text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800/50 rounded-lg transition-all duration-200"
+                        className="px-3 py-2 text-sm text-[#2F1F12] hover:bg-[#F2E9DD] border border-[#E5D8C7] rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         Previous
                       </button>
@@ -776,14 +776,14 @@ const JobTracker = () => {
                             return (
                               <React.Fragment key={page}>
                                 {showEllipsis && (
-                                  <span className="px-2 text-gray-600 text-sm">...</span>
+                                  <span className="px-2 text-[#8B6E5A] text-sm">...</span>
                                 )}
                                 <button
                                   onClick={() => setCurrentPage(page)}
-                                  className={`w-8 h-8 text-sm rounded-lg transition-all duration-200 ${
+                                  className={`w-8 h-8 text-sm rounded-xl transition-all duration-200 border ${
                                     currentPage === page
-                                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                                      : 'text-gray-400 hover:text-white hover:bg-slate-800/50 border border-slate-700/50 hover:border-slate-600'
+                                      ? 'bg-[#2b1e1a] text-[#FFFDF7] border-[#2b1e1a]'
+                                      : 'text-[#2F1F12] hover:bg-[#F2E9DD] border-[#E5D8C7]'
                                   }`}
                                 >
                                   {page}
@@ -795,7 +795,7 @@ const JobTracker = () => {
                       <button
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationData.totalPages))}
                         disabled={currentPage === paginationData.totalPages}
-                        className="px-3 py-2 text-sm text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800/50 rounded-lg transition-all duration-200"
+                        className="px-3 py-2 text-sm text-[#2F1F12] hover:bg-[#F2E9DD] border border-[#E5D8C7] rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         Next
                       </button>
