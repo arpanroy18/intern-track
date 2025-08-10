@@ -564,7 +564,7 @@ const JobTracker = () => {
                     </div>
                     
                     {/* Divider */}
-                    <div className="border-t border-slate-700 my-1" />
+                    <div className="border-t border-stone-200 my-1" />
                     
                     {/* Quick Actions */}
                     <div className="py-1">
@@ -573,7 +573,7 @@ const JobTracker = () => {
                           setShowFolderModal(true);
                           setShowSeasonDropdown(false);
                         }}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-purple-400 hover:bg-slate-700/50 transition-colors"
+                        className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-700 hover:bg-stone-200/60 transition-colors"
                       >
                         <div className="flex items-center gap-2">
                           <Plus className="w-3 h-3" />
@@ -586,7 +586,7 @@ const JobTracker = () => {
                             setShowSeasonsManagementModal(true);
                             setShowSeasonDropdown(false);
                           }}
-                          className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-gray-300 hover:bg-slate-700/50 transition-colors"
+                          className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-700 hover:bg-stone-200/60 transition-colors"
                         >
                           <div className="flex items-center gap-2">
                             <Settings className="w-3 h-3" />
