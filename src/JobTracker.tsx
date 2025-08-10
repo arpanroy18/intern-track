@@ -810,101 +810,101 @@ const JobTracker = () => {
         {/* Add Job Modal */}
         {showAddModal && (
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
             onClick={handleCloseAddModal}
           >
             <div 
-              className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full border border-slate-800 shadow-2xl"
+              className="bg-[#FFFDF7] backdrop-blur-sm rounded-3xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-[#E5D8C7] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-purple-400/10 rounded-xl">
+              <div className="flex items-start gap-3 mb-6">
+                <div className="p-2.5 bg-[#2b1e1a] rounded-2xl shadow-sm flex-shrink-0">
                   {isFromAIParse ? (
-                    <Sparkles className="w-6 h-6 text-purple-400" />
+                    <Sparkles className="w-6 h-6 text-[#FFFDF7]" />
                   ) : (
-                    <Plus className="w-6 h-6 text-purple-400" />
+                    <Plus className="w-6 h-6 text-[#FFFDF7]" />
                   )}
                 </div>
-                <div>
-                  <h2 className="text-xl font-semibold">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl font-bold text-[#2F1F12] mb-1 font-lora">
                     {isFromAIParse ? 'Review AI Parsed Job' : 'Add New Application'}
                   </h2>
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-[#8B6E5A] text-sm">
                     {isFromAIParse ? 'Review and edit the extracted job details' : 'Fill in the job details manually'}
                   </p>
                 </div>
               </div>
               
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Job Title *</label>
+                    <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Job Title *</label>
                     <input
                       type="text"
                       value={formData.role}
                       onChange={(e) => setFormData({...formData, role: e.target.value})}
                       placeholder="e.g. Software Engineer"
-                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Company *</label>
+                    <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Company *</label>
                     <input
                       type="text"
                       value={formData.company}
                       onChange={(e) => setFormData({...formData, company: e.target.value})}
                       placeholder="e.g. Google"
-                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                     />
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Location</label>
+                    <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Location</label>
                     <input
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData({...formData, location: e.target.value})}
                       placeholder="e.g. San Francisco, CA"
-                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Experience Required</label>
+                    <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Experience Required</label>
                     <input
                       type="text"
                       value={formData.experienceRequired}
                       onChange={(e) => setFormData({...formData, experienceRequired: e.target.value})}
                       placeholder="e.g. 2-3 years"
-                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                     />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Skills (comma-separated)</label>
+                  <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Skills (comma-separated)</label>
                   <input
                     type="text"
                     value={formData.skills}
                     onChange={(e) => setFormData({...formData, skills: e.target.value})}
                     placeholder="e.g. React, TypeScript, Node.js"
-                    className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                    className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                   />
                 </div>
                 
                 {folders.length > 0 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                    <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-3 w-3" />
+                        <Calendar className="h-3.5 w-3.5" />
                         Season
                       </div>
                     </label>
                     <select
                       value={formData.folderId}
                       onChange={(e) => setFormData({...formData, folderId: e.target.value})}
-                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all font-lora text-sm"
                     >
                       <option value="">
                         {selectedFolder ? `Use current season (${selectedFolder.name})` : 'No season (default)'}
@@ -919,50 +919,50 @@ const JobTracker = () => {
                 )}
                 
                 <div>
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2.5">
                     <input
                       type="checkbox"
                       checked={formData.remote}
                       onChange={(e) => setFormData({...formData, remote: e.target.checked})}
-                      className="rounded border-gray-300"
+                      className="w-4 h-4 rounded border-2 border-[#E5D8C7] text-[#2b1e1a] focus:ring-[#2b1e1a]/20 bg-[#F7F3E9]"
                     />
-                    <span className="text-sm text-gray-400">Remote work available</span>
+                    <span className="text-sm text-[#2F1F12] font-lora">Remote work available</span>
                   </label>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Job Posting URL</label>
+                  <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Job Posting URL</label>
                   <input
                     type="url"
                     value={formData.jobPostingUrl}
                     onChange={(e) => setFormData({...formData, jobPostingUrl: e.target.value})}
                     placeholder="e.g. https://company.com/jobs/software-engineer"
-                    className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                    className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Notes</label>
+                  <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Notes</label>
                   <textarea
                     value={formData.notes}
                     onChange={(e) => setFormData({...formData, notes: e.target.value})}
                     placeholder="Additional notes about the role, responsibilities, benefits, etc."
-                    className="w-full h-24 bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 resize-none border border-slate-700 focus:border-purple-400 focus:outline-none"
+                    className="w-full h-20 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                   />
                 </div>
               </div>
               
-              <div className="flex gap-3 justify-end mt-6">
+              <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-[#E5D8C7]">
                 <button
                   onClick={handleCloseAddModal}
-                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                  className="px-5 py-2.5 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-xl transition-all duration-200 font-medium border border-[#E5D8C7] font-lora text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddJob}
                   disabled={!formData.role.trim() || !formData.company.trim()}
-                  className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-5 py-2.5 bg-[#6b7c2c] hover:bg-[#475a25] text-white rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-lg font-lora border-2 border-[#3a4a1a] text-sm"
                 >
                   {isLoading ? (
                     <>
@@ -1469,76 +1469,76 @@ const JobTracker = () => {
         {/* AI Parse Modal */}
         {showAIParseModal && (
           <div 
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
             onClick={() => setShowAIParseModal(false)}
           >
             <div 
-              className="bg-[#FFFDF7] backdrop-blur-sm rounded-3xl p-8 max-w-2xl w-full border border-[#E5D8C7] shadow-2xl"
+              className="bg-[#FFFDF7] backdrop-blur-sm rounded-3xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-[#E5D8C7] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-start gap-4 mb-8">
-                <div className="p-3 bg-[#2b1e1a] rounded-2xl shadow-sm">
-                  <Wand2 className="w-7 h-7 text-[#FFFDF7]" />
+              <div className="flex items-start gap-3 mb-6">
+                <div className="p-2.5 bg-[#2b1e1a] rounded-2xl shadow-sm flex-shrink-0">
+                  <Wand2 className="w-6 h-6 text-[#FFFDF7]" />
                 </div>
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-[#2F1F12] mb-1 font-lora">Parse Job with AI</h2>
-                  <p className="text-[#8B6E5A] text-base">Paste a job description and let AI extract the details</p>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl font-bold text-[#2F1F12] mb-1 font-lora">Parse Job with AI</h2>
+                  <p className="text-[#8B6E5A] text-sm">Paste a job description and let AI extract the details</p>
                 </div>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-base font-medium text-[#2F1F12] mb-3 font-lora">
+                  <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">
                     Job Description
                   </label>
                   <textarea
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                     placeholder="Paste the job description here..."
-                    className="w-full h-72 bg-[#F7F3E9] backdrop-blur-sm rounded-2xl p-4 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-2 focus:ring-[#2b1e1a]/10 transition-all"
+                    className="w-full h-48 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                     disabled={isParsingAI}
                   />
                 </div>
                 
 
                 
-                <div className="bg-[#F2E9DD] backdrop-blur-sm rounded-2xl p-5 border border-[#E5D8C7]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Sparkles className="w-5 h-5 text-[#2b1e1a]" />
-                    <span className="text-base font-medium text-[#2F1F12] font-lora">What the AI will extract:</span>
+                <div className="bg-[#F2E9DD] backdrop-blur-sm rounded-xl p-4 border border-[#E5D8C7]">
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <Sparkles className="w-4 h-4 text-[#2b1e1a]" />
+                    <span className="text-sm font-medium text-[#2F1F12] font-lora">What the AI will extract:</span>
                   </div>
-                  <div className="text-[#2F1F12] space-y-2">
+                  <div className="text-[#2F1F12] space-y-1.5 text-sm">
                     <p className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-[#2b1e1a] rounded-full"></span>
+                      <span className="w-1 h-1 bg-[#2b1e1a] rounded-full"></span>
                       Job title and company name
                     </p>
                     <p className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-[#2b1e1a] rounded-full"></span>
+                      <span className="w-1 h-1 bg-[#2b1e1a] rounded-full"></span>
                       Location and remote work options
                     </p>
                     <p className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-[#2b1e1a] rounded-full"></span>
+                      <span className="w-1 h-1 bg-[#2b1e1a] rounded-full"></span>
                       Required skills and experience
                     </p>
                     <p className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-[#2b1e1a] rounded-full"></span>
+                      <span className="w-1 h-1 bg-[#2b1e1a] rounded-full"></span>
                       Comprehensive job summary
                     </p>
                   </div>
                 </div>
               </div>
               
-              <div className="flex gap-4 justify-end mt-8">
+              <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-[#E5D8C7]">
                 <button
                   onClick={() => setShowAIParseModal(false)}
-                  className="px-6 py-3 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-2xl transition-all duration-200 font-medium border border-[#E5D8C7] font-lora"
+                  className="px-5 py-2.5 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-xl transition-all duration-200 font-medium border border-[#E5D8C7] font-lora text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAIParseJob}
                   disabled={isParsingAI || !jobDescription.trim()}
-                  className="px-6 py-3 bg-[#6b7c2c] hover:bg-[#475a25] text-white rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[200px] justify-center font-medium shadow-lg font-lora border-2 border-[#3a4a1a]"
+                  className="px-5 py-2.5 bg-[#6b7c2c] hover:bg-[#475a25] text-white rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[180px] justify-center font-medium shadow-lg font-lora border-2 border-[#3a4a1a] text-sm"
                 >
                   {isParsingAI ? (
                     <OptimizedLoadingIndicator 
