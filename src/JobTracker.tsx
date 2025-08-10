@@ -1664,97 +1664,81 @@ const JobTracker = () => {
 
         {/* Edit Season Modal */}
         {showEditSeasonModal && editingFolder && (
-          <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+          <div
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
             onClick={() => {
               setShowEditSeasonModal(false);
               setEditingFolder(null);
             }}
           >
-            <div 
-              className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-800 shadow-2xl"
+            <div
+              className="bg-[#FFFDF7] backdrop-blur-sm rounded-3xl p-6 max-w-md w-full border border-[#E5D8C7] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-400/10 rounded-lg">
-                    <Edit2 className="w-5 h-5 text-blue-400" />
+                  <div className="p-2.5 bg-[#2b1e1a] rounded-2xl shadow-sm">
+                    <Edit2 className="w-5 h-5 text-[#FFFDF7]" />
                   </div>
-                  <h2 className="text-xl font-semibold">Edit Season</h2>
+                  <h2 className="text-xl font-bold text-[#2F1F12] font-lora">Edit Season</h2>
                 </div>
                 <button
                   onClick={() => {
                     setShowEditSeasonModal(false);
                     setEditingFolder(null);
                   }}
-                  className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[#F2E9DD] rounded-xl transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-[#8B6E5A]" />
                 </button>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
-                    Season Name
-                  </label>
+                  <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Season Name</label>
                   <input
                     type="text"
                     value={editFolderFormData.name}
-                    onChange={(e) => setEditFolderFormData({...editFolderFormData, name: e.target.value})}
+                    onChange={(e) => setEditFolderFormData({ ...editFolderFormData, name: e.target.value })}
                     placeholder="e.g., Summer 2025, Fall 2025"
-                    className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:bg-slate-800 transition-all"
+                    className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
-                    Description
-                  </label>
+                  <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Description</label>
                   <textarea
                     value={editFolderFormData.description}
-                    onChange={(e) => setEditFolderFormData({...editFolderFormData, description: e.target.value})}
+                    onChange={(e) => setEditFolderFormData({ ...editFolderFormData, description: e.target.value })}
                     placeholder="Optional description for this season"
-                    className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:bg-slate-800 transition-all"
-                    rows={3}
+                    className="w-full h-24 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
-                    Color Theme
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <input
-                        type="color"
-                        value={editFolderFormData.color}
-                        onChange={(e) => setEditFolderFormData({...editFolderFormData, color: e.target.value})}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      />
-                      <div 
-                        className="w-12 h-12 rounded-full border-2 border-slate-700 cursor-pointer"
-                        style={{ backgroundColor: editFolderFormData.color }}
-                      />
-                    </div>
-                    <span className="text-sm text-gray-400">Choose a color to represent this season</span>
-                  </div>
+                  <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Color Theme</label>
+                  <ColorPicker
+                    color={editFolderFormData.color}
+                    onChange={(color) => setEditFolderFormData({ ...editFolderFormData, color })}
+                    variant="light"
+                  />
+                  <span className="text-xs text-[#8B6E5A] mt-2 block">Choose a color to represent this season</span>
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-[#E5D8C7]">
                   <button
                     onClick={() => {
                       setShowEditSeasonModal(false);
                       setEditingFolder(null);
                     }}
-                    className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-gray-300 rounded-lg transition-colors"
+                    className="px-5 py-2.5 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-xl transition-all duration-200 font-medium border border-[#E5D8C7] font-lora text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleUpdateFolder}
                     disabled={!editFolderFormData.name.trim()}
-                    className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                    className="group relative inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[#b5bd98] disabled:border-[#7a815f] after:content-[''] after:absolute after:inset-0 after:rounded-xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10 disabled:after:bg-[#7a815f] disabled:after:translate-x-[2px] disabled:after:translate-y-[2px] disabled:after:opacity-35 font-lora"
                   >
                     Save Changes
                   </button>
