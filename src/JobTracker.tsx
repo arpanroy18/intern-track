@@ -344,11 +344,11 @@ const JobTracker = () => {
   }, [setShowTimelineModal]);
 
   const statusColors: Record<JobStatus, string> = useMemo(() => ({
-    'Applied': 'text-blue-700 bg-blue-100',
-    'Online Assessment': 'text-orange-700 bg-orange-100',
-    'Interview': 'text-yellow-800 bg-yellow-100',
-    'Offer': 'text-green-700 bg-green-100',
-    'Closed': 'text-red-700 bg-red-100'
+    'Applied': 'text-[#2d4253] bg-[#e8eff5] border border-[#b8d0e8]',
+    'Online Assessment': 'text-[#6f4b3e] bg-[#efe6de] border border-[#d4bfa8]',
+    'Interview': 'text-[#7d5a1e] bg-[#f6efdf] border border-[#e5d1a3]',
+    'Offer': 'text-[#445018] bg-[#eef0e6] border border-[#d0d7b3]',
+    'Closed': 'text-[#7b3b3b] bg-[#f3e6e6] border border-[#ddbdbd]'
   }), []);
 
 
@@ -376,19 +376,19 @@ const JobTracker = () => {
             <div className="relative user-menu z-50">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="w-10 h-10 bg-slate-800/50 hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors border border-slate-700/50"
+                className="w-10 h-10 bg-[#FFFDF7]/80 hover:bg-[#F2E9DD] rounded-full flex items-center justify-center transition-colors border border-[#E5D8C7]"
               >
-                <User className="w-5 h-5 text-gray-400" />
+                <User className="w-5 h-5 text-[#8B6E5A]" />
               </button>
               
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-40 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-40 bg-[#FFFDF7] rounded-lg shadow-xl border border-[#E5D8C7] py-2 z-50 backdrop-blur-sm">
                   <button
                     onClick={() => {
                       setShowAnalytics(true);
                       setShowUserMenu(false);
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#2F1F12] hover:bg-[#F2E9DD] transition-colors"
                   >
                     <BarChart3 className="w-4 h-4" />
                     Analytics
@@ -398,7 +398,7 @@ const JobTracker = () => {
                       setShowUserSettingsModal(true);
                       setShowUserMenu(false);
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#2F1F12] hover:bg-[#F2E9DD] transition-colors"
                   >
                     <Settings className="w-4 h-4" />
                     Settings
@@ -408,7 +408,7 @@ const JobTracker = () => {
                       signOut();
                       setShowUserMenu(false);
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[#2F1F12] hover:bg-[#F2E9DD] transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out
@@ -984,20 +984,20 @@ const JobTracker = () => {
         {/* Job Details Modal */}
         {showDetailsModal && selectedJob && (
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-6 z-50"
             onClick={() => {
               setShowDetailsModal(false);
               setIsEditingJob(false);
             }}
           >
             <div 
-              className="bg-slate-900 rounded-2xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-slate-800 shadow-2xl"
+              className="bg-[#FFFDF7] backdrop-blur-sm rounded-3xl p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-[#E5D8C7] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h2 className="text-2xl font-semibold mb-2 font-lora">{selectedJob.role}</h2>
-                  <div className="flex items-center gap-4 text-gray-400">
+                  <h2 className="text-2xl font-semibold mb-2 font-lora text-[#2F1F12]">{selectedJob.role}</h2>
+                  <div className="flex items-center gap-4 text-[#8B6E5A]">
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4" />
                       {selectedJob.company}
@@ -1011,19 +1011,19 @@ const JobTracker = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleEditJob}
-                    className="p-2 hover:bg-slate-800 rounded-lg transition-colors group"
+                    className="p-2 hover:bg-[#F2E9DD] rounded-xl transition-colors group"
                     title="Edit application details"
                   >
-                    <Edit2 className="w-5 h-5 text-gray-400 group-hover:text-purple-400" />
+                    <Edit2 className="w-5 h-5 text-[#8B6E5A] group-hover:text-[#6b7c2c]" />
                   </button>
                   <button
                     onClick={() => {
                       setShowDetailsModal(false);
                       setIsEditingJob(false);
                     }}
-                    className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                    className="p-2 hover:bg-[#F2E9DD] rounded-xl transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-400" />
+                    <X className="w-5 h-5 text-[#8B6E5A]" />
                   </button>
                 </div>
               </div>
@@ -1032,73 +1032,73 @@ const JobTracker = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">Job Title *</label>
+                      <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Job Title *</label>
                       <input
                         type="text"
                         value={editJobFormData.role}
                         onChange={(e) => setEditJobFormData({...editJobFormData, role: e.target.value})}
                         placeholder="e.g. Software Engineer"
-                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">Company *</label>
+                      <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Company *</label>
                       <input
                         type="text"
                         value={editJobFormData.company}
                         onChange={(e) => setEditJobFormData({...editJobFormData, company: e.target.value})}
                         placeholder="e.g. Google"
-                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                       />
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">Location</label>
+                      <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Location</label>
                       <input
                         type="text"
                         value={editJobFormData.location}
                         onChange={(e) => setEditJobFormData({...editJobFormData, location: e.target.value})}
                         placeholder="e.g. San Francisco, CA"
-                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">Experience Required</label>
+                      <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Experience Required</label>
                       <input
                         type="text"
                         value={editJobFormData.experienceRequired}
                         onChange={(e) => setEditJobFormData({...editJobFormData, experienceRequired: e.target.value})}
                         placeholder="e.g. 2-3 years"
-                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Skills (comma-separated)</label>
+                    <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Skills (comma-separated)</label>
                     <input
                       type="text"
                       value={editJobFormData.skills}
                       onChange={(e) => setEditJobFormData({...editJobFormData, skills: e.target.value})}
                       placeholder="e.g. React, TypeScript, Node.js"
-                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                     />
                   </div>
                   
                   {folders.length > 0 && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-1">
+                      <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-3 w-3" />
+                          <Calendar className="h-3.5 w-3.5" />
                           Season
                         </div>
                       </label>
                       <select
                         value={editJobFormData.folderId}
                         onChange={(e) => setEditJobFormData({...editJobFormData, folderId: e.target.value})}
-                        className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all font-lora text-sm"
                       >
                         <option value="">No season (default)</option>
                         {folders.map(folder => (
@@ -1111,49 +1111,49 @@ const JobTracker = () => {
                   )}
                   
                   <div>
-                    <label className="flex items-center gap-2">
+                    <label className="flex items-center gap-2.5">
                       <input
                         type="checkbox"
                         checked={editJobFormData.remote}
                         onChange={(e) => setEditJobFormData({...editJobFormData, remote: e.target.checked})}
-                        className="rounded border-gray-300"
+                        className="w-4 h-4 rounded border-2 border-[#E5D8C7] text-[#2b1e1a] focus:ring-[#2b1e1a]/20 bg-[#F7F3E9]"
                       />
-                      <span className="text-sm text-gray-400">Remote work available</span>
+                      <span className="text-sm text-[#2F1F12] font-lora">Remote work available</span>
                     </label>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Job Posting URL</label>
+                    <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Job Posting URL</label>
                     <input
                       type="url"
                       value={editJobFormData.jobPostingUrl}
                       onChange={(e) => setEditJobFormData({...editJobFormData, jobPostingUrl: e.target.value})}
                       placeholder="e.g. https://company.com/jobs/software-engineer"
-                      className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Notes</label>
+                    <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Notes</label>
                     <textarea
                       value={editJobFormData.notes}
                       onChange={(e) => setEditJobFormData({...editJobFormData, notes: e.target.value})}
                       placeholder="Additional notes about the role, responsibilities, benefits, etc."
-                      className="w-full h-24 bg-slate-800 rounded-lg p-3 text-gray-100 placeholder-gray-500 resize-none border border-slate-700 focus:border-purple-400 focus:outline-none"
+                      className="w-full h-24 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
                     />
                   </div>
                   
-                  <div className="flex gap-3 justify-end pt-4">
+                  <div className="flex gap-3 justify-end pt-4 border-t border-[#E5D8C7]">
                     <button
                       onClick={handleCancelEdit}
-                      className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                      className="px-5 py-2.5 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-xl transition-all duration-200 font-medium border border-[#E5D8C7] font-lora text-sm"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSaveJob}
                       disabled={!editJobFormData.role.trim() || !editJobFormData.company.trim()}
-                      className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      className="px-5 py-2.5 bg-[#6b7c2c] hover:bg-[#475a25] text-white rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-lg font-lora border-2 border-[#3a4a1a] text-sm"
                     >
                       Save Changes
                     </button>
@@ -1162,22 +1162,22 @@ const JobTracker = () => {
               ) : (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-400 mb-2">Status</h3>
-                    <span className={`px-3 py-1.5 rounded-lg text-sm font-medium ${statusColors[selectedJob.status]}`}>
+                    <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Status</h3>
+                    <span className={`px-4 py-2 rounded-xl text-sm font-medium font-lora ${statusColors[selectedJob.status]}`}>
                       {selectedJob.status}
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-medium text-gray-400 mb-2">Experience Required</h3>
-                    <p>{selectedJob.experienceRequired}</p>
+                    <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Experience Required</h3>
+                    <p className="text-[#6B5B4A]">{selectedJob.experienceRequired}</p>
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-medium text-gray-400 mb-2">Skills</h3>
+                    <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Skills</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedJob.skills.map((skill, index) => (
-                        <span key={index} className="px-3 py-1.5 bg-slate-800 rounded-lg text-sm font-semibold">
+                        <span key={index} className="px-3 py-1.5 bg-[#EEE7DA] text-[#3F2F2F] rounded-lg text-sm font-semibold border border-[#D8CBB5]">
                           {skill}
                         </span>
                       ))}
@@ -1186,10 +1186,10 @@ const JobTracker = () => {
 
                   {selectedJob.jobPostingUrl && (
                     <div>
-                      <h3 className="text-sm font-medium text-gray-400 mb-2">Job Posting</h3>
+                      <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Job Posting</h3>
                       <button
                         onClick={() => window.open(selectedJob.jobPostingUrl, '_blank', 'noopener,noreferrer')}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg text-blue-400 hover:text-blue-300 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 bg-[#e8eff5] hover:bg-[#d4e3f0] border border-[#b8d0e8] rounded-xl text-[#3f6a86] hover:text-[#2d4f6b] transition-colors font-lora"
                       >
                         <ExternalLink className="w-4 h-4" />
                         View Original Job Posting
@@ -1198,13 +1198,13 @@ const JobTracker = () => {
                   )}
 
                   <div>
-                    <h3 className="text-sm font-medium text-gray-400 mb-2">Job Description Summary</h3>
-                    <div className="bg-slate-800 rounded-xl p-4">
-                      <p className="text-gray-300 leading-relaxed">{selectedJob.notes}</p>
+                    <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Job Description Summary</h3>
+                    <div className="bg-[#F2E9DD] backdrop-blur-sm rounded-xl p-4 border border-[#E5D8C7]">
+                      <p className="text-[#6B5B4A] leading-relaxed">{selectedJob.notes}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-sm text-gray-400">
+                  <div className="flex items-center gap-3 text-sm text-[#8B6E5A] font-lora">
                     <Calendar className="w-4 h-4" />
                     Applied on {selectedJob.dateApplied}
                   </div>
