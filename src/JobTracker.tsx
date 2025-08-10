@@ -367,7 +367,7 @@ const JobTracker = () => {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-semibold font-lora text-[#2F1F12]">
                 InternTrack
               </h1>
             </div>
