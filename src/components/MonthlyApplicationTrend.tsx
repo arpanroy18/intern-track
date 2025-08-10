@@ -15,15 +15,15 @@ const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({ month
     const { active, payload, label } = props;
     if (active && payload && payload.length) {
       return (
-        <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-600/50 rounded-lg p-3 shadow-xl">
+        <div className="bg-white/95 backdrop-blur-sm border border-[#e5e0d6] rounded-lg p-3 shadow-xl">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-3 h-3 rounded-full bg-blue-400" />
-            <span className="text-white font-medium">{label}</span>
+            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <span className="text-[#2b1e1a] font-medium font-lora">{label}</span>
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between gap-4">
-              <span className="text-gray-300 text-sm">Applications:</span>
-              <span className="text-white font-semibold">{payload[0].value}</span>
+              <span className="text-slate-600 text-sm font-lora">Applications:</span>
+              <span className="text-[#2b1e1a] font-semibold font-lora">{payload[0].value}</span>
             </div>
           </div>
         </div>
@@ -51,7 +51,7 @@ const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({ month
         >
           <CartesianGrid 
             strokeDasharray="3 3" 
-            stroke="rgba(148, 163, 184, 0.1)" 
+            stroke="rgba(0, 0, 0, 0.05)" 
             horizontal={true}
             vertical={false}
           />
@@ -59,30 +59,30 @@ const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({ month
             dataKey="month" 
             axisLine={false}
             tickLine={false}
-            tick={{ fill: 'rgba(156, 163, 175, 0.8)', fontSize: 12 }}
+            tick={{ fill: 'rgba(71, 85, 105, 0.9)', fontSize: 12 }}
             tickFormatter={formatXAxisLabel}
           />
           <YAxis 
             axisLine={false}
             tickLine={false}
-            tick={{ fill: 'rgba(156, 163, 175, 0.8)', fontSize: 12 }}
+            tick={{ fill: 'rgba(71, 85, 105, 0.9)', fontSize: 12 }}
             allowDecimals={false}
           />
           <Tooltip content={renderCustomTooltip} />
           <Line 
             type="monotone" 
             dataKey="count" 
-            stroke="#3B82F6"
+            stroke="#2563EB"
             strokeWidth={3}
             dot={{ 
-              fill: '#3B82F6', 
+              fill: '#2563EB', 
               strokeWidth: 3, 
               r: 6,
-              stroke: '#1E293B'
+              stroke: '#ffffff'
             }}
             activeDot={{ 
               r: 8, 
-              fill: '#3B82F6',
+              fill: '#2563EB',
               stroke: '#ffffff',
               strokeWidth: 2
             }}

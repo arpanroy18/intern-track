@@ -1803,7 +1803,7 @@ const JobTracker = () => {
 
       {/* Analytics Dashboard */}
       {showAnalytics && (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-50 overflow-auto bg-[#EDE9DF]">
           <Analytics 
             onBack={() => setShowAnalytics(false)}
             folders={folders}

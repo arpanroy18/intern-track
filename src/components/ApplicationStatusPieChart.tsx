@@ -32,22 +32,22 @@ const ApplicationStatusPieChart: React.FC<ApplicationStatusPieChartProps> = ({ s
     if (active && payload && payload.length) {
       const data = payload[0];
       return (
-        <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-600/50 rounded-lg p-3 shadow-xl">
+        <div className="bg-white/95 backdrop-blur-sm border border-[#e5e0d6] rounded-lg p-3 shadow-xl">
           <div className="flex items-center gap-2 mb-2">
             <div 
               className="w-3 h-3 rounded-full" 
               style={{ backgroundColor: data.color }}
             />
-            <span className="text-white font-medium">{data.name}</span>
+            <span className="text-[#2b1e1a] font-medium">{data.name}</span>
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between gap-4">
-              <span className="text-gray-300 text-sm">Count:</span>
-              <span className="text-white font-semibold">{data.value}</span>
+              <span className="text-slate-600 text-sm">Count:</span>
+              <span className="text-[#2b1e1a] font-semibold">{data.value}</span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span className="text-gray-300 text-sm">Percentage:</span>
-              <span className="text-white font-semibold">{data.payload.percentage.toFixed(1)}%</span>
+              <span className="text-slate-600 text-sm">Percentage:</span>
+              <span className="text-[#2b1e1a] font-semibold">{data.payload.percentage.toFixed(1)}%</span>
             </div>
           </div>
         </div>
@@ -113,7 +113,7 @@ const ApplicationStatusPieChart: React.FC<ApplicationStatusPieChartProps> = ({ s
                 <Cell 
                   key={`cell-${index}`} 
                   fill={COLORS[entry.name as keyof typeof COLORS]} 
-                  stroke={activeIndex === index ? '#ffffff' : 'transparent'}
+                  stroke={activeIndex === index ? '#334155' : 'transparent'}
                   strokeWidth={activeIndex === index ? 2 : 0}
                   style={{
                     filter: activeIndex === index ? 'brightness(1.1)' : 'brightness(1)',
@@ -135,7 +135,7 @@ const ApplicationStatusPieChart: React.FC<ApplicationStatusPieChartProps> = ({ s
           <div 
             key={entry.name}
             className={`flex items-center justify-between px-2 py-1 rounded-lg transition-all cursor-pointer ${
-              activeIndex === index ? 'bg-slate-700/50' : 'hover:bg-slate-700/30'
+              activeIndex === index ? 'bg-slate-100' : 'hover:bg-slate-50'
             }`}
             onMouseEnter={() => setActiveIndex(index)}
             onMouseLeave={() => setActiveIndex(null)}
@@ -145,11 +145,11 @@ const ApplicationStatusPieChart: React.FC<ApplicationStatusPieChartProps> = ({ s
                 className="w-2.5 h-2.5 rounded-full flex-shrink-0" 
                 style={{ backgroundColor: COLORS[entry.name as keyof typeof COLORS] }}
               />
-              <span className="text-gray-300 text-xs font-medium leading-tight">{entry.name}</span>
+              <span className="text-slate-700 text-xs font-medium leading-tight">{entry.name}</span>
             </div>
             <div className="text-right">
-              <div className="text-white font-semibold text-xs">{entry.value}</div>
-              <div className="text-gray-400 text-xs leading-tight">{entry.percentage.toFixed(1)}%</div>
+              <div className="text-[#2b1e1a] font-semibold text-xs">{entry.value}</div>
+              <div className="text-slate-500 text-xs leading-tight">{entry.percentage.toFixed(1)}%</div>
             </div>
           </div>
         ))}

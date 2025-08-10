@@ -190,59 +190,44 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-gray-100 relative overflow-hidden flex items-center justify-center">
-        {/* Advanced Background Effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.06),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,rgba(120,200,255,0.04),transparent_50%)]"></div>
-        <div className="text-white text-xl relative z-10">Loading analytics...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-400/30 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-slate-950 text-gray-100 relative overflow-hidden flex items-center justify-center">
-        {/* Advanced Background Effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.06),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,rgba(120,200,255,0.04),transparent_50%)]"></div>
-        <div className="text-white text-xl relative z-10">Unable to load analytics data</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-[#2b1e1a] text-xl">Unable to load analytics data</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-gray-100 p-6 pb-24 relative overflow-auto">
-      {/* Advanced Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.08),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.06),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,rgba(120,200,255,0.04),transparent_50%)]"></div>
-      {/* Floating Particles removed */}
-      
-      <div className="max-w-7xl mx-auto relative z-10">
+    <div className="min-h-screen p-6 pb-24 relative overflow-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <button
               onClick={onBack}
-              className="p-2 bg-slate-800/50 hover:bg-slate-700 rounded-lg border border-slate-700/50 transition-colors"
+              className="p-2 bg-white hover:bg-slate-50 rounded-lg border border-[#e5e0d6] transition-colors shadow-sm"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
+              <ArrowLeft className="w-5 h-5 text-slate-600" />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-white">Analytics Dashboard</h1>
-              <p className="text-gray-400 mt-1">Comprehensive insights into your job application journey</p>
+              <h1 className="text-3xl font-bold text-[#2b1e1a] font-lora">Analytics Dashboard</h1>
             </div>
           </div>
 
           {/* Folder Selector */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-lg border border-slate-700/50 p-4">
-            <label className="block text-sm font-medium text-gray-300 mb-2">Season Filter</label>
+          <div className="bg-white rounded-lg border border-[#e5e0d6] p-4 shadow-sm">
+            <label className="block text-sm font-medium text-slate-700 mb-2 font-lora">Season Filter</label>
             <select
               value={selectedFolder}
               onChange={(e) => setSelectedFolder(e.target.value)}
-              className="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="bg-white border border-[#e5e0d6] rounded-lg px-3 py-2 text-[#2b1e1a] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent font-lora"
             >
               <option value="all">All Seasons</option>
               {folders.map(folder => (
@@ -256,71 +241,71 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
 
         {/* Overview Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
-              <Target className="w-5 h-5 text-blue-400" />
-              <span className="text-sm text-gray-400">Total Applied</span>
+              <Target className="w-5 h-5 text-blue-500" />
+              <span className="text-sm text-slate-600 font-lora">Total Applied</span>
             </div>
-            <p className="text-2xl font-bold text-white">{stats.total}</p>
+            <p className="text-2xl font-bold text-[#2b1e1a] font-lora">{stats.total}</p>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-5 h-5 text-green-400" />
-              <span className="text-sm text-gray-400">Success Rate</span>
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-sm text-slate-600 font-lora">Success Rate</span>
             </div>
-            <p className="text-2xl font-bold text-green-400">{formatPercentage(stats.successRate)}</p>
+            <p className="text-2xl font-bold text-green-700 font-lora">{formatPercentage(stats.successRate)}</p>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
-              <XCircle className="w-5 h-5 text-red-400" />
-              <span className="text-sm text-gray-400">Rejection Rate</span>
+              <XCircle className="w-5 h-5 text-red-600" />
+              <span className="text-sm text-slate-600 font-lora">Rejection Rate</span>
             </div>
-            <p className="text-2xl font-bold text-red-400">{formatPercentage(stats.rejectionRate)}</p>
+            <p className="text-2xl font-bold text-red-700 font-lora">{formatPercentage(stats.rejectionRate)}</p>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
-              <Activity className="w-5 h-5 text-yellow-400" />
-              <span className="text-sm text-gray-400">Pending</span>
+              <Activity className="w-5 h-5 text-yellow-600" />
+              <span className="text-sm text-slate-600 font-lora">Pending</span>
             </div>
-            <p className="text-2xl font-bold text-yellow-400">{formatPercentage(stats.pendingRate)}</p>
+            <p className="text-2xl font-bold text-yellow-700 font-lora">{formatPercentage(stats.pendingRate)}</p>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-purple-400" />
-              <span className="text-sm text-gray-400">Avg to Interview</span>
+              <Clock className="w-5 h-5 text-purple-600" />
+              <span className="text-sm text-slate-600 font-lora">Avg to Interview</span>
             </div>
-            <p className="text-2xl font-bold text-purple-400">{stats.averageTimeToInterview}d</p>
+            <p className="text-2xl font-bold text-purple-700 font-lora">{stats.averageTimeToInterview}d</p>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-5 h-5 text-pink-400" />
-              <span className="text-sm text-gray-400">Avg to Offer</span>
+              <TrendingUp className="w-5 h-5 text-pink-600" />
+              <span className="text-sm text-slate-600 font-lora">Avg to Offer</span>
             </div>
-            <p className="text-2xl font-bold text-pink-400">{stats.averageTimeToOffer}d</p>
+            <p className="text-2xl font-bold text-pink-700 font-lora">{stats.averageTimeToOffer}d</p>
           </div>
         </div>
 
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           {/* Application Status Distribution */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-3">
-              <PieChart className="w-5 h-5 text-purple-400" />
-              <h3 className="text-lg font-semibold text-white">Application Status Distribution</h3>
+              <PieChart className="w-5 h-5 text-purple-600" />
+              <h3 className="text-lg font-semibold text-[#2b1e1a] font-lora">Application Status Distribution</h3>
             </div>
             <ApplicationStatusPieChart statusDistribution={stats.statusDistribution} />
           </div>
 
           {/* Monthly Applications Trend */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="w-5 h-5 text-blue-400" />
-              <h3 className="text-lg font-semibold text-white">Monthly Application Trend</h3>
+              <TrendingUp className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-semibold text-[#2b1e1a] font-lora">Monthly Application Trend</h3>
             </div>
             <MonthlyApplicationTrend monthlyApplications={stats.monthlyApplications} />
           </div>
@@ -329,57 +314,57 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
         {/* Additional Analytics Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-visible mt-8 mb-24">
           {/* Top Companies */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6 min-h-fit overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-6 min-h-fit overflow-hidden shadow-sm">
             <div className="flex items-center gap-2 mb-6">
-              <Building2 className="w-5 h-5 text-green-400" />
-              <h3 className="text-lg font-semibold text-white">Top Companies</h3>
+              <Building2 className="w-5 h-5 text-green-600" />
+              <h3 className="text-lg font-semibold text-[#2b1e1a] font-lora">Top Companies</h3>
             </div>
             <div className="space-y-3">
               {stats.topCompanies.slice(0, 6).map((item, index) => (
                 <div key={item.company} className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-gray-400 text-sm w-4 flex-shrink-0">#{index + 1}</span>
-                    <span className="text-gray-300 truncate">{item.company}</span>
+                    <span className="text-slate-500 text-sm w-4 flex-shrink-0">#{index + 1}</span>
+                    <span className="text-slate-700 truncate">{item.company}</span>
                   </div>
-                  <span className="text-white font-medium flex-shrink-0">{item.count}</span>
+                  <span className="text-[#2b1e1a] font-medium flex-shrink-0">{item.count}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Top Locations */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6 min-h-fit overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-6 min-h-fit overflow-hidden shadow-sm">
             <div className="flex items-center gap-2 mb-6">
-              <MapPin className="w-5 h-5 text-pink-400" />
-              <h3 className="text-lg font-semibold text-white">Top Locations</h3>
+              <MapPin className="w-5 h-5 text-pink-600" />
+              <h3 className="text-lg font-semibold text-[#2b1e1a] font-lora">Top Locations</h3>
             </div>
             <div className="space-y-3">
               {stats.topLocations.slice(0, 6).map((item, index) => (
                 <div key={item.location} className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-gray-400 text-sm w-4 flex-shrink-0">#{index + 1}</span>
-                    <span className="text-gray-300 truncate">{item.location}</span>
+                    <span className="text-slate-500 text-sm w-4 flex-shrink-0">#{index + 1}</span>
+                    <span className="text-slate-700 truncate">{item.location}</span>
                   </div>
-                  <span className="text-white font-medium flex-shrink-0">{item.count}</span>
+                  <span className="text-[#2b1e1a] font-medium flex-shrink-0">{item.count}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Top Skills */}
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-6 min-h-fit overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#e5e0d6] p-6 min-h-fit overflow-hidden shadow-sm">
             <div className="flex items-center gap-2 mb-6">
-              <Zap className="w-5 h-5 text-yellow-400" />
-              <h3 className="text-lg font-semibold text-white">Top Skills</h3>
+              <Zap className="w-5 h-5 text-yellow-600" />
+              <h3 className="text-lg font-semibold text-[#2b1e1a] font-lora">Top Skills</h3>
             </div>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {stats.topSkills.map((item, index) => (
                 <div key={item.skill} className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-gray-400 text-sm w-4 flex-shrink-0">#{index + 1}</span>
-                    <span className="text-gray-300 truncate">{item.skill}</span>
+                    <span className="text-slate-500 text-sm w-4 flex-shrink-0">#{index + 1}</span>
+                    <span className="text-slate-700 truncate">{item.skill}</span>
                   </div>
-                  <span className="text-white font-medium flex-shrink-0">{item.count}</span>
+                  <span className="text-[#2b1e1a] font-medium flex-shrink-0">{item.count}</span>
                 </div>
               ))}
             </div>
