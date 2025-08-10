@@ -962,7 +962,7 @@ const JobTracker = () => {
                 <button
                   onClick={handleAddJob}
                   disabled={!formData.role.trim() || !formData.company.trim()}
-                  className="px-5 py-2.5 bg-[#6b7c2c] hover:bg-[#475a25] text-white rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-lg font-lora border-2 border-[#3a4a1a] text-sm"
+                  className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[#b5bd98] disabled:border-[#7a815f] after:content-[''] after:absolute after:inset-0 after:rounded-xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10 disabled:after:bg-[#7a815f] disabled:after:translate-x-[2px] disabled:after:translate-y-[2px] disabled:after:opacity-35 font-lora"
                 >
                   {isLoading ? (
                     <>
