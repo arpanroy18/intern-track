@@ -855,7 +855,7 @@ const JobTracker = () => {
                       value={formData.role}
                       onChange={(e) => setFormData({...formData, role: e.target.value})}
                       placeholder="e.g. Software Engineer"
-                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                     />
                   </div>
                   <div>
@@ -865,7 +865,7 @@ const JobTracker = () => {
                       value={formData.company}
                       onChange={(e) => setFormData({...formData, company: e.target.value})}
                       placeholder="e.g. Google"
-                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                     />
                   </div>
                 </div>
@@ -878,7 +878,7 @@ const JobTracker = () => {
                       value={formData.location}
                       onChange={(e) => setFormData({...formData, location: e.target.value})}
                       placeholder="e.g. San Francisco, CA"
-                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                     />
                   </div>
                   <div>
@@ -888,7 +888,7 @@ const JobTracker = () => {
                       value={formData.experienceRequired}
                       onChange={(e) => setFormData({...formData, experienceRequired: e.target.value})}
                       placeholder="e.g. 2-3 years"
-                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                     />
                   </div>
                 </div>
@@ -900,7 +900,7 @@ const JobTracker = () => {
                     value={formData.skills}
                     onChange={(e) => setFormData({...formData, skills: e.target.value})}
                     placeholder="e.g. React, TypeScript, Node.js"
-                    className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                    className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                   />
                 </div>
                 
@@ -948,7 +948,7 @@ const JobTracker = () => {
                     value={formData.jobPostingUrl}
                     onChange={(e) => setFormData({...formData, jobPostingUrl: e.target.value})}
                     placeholder="e.g. https://company.com/jobs/software-engineer"
-                    className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                    className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                   />
                 </div>
                 
@@ -958,7 +958,7 @@ const JobTracker = () => {
                     value={formData.notes}
                     onChange={(e) => setFormData({...formData, notes: e.target.value})}
                     placeholder="Additional notes about the role, responsibilities, benefits, etc."
-                    className="w-full h-20 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                    className="w-full h-20 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                   />
                 </div>
               </div>
@@ -1049,7 +1049,7 @@ const JobTracker = () => {
                         value={editJobFormData.role}
                         onChange={(e) => setEditJobFormData({...editJobFormData, role: e.target.value})}
                         placeholder="e.g. Software Engineer"
-                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                         className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                       />
                     </div>
                     <div>
@@ -1059,7 +1059,7 @@ const JobTracker = () => {
                         value={editJobFormData.company}
                         onChange={(e) => setEditJobFormData({...editJobFormData, company: e.target.value})}
                         placeholder="e.g. Google"
-                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                         className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                       />
                     </div>
                   </div>
@@ -1072,7 +1072,7 @@ const JobTracker = () => {
                         value={editJobFormData.location}
                         onChange={(e) => setEditJobFormData({...editJobFormData, location: e.target.value})}
                         placeholder="e.g. San Francisco, CA"
-                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                          className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                       />
                     </div>
                     <div>
@@ -1082,7 +1082,7 @@ const JobTracker = () => {
                         value={editJobFormData.experienceRequired}
                         onChange={(e) => setEditJobFormData({...editJobFormData, experienceRequired: e.target.value})}
                         placeholder="e.g. 2-3 years"
-                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                          className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                       />
                     </div>
                   </div>
@@ -1094,7 +1094,7 @@ const JobTracker = () => {
                       value={editJobFormData.skills}
                       onChange={(e) => setEditJobFormData({...editJobFormData, skills: e.target.value})}
                       placeholder="e.g. React, TypeScript, Node.js"
-                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                       className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                     />
                   </div>
                   
@@ -1109,7 +1109,7 @@ const JobTracker = () => {
                       <select
                         value={editJobFormData.folderId}
                         onChange={(e) => setEditJobFormData({...editJobFormData, folderId: e.target.value})}
-                        className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all font-lora text-sm"
+                         className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all font-lora text-sm"
                       >
                         <option value="">No season (default)</option>
                         {folders.map(folder => (
@@ -1135,22 +1135,22 @@ const JobTracker = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Job Posting URL</label>
-                    <input
+                      <input
                       type="url"
                       value={editJobFormData.jobPostingUrl}
                       onChange={(e) => setEditJobFormData({...editJobFormData, jobPostingUrl: e.target.value})}
                       placeholder="e.g. https://company.com/jobs/software-engineer"
-                      className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                       className="w-full bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                     />
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-[#2F1F12] mb-1.5 font-lora">Notes</label>
-                    <textarea
+                      <textarea
                       value={editJobFormData.notes}
                       onChange={(e) => setEditJobFormData({...editJobFormData, notes: e.target.value})}
                       placeholder="Additional notes about the role, responsibilities, benefits, etc."
-                      className="w-full h-24 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                        className="w-full h-24 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                     />
                   </div>
                   
