@@ -81,11 +81,11 @@ export const JobCard = React.memo(({
                         <div className="flex items-center gap-6 text-sm text-gray-400">
                             <div className="flex items-center gap-2">
                                 <Building2 className="w-4 h-4" />
-                                {job.company}
+                                <span className="font-sans">{job.company}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <MapPin className="w-4 h-4" />
-                                {job.location}
+                                <span className="font-sans">{job.location}</span>
                                 {job.remote && (
                                     <span className="px-2 py-0.5 bg-blue-400/10 text-blue-400 rounded text-xs ml-1">
                                         Remote
@@ -94,7 +94,7 @@ export const JobCard = React.memo(({
                             </div>
                             <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4" />
-                                {job.dateApplied}
+                                <span className="font-sans">{job.dateApplied}</span>
                             </div>
                         </div>
 

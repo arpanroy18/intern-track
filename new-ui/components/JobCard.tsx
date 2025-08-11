@@ -76,15 +76,15 @@ export const JobCard = React.memo(({
                         <div className="flex items-center gap-6 text-sm text-[#6B5B53]">
                             <div className="flex items-center gap-2">
                                 <Building2 className="w-4 h-4" />
-                                {job.company}
+                                <span className="font-sans">{job.company}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <MapPin className="w-4 h-4" />
-                                {job.location}
+                                <span className="font-sans">{job.location}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4" />
-                                {job.dateApplied}
+                                <span className="font-sans">{job.dateApplied}</span>
                             </div>
                         </div>
 

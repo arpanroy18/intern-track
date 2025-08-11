@@ -462,7 +462,7 @@ const JobTracker = () => {
               <div className="relative filter-container">
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`filter-button h-12 px-4 rounded-2xl text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-sm backdrop-blur-sm ${
+                  className={`filter-button h-12 px-4 rounded-2xl text-sm font-medium font-sans transition-all duration-200 flex items-center gap-2 shadow-sm backdrop-blur-sm ${
                     showFilters || selectedStatusFilter !== 'All'
                       ? 'bg-stone-600 text-stone-50 shadow-md'
                       : 'bg-stone-100/90 text-gray-600 hover:bg-stone-200/90 hover:text-gray-700 border border-stone-200/60'
@@ -510,7 +510,7 @@ const JobTracker = () => {
               <div className="relative season-dropdown">
                 <button
                   onClick={() => setShowSeasonDropdown(!showSeasonDropdown)}
-                  className="flex items-center gap-2 px-4 py-2.5 h-12 bg-stone-100/90 hover:bg-stone-200/90 border border-stone-200/60 hover:border-stone-300 rounded-2xl transition-all duration-200 text-sm shadow-sm backdrop-blur-sm"
+                  className="flex items-center gap-2 px-4 py-2.5 h-12 bg-stone-100/90 hover:bg-stone-200/90 border border-stone-200/60 hover:border-stone-300 rounded-2xl transition-all duration-200 text-sm shadow-sm backdrop-blur-sm font-sans"
                 >
                   {selectedFolder ? (
                     <>
@@ -518,10 +518,10 @@ const JobTracker = () => {
                         className="w-2 h-2 rounded-full"
                         style={{ backgroundColor: selectedFolder.color }}
                       />
-                      <span className="text-gray-700">{selectedFolder.name}</span>
+                      <span className="text-gray-700 font-sans">{selectedFolder.name}</span>
                     </>
                   ) : (
-                    <span className="text-gray-600">All Applications</span>
+                    <span className="text-gray-600 font-sans">All Applications</span>
                   )}
                   <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -538,14 +538,14 @@ const JobTracker = () => {
                           setSelectedFolder(null);
                           setShowSeasonDropdown(false);
                         }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-stone-200/60 transition-colors duration-200 ${
+                        className={`w-full text-left px-3 py-2 text-sm font-sans hover:bg-stone-200/60 transition-colors duration-200 ${
                           !selectedFolder ? 'text-stone-700 bg-stone-200/50 font-medium' : 'text-gray-600'
                         }`}
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 font-sans">
                           <div className="w-2 h-2 rounded-full bg-gray-500" />
-                          <span>All Applications</span>
-                          <span className="ml-auto text-xs text-gray-500">({allJobs.length})</span>
+                          <span className="font-sans">All Applications</span>
+                          <span className="ml-auto text-xs text-gray-500 font-sans">({allJobs.length})</span>
                         </div>
                       </button>
                       {folders.map(folder => {
@@ -557,17 +557,17 @@ const JobTracker = () => {
                               setSelectedFolder(folder);
                               setShowSeasonDropdown(false);
                             }}
-                            className={`w-full text-left px-3 py-2 text-sm hover:bg-stone-200/60 transition-colors duration-200 ${
+                            className={`w-full text-left px-3 py-2 text-sm font-sans hover:bg-stone-200/60 transition-colors duration-200 ${
                               selectedFolder?.id === folder.id ? 'text-stone-700 bg-stone-200/50 font-medium' : 'text-gray-600'
                             }`}
                           >
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 font-sans">
                               <div
                                 className="w-2 h-2 rounded-full"
                                 style={{ backgroundColor: folder.color }}
                               />
-                              <span>{folder.name}</span>
-                              <span className="ml-auto text-xs text-gray-500">({folderJobCount})</span>
+                              <span className="font-sans">{folder.name}</span>
+                              <span className="ml-auto text-xs text-gray-500 font-sans">({folderJobCount})</span>
                             </div>
                           </button>
                         );
@@ -584,11 +584,11 @@ const JobTracker = () => {
                           setShowFolderModal(true);
                           setShowSeasonDropdown(false);
                         }}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-700 hover:bg-stone-200/60 transition-colors"
+                        className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-700 hover:bg-stone-200/60 transition-colors font-sans"
                       >
                         <div className="flex items-center gap-2">
                           <Plus className="w-3 h-3" />
-                          <span>Add Season</span>
+                          <span className="font-sans">Add Season</span>
                         </div>
                       </button>
                       {folders.length > 0 && (
@@ -597,11 +597,11 @@ const JobTracker = () => {
                             setShowSeasonsManagementModal(true);
                             setShowSeasonDropdown(false);
                           }}
-                          className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-700 hover:bg-stone-200/60 transition-colors"
+                          className="w-full text-left px-3 py-2 text-sm text-gray-600 hover:text-gray-700 hover:bg-stone-200/60 transition-colors font-sans"
                         >
                           <div className="flex items-center gap-2">
                             <Settings className="w-3 h-3" />
-                            <span>Manage Seasons</span>
+                            <span className="font-sans">Manage Seasons</span>
                           </div>
                         </button>
                       )}
