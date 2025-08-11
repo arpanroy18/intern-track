@@ -1174,21 +1174,21 @@ const JobTracker = () => {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Status</h3>
-                    <span className={`px-4 py-2 rounded-xl text-sm font-medium font-lora ${statusColors[selectedJob.status]}`}>
+                    <span className={`px-4 py-2 rounded-xl text-sm font-medium font-sans ${statusColors[selectedJob.status]}`}>
                       {selectedJob.status}
                     </span>
                   </div>
 
                   <div>
                     <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Experience Required</h3>
-                    <p className="text-[#6B5B4A]">{selectedJob.experienceRequired}</p>
+                    <p className="text-[#6B5B4A] font-sans">{selectedJob.experienceRequired}</p>
                   </div>
 
                   <div>
                     <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Skills</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedJob.skills.map((skill, index) => (
-                        <span key={index} className="px-3 py-1.5 bg-[#EEE7DA] text-[#3F2F2F] rounded-lg text-sm font-semibold border border-[#D8CBB5]">
+                        <span key={index} className="px-3 py-1.5 bg-[#EEE7DA] text-[#3F2F2F] rounded-lg text-sm font-semibold border border-[#D8CBB5] font-sans">
                           {skill}
                         </span>
                       ))}
@@ -1200,7 +1200,7 @@ const JobTracker = () => {
                       <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Job Posting</h3>
                       <button
                         onClick={() => window.open(selectedJob.jobPostingUrl, '_blank', 'noopener,noreferrer')}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#e8eff5] hover:bg-[#d4e3f0] border border-[#b8d0e8] rounded-xl text-[#3f6a86] hover:text-[#2d4f6b] transition-colors font-lora"
+                        className="flex items-center gap-2 px-4 py-2 bg-[#e8eff5] hover:bg-[#d4e3f0] border border-[#b8d0e8] rounded-xl text-[#3f6a86] hover:text-[#2d4f6b] transition-colors font-sans"
                       >
                         <ExternalLink className="w-4 h-4" />
                         View Original Job Posting
@@ -1211,11 +1211,11 @@ const JobTracker = () => {
                   <div>
                     <h3 className="text-sm font-medium text-[#2F1F12] mb-3 font-lora">Job Description Summary</h3>
                     <div className="bg-[#F2E9DD] backdrop-blur-sm rounded-xl p-4 border border-[#E5D8C7]">
-                      <p className="text-[#6B5B4A] leading-relaxed">{selectedJob.notes}</p>
+                      <p className="text-[#6B5B4A] leading-relaxed font-sans">{selectedJob.notes}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-sm text-[#8B6E5A] font-lora">
+                  <div className="flex items-center gap-3 text-sm text-[#8B6E5A] font-sans">
                     <Calendar className="w-4 h-4" />
                     Applied on {selectedJob.dateApplied}
                   </div>
