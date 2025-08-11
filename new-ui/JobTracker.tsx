@@ -615,14 +615,14 @@ const JobTracker = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowAIParseModal(true)}
-                className="group relative inline-flex items-center gap-2 h-12 px-5 rounded-2xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 after:content-[''] after:absolute after:inset-0 after:rounded-2xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10"
+                className="group relative inline-flex items-center gap-2 h-12 px-5 rounded-2xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 after:content-[''] after:absolute after:inset-0 after:rounded-2xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10 font-sans"
               >
                 <Wand2 className="w-4 h-4" />
                 Parse with AI
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="group relative inline-flex items-center gap-2 h-12 px-5 rounded-2xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 after:content-[''] after:absolute after:inset-0 after:rounded-2xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10"
+                className="group relative inline-flex items-center gap-2 h-12 px-5 rounded-2xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 after:content-[''] after:absolute after:inset-0 after:rounded-2xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10 font-sans"
               >
                 <Sparkles className="w-4 h-4" />
                 Add Application
