@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "new-ui"],
   "references": [{ "path": "./tsconfig.node.json" }]
 } 
