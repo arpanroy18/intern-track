@@ -1509,7 +1509,7 @@ const JobTracker = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h2 className="text-xl font-bold text-[#2F1F12] mb-1 font-lora">Parse Job with AI</h2>
-                  <p className="text-[#8B6E5A] text-sm">Paste a job description and let AI extract the details</p>
+                  <p className="text-[#8B6E5A] text-sm font-sans">Paste a job description and let AI extract the details</p>
                 </div>
               </div>
               
@@ -1522,7 +1522,7 @@ const JobTracker = () => {
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                     placeholder="Paste the job description here..."
-                    className="w-full h-48 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm"
+                    className="w-full h-48 bg-[#F7F3E9] backdrop-blur-sm rounded-xl p-3 text-[#2F1F12] placeholder-[#8B6E5A] resize-none border border-[#E5D8C7] focus:border-[#2b1e1a] focus:outline-none focus:ring-1 focus:ring-[#2b1e1a]/10 transition-all text-sm font-sans"
                     disabled={isParsingAI}
                   />
                 </div>
@@ -1532,9 +1532,9 @@ const JobTracker = () => {
                 <div className="bg-[#F2E9DD] backdrop-blur-sm rounded-xl p-4 border border-[#E5D8C7]">
                   <div className="flex items-center gap-2.5 mb-3">
                     <Sparkles className="w-4 h-4 text-[#2b1e1a]" />
-                    <span className="text-sm font-medium text-[#2F1F12] font-lora">What the AI will extract:</span>
+                    <span className="text-sm font-medium text-[#2F1F12] font-sans">What the AI will extract:</span>
                   </div>
-                  <div className="text-[#2F1F12] space-y-1.5 text-sm">
+                  <div className="text-[#2F1F12] space-y-1.5 text-sm font-sans">
                     <p className="flex items-center gap-2">
                       <span className="w-1 h-1 bg-[#2b1e1a] rounded-full"></span>
                       Job title and company name
@@ -1558,14 +1558,14 @@ const JobTracker = () => {
               <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-[#E5D8C7]">
                 <button
                   onClick={() => setShowAIParseModal(false)}
-                  className="px-5 py-2.5 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-xl transition-all duration-200 font-medium border border-[#E5D8C7] font-lora text-sm"
+                  className="px-5 py-2.5 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-xl transition-all duration-200 font-medium border border-[#E5D8C7] font-sans text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAIParseJob}
                   disabled={isParsingAI || !jobDescription.trim()}
-                  className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[#b5bd98] disabled:border-[#7a815f] min-w-[180px] justify-center after:content-[''] after:absolute after:inset-0 after:rounded-xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10 disabled:after:bg-[#7a815f] disabled:after:translate-x-[2px] disabled:after:translate-y-[2px] disabled:after:opacity-35 font-lora"
+                  className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[#b5bd98] disabled:border-[#7a815f] min-w-[180px] justify-center after:content-[''] after:absolute after:inset-0 after:rounded-xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10 disabled:after:bg-[#7a815f] disabled:after:translate-x-[2px] disabled:after:translate-y-[2px] disabled:after:opacity-35 font-sans"
                 >
                   {isParsingAI ? (
                     <OptimizedLoadingIndicator 
