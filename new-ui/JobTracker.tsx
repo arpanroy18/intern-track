@@ -446,7 +446,7 @@ const JobTracker = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search by company, role, or tag"
-                  className="w-full h-12 pl-12 pr-4 bg-stone-100/90 border border-stone-200/60 rounded-full text-gray-700 placeholder-gray-500 focus:outline-none focus:border-stone-300 focus:bg-stone-50 transition-all duration-200 shadow-sm backdrop-blur-sm relative z-0"
+                  className="w-full h-12 pl-12 pr-4 bg-stone-100/90 border border-stone-200/60 rounded-full text-gray-700 placeholder-gray-500 focus:outline-none focus:border-stone-300 focus:bg-stone-50 transition-all duration-200 shadow-sm backdrop-blur-sm relative z-0 font-sans"
                 />
                 {searchTerm && (
                   <button
