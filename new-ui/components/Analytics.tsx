@@ -246,7 +246,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
               <Target className="w-5 h-5 text-blue-500" />
               <span className="text-sm text-slate-600 font-lora">Total Applied</span>
             </div>
-            <p className="text-2xl font-bold text-[#2b1e1a] font-lora">{stats.total}</p>
+            <p className="text-2xl font-bold text-[#2b1e1a] font-sans">{stats.total}</p>
           </div>
 
           <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
@@ -254,7 +254,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
               <CheckCircle className="w-5 h-5 text-green-600" />
               <span className="text-sm text-slate-600 font-lora">Success Rate</span>
             </div>
-            <p className="text-2xl font-bold text-green-700 font-lora">{formatPercentage(stats.successRate)}</p>
+            <p className="text-2xl font-bold text-green-700 font-sans">{formatPercentage(stats.successRate)}</p>
           </div>
 
           <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
@@ -262,7 +262,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
               <XCircle className="w-5 h-5 text-red-600" />
               <span className="text-sm text-slate-600 font-lora">Rejection Rate</span>
             </div>
-            <p className="text-2xl font-bold text-red-700 font-lora">{formatPercentage(stats.rejectionRate)}</p>
+            <p className="text-2xl font-bold text-red-700 font-sans">{formatPercentage(stats.rejectionRate)}</p>
           </div>
 
           <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
@@ -270,7 +270,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
               <Activity className="w-5 h-5 text-yellow-600" />
               <span className="text-sm text-slate-600 font-lora">Pending</span>
             </div>
-            <p className="text-2xl font-bold text-yellow-700 font-lora">{formatPercentage(stats.pendingRate)}</p>
+            <p className="text-2xl font-bold text-yellow-700 font-sans">{formatPercentage(stats.pendingRate)}</p>
           </div>
 
           <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
@@ -278,7 +278,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
               <Clock className="w-5 h-5 text-purple-600" />
               <span className="text-sm text-slate-600 font-lora">Avg to Interview</span>
             </div>
-            <p className="text-2xl font-bold text-purple-700 font-lora">{stats.averageTimeToInterview}d</p>
+            <p className="text-2xl font-bold text-purple-700 font-sans">{stats.averageTimeToInterview}d</p>
           </div>
 
           <div className="bg-white rounded-xl border border-[#e5e0d6] p-4 shadow-sm">
@@ -286,7 +286,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
               <TrendingUp className="w-5 h-5 text-pink-600" />
               <span className="text-sm text-slate-600 font-lora">Avg to Offer</span>
             </div>
-            <p className="text-2xl font-bold text-pink-700 font-lora">{stats.averageTimeToOffer}d</p>
+            <p className="text-2xl font-bold text-pink-700 font-sans">{stats.averageTimeToOffer}d</p>
           </div>
         </div>
 
@@ -323,10 +323,10 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
               {stats.topCompanies.slice(0, 6).map((item, index) => (
                 <div key={item.company} className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-slate-500 text-sm w-4 flex-shrink-0">#{index + 1}</span>
-                    <span className="text-slate-700 truncate">{item.company}</span>
+                    <span className="text-slate-500 text-sm w-4 flex-shrink-0 font-sans">#{index + 1}</span>
+                    <span className="text-slate-700 truncate font-sans">{item.company}</span>
                   </div>
-                  <span className="text-[#2b1e1a] font-medium flex-shrink-0">{item.count}</span>
+                  <span className="text-[#2b1e1a] font-medium flex-shrink-0 font-sans">{item.count}</span>
                 </div>
               ))}
             </div>
@@ -342,10 +342,10 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
               {stats.topLocations.slice(0, 6).map((item, index) => (
                 <div key={item.location} className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-slate-500 text-sm w-4 flex-shrink-0">#{index + 1}</span>
-                    <span className="text-slate-700 truncate">{item.location}</span>
+                    <span className="text-slate-500 text-sm w-4 flex-shrink-0 font-sans">#{index + 1}</span>
+                    <span className="text-slate-700 truncate font-sans">{item.location}</span>
                   </div>
-                  <span className="text-[#2b1e1a] font-medium flex-shrink-0">{item.count}</span>
+                  <span className="text-[#2b1e1a] font-medium flex-shrink-0 font-sans">{item.count}</span>
                 </div>
               ))}
             </div>
@@ -361,10 +361,10 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
               {stats.topSkills.map((item, index) => (
                 <div key={item.skill} className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-slate-500 text-sm w-4 flex-shrink-0">#{index + 1}</span>
-                    <span className="text-slate-700 truncate">{item.skill}</span>
+                    <span className="text-slate-500 text-sm w-4 flex-shrink-0 font-sans">#{index + 1}</span>
+                    <span className="text-slate-700 truncate font-sans">{item.skill}</span>
                   </div>
-                  <span className="text-[#2b1e1a] font-medium flex-shrink-0">{item.count}</span>
+                  <span className="text-[#2b1e1a] font-medium flex-shrink-0 font-sans">{item.count}</span>
                 </div>
               ))}
             </div>
