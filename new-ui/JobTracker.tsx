@@ -937,7 +937,7 @@ const JobTracker = () => {
                       onChange={(e) => setFormData({...formData, remote: e.target.checked})}
                       className="w-4 h-4 rounded border-2 border-[#E5D8C7] text-[#2b1e1a] focus:ring-[#2b1e1a]/20 bg-[#F7F3E9]"
                     />
-                    <span className="text-sm text-[#2F1F12] font-lora">Remote work available</span>
+                    <span className="text-sm text-[#2F1F12] font-sans">Remote work available</span>
                   </label>
                 </div>
                 
@@ -1129,7 +1129,7 @@ const JobTracker = () => {
                         onChange={(e) => setEditJobFormData({...editJobFormData, remote: e.target.checked})}
                         className="w-4 h-4 rounded border-2 border-[#E5D8C7] text-[#2b1e1a] focus:ring-[#2b1e1a]/20 bg-[#F7F3E9]"
                       />
-                      <span className="text-sm text-[#2F1F12] font-lora">Remote work available</span>
+                      <span className="text-sm text-[#2F1F12] font-sans">Remote work available</span>
                     </label>
                   </div>
                   
