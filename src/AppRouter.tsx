@@ -38,6 +38,50 @@ const AppRouter: React.FC = () => {
     }
   }, [variant])
 
+  // Ensure variant-specific fonts are loaded and applied
+  useEffect(() => {
+    const head = document.head
+
+    const removeIfExists = (id: string) => {
+      const el = document.getElementById(id)
+      if (el) el.remove()
+    }
+
+    removeIfExists('app-font')
+    removeIfExists('app-font-preconnect-1')
+    removeIfExists('app-font-preconnect-2')
+
+    const pre1 = document.createElement('link')
+    pre1.id = 'app-font-preconnect-1'
+    pre1.rel = 'preconnect'
+    pre1.href = 'https://fonts.googleapis.com'
+    head.appendChild(pre1)
+
+    const pre2 = document.createElement('link')
+    pre2.id = 'app-font-preconnect-2'
+    pre2.rel = 'preconnect'
+    pre2.href = 'https://fonts.gstatic.com'
+    pre2.crossOrigin = 'anonymous'
+    head.appendChild(pre2)
+
+    const link = document.createElement('link')
+    link.id = 'app-font'
+    link.rel = 'stylesheet'
+    link.href = variant === 'new'
+      ? 'https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap'
+      : 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
+    head.appendChild(link)
+
+    const root = document.documentElement
+    if (variant === 'new') {
+      root.classList.add('font-lora')
+      root.classList.remove('font-sans')
+    } else {
+      root.classList.add('font-sans')
+      root.classList.remove('font-lora')
+    }
+  }, [variant])
+
   const AppComponent = useMemo(() => {
     return React.lazy(() => (variant === 'new' ? import('../new-ui/App') : import('./App')))
   }, [variant])
