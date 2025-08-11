@@ -840,7 +840,7 @@ const JobTracker = () => {
                   <h2 className="text-xl font-bold text-[#2F1F12] mb-1 font-lora">
                     {isFromAIParse ? 'Review AI Parsed Job' : 'Add New Application'}
                   </h2>
-                  <p className="text-[#8B6E5A] text-sm">
+                  <p className="text-[#8B6E5A] font-sans text-sm">
                     {isFromAIParse ? 'Review and edit the extracted job details' : 'Fill in the job details manually'}
                   </p>
                 </div>
@@ -966,14 +966,14 @@ const JobTracker = () => {
               <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-[#E5D8C7]">
                 <button
                   onClick={handleCloseAddModal}
-                  className="px-5 py-2.5 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-xl transition-all duration-200 font-medium border border-[#E5D8C7] font-lora text-sm"
+                  className="px-5 py-2.5 bg-[#F2E9DD] hover:bg-[#E5D8C7] text-[#2F1F12] rounded-xl transition-all duration-200 font-medium border border-[#E5D8C7] font-sans text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddJob}
                   disabled={!formData.role.trim() || !formData.company.trim()}
-                  className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[#b5bd98] disabled:border-[#7a815f] after:content-[''] after:absolute after:inset-0 after:rounded-xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10 disabled:after:bg-[#7a815f] disabled:after:translate-x-[2px] disabled:after:translate-y-[2px] disabled:after:opacity-35 font-lora"
+                  className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#6b7c2c] hover:bg-[#7a8f35] border border-[#2d3314] transition-all duration-200 active:translate-y-0.5 disabled:cursor-not-allowed disabled:bg-[#b5bd98] disabled:border-[#7a815f] after:content-[''] after:absolute after:inset-0 after:rounded-xl after:bg-[#2d3314] after:opacity-80 after:translate-x-[4px] after:translate-y-[5px] after:-z-10 disabled:after:bg-[#7a815f] disabled:after:translate-x-[2px] disabled:after:translate-y-[2px] disabled:after:opacity-35 font-sans"
                 >
                   {isLoading ? (
                     <>
