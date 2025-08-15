@@ -5,9 +5,25 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>InternTrack</title>
-    <script type="module" crossorigin src="/assets/index-BrrRom9r.js"></script>
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function() {
+        try {
+          var variant = localStorage.getItem('uiVariant');
+          var isClassic = variant === 'classic';
+          var script = document.createElement('script');
+          script.type = 'module';
+          script.src = isClassic ? '/src/main.tsx' : '/new-ui/main.tsx';
+          document.body.appendChild(script);
+        } catch (e) {
+          var fallback = document.createElement('script');
+          fallback.type = 'module';
+          fallback.src = '/new-ui/main.tsx';
+          document.body.appendChild(fallback);
+        }
+      })();
+    </script>
   </body>
 </html> 
