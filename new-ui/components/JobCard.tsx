@@ -90,7 +90,10 @@ export const JobCard = React.memo(({
 
                         <div className="mt-2 flex items-center gap-2">
                             {job.skills.map((skill, skillIndex) => (
-                                <span key={skillIndex} className="px-2 py-1 bg-[#EEE7DA] text-[#3F2F2F] rounded text-xs font-semibold border border-[#D8CBB5]">
+                                <span
+                                    key={skillIndex}
+                                    className="inline-flex items-center h-7 px-2 bg-[#EEE7DA] text-[#3F2F2F] rounded text-xs font-semibold border border-[#D8CBB5] whitespace-nowrap leading-none"
+                                >
                                     {skill}
                                 </span>
                             ))}
