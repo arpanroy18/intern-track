@@ -8,22 +8,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      (function() {
-        try {
-          var variant = localStorage.getItem('uiVariant');
-          var isClassic = variant === 'classic';
-          var script = document.createElement('script');
-          script.type = 'module';
-          script.src = isClassic ? '/src/main.tsx' : '/new-ui/main.tsx';
-          document.body.appendChild(script);
-        } catch (e) {
-          var fallback = document.createElement('script');
-          fallback.type = 'module';
-          fallback.src = '/new-ui/main.tsx';
-          document.body.appendChild(fallback);
-        }
-      })();
-    </script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html> 
