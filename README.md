@@ -4,7 +4,7 @@ A modern, AI-powered job application tracking system built with React, TypeScrip
 
 ## Demo
 
-Watch the project demo: [Project Demo Video](https://github.com/arpanroy18/intern-track/blob/master/public/Project%20Demo.mp4)
+![InternTrack Demo](https://github.com/arpanroy18/intern-track/blob/59d43d27ca70332fa90626f3654bb90a688ae20c/public/Interntrack%20Video.gif)
 
 ## Features
 
