@@ -28,6 +28,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
   const [selectedFolder, setSelectedFolder] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<DetailedStats | null>(null);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
 
   const loadAnalyticsData = useCallback(async () => {
     try {
@@ -38,6 +39,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
         ? allJobs 
         : allJobs.filter((job: Job) => job.folderId === selectedFolder);
       
+      setFilteredJobs(filteredJobs);
       setStats(calculateDetailedStats(filteredJobs));
     } catch (error) {
       console.error('Error loading analytics data:', error);
@@ -323,9 +325,12 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
           <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700/50 p-4">
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="w-5 h-5 text-blue-400" />
-              <h3 className="text-lg font-semibold text-white">Monthly Application Trend</h3>
+              <h3 className="text-lg font-semibold text-white">Application Trend</h3>
             </div>
-            <MonthlyApplicationTrend monthlyApplications={stats.monthlyApplications} />
+            <MonthlyApplicationTrend 
+              monthlyApplications={stats.monthlyApplications} 
+              jobs={filteredJobs}
+            />
           </div>
         </div>
 
