@@ -20,6 +20,35 @@ interface MonthlyApplicationTrendProps {
 type ViewMode = 'monthly' | 'daily';
 type TimePeriod = '6months' | '3months' | '1month' | 'custom';
 
+// Utility function to parse date string and convert to EST timezone
+const parseDateToEST = (dateString: string): Date => {
+  // Parse the date string and assume it's in local timezone
+  const date = new Date(dateString);
+  
+  // Get the date components in EST timezone
+  const estDate = new Date(date.toLocaleString("en-US", {timeZone: "America/New_York"}));
+  
+  // Create a new date with the EST components but in local timezone for comparison
+  return new Date(estDate.getFullYear(), estDate.getMonth(), estDate.getDate());
+};
+
+// Utility function to get date string in EST timezone
+const getESTDateString = (date: Date): string => {
+  return date.toLocaleDateString('en-US', { 
+    timeZone: 'America/New_York',
+    month: 'short', 
+    day: 'numeric' 
+  });
+};
+
+// Utility function to compare dates in EST timezone
+const isSameDateEST = (date1: Date, date2: Date): boolean => {
+  // Convert both dates to EST and compare only the date part
+  const est1 = parseDateToEST(date1.toISOString());
+  const est2 = parseDateToEST(date2.toISOString());
+  return est1.getTime() === est2.getTime();
+};
+
 const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({ 
   monthlyApplications, 
   jobs 
@@ -35,12 +64,13 @@ const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({
     
     for (let i = 29; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
-      const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dateString = getESTDateString(date);
       
-      // Count applications for this specific date
+      // Count applications for this specific date using EST timezone
       const count = jobs.filter(job => {
-        const jobDate = new Date(job.dateApplied);
-        return jobDate.toDateString() === date.toDateString();
+        const jobDate = parseDateToEST(job.dateApplied);
+        const targetDate = parseDateToEST(date.toISOString());
+        return jobDate.getTime() === targetDate.getTime();
       }).length;
       
       data.push({ date: dateString, count });

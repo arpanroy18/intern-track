@@ -20,6 +20,35 @@ interface MonthlyApplicationTrendProps {
 type ViewMode = 'monthly' | 'daily';
 type TimePeriod = '6months' | '3months' | '1month' | 'custom';
 
+// Utility function to parse date string and convert to EST timezone
+const parseDateToEST = (dateString: string): Date => {
+  // Parse the date string and assume it's in local timezone
+  const date = new Date(dateString);
+  
+  // Get the date components in EST timezone
+  const estDate = new Date(date.toLocaleString("en-US", {timeZone: "America/New_York"}));
+  
+  // Create a new date with the EST components but in local timezone for comparison
+  return new Date(estDate.getFullYear(), estDate.getMonth(), estDate.getDate());
+};
+
+// Utility function to get date string in EST timezone
+const getESTDateString = (date: Date): string => {
+  return date.toLocaleDateString('en-US', { 
+    timeZone: 'America/New_York',
+    month: 'short', 
+    day: 'numeric' 
+  });
+};
+
+// Utility function to compare dates in EST timezone
+const isSameDateEST = (date1: Date, date2: Date): boolean => {
+  // Convert both dates to EST and compare only the date part
+  const est1 = parseDateToEST(date1.toISOString());
+  const est2 = parseDateToEST(date2.toISOString());
+  return est1.getTime() === est2.getTime();
+};
+
 const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({ 
   monthlyApplications, 
   jobs 
@@ -33,19 +62,40 @@ const MonthlyApplicationTrend: React.FC<MonthlyApplicationTrendProps> = ({
     const data: DailyData[] = [];
     const now = new Date();
     
+    // Debug: Log the current jobs and their dates
+    console.log('Processing jobs for daily data:', jobs.map(job => ({
+      dateApplied: job.dateApplied,
+      estDate: getESTDateString(new Date(job.dateApplied)),
+      parsedEST: parseDateToEST(job.dateApplied).toDateString()
+    })));
+    
+    // Debug: Show what dates we're looking for
+    console.log('Looking for applications on these dates (EST):', 
+      Array.from({length: 30}, (_, i) => {
+        const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        return getESTDateString(date);
+      }).reverse()
+    );
+    
     for (let i = 29; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
-      const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dateString = getESTDateString(date);
       
-      // Count applications for this specific date
+      // Count applications for this specific date using EST timezone
       const count = jobs.filter(job => {
-        const jobDate = new Date(job.dateApplied);
-        return jobDate.toDateString() === date.toDateString();
+        const jobDate = parseDateToEST(job.dateApplied);
+        const targetDate = parseDateToEST(date.toISOString());
+        const isSame = jobDate.getTime() === targetDate.getTime();
+        if (isSame) {
+          console.log(`Found match: Job date ${job.dateApplied} (EST: ${jobDate.toDateString()}) matches ${dateString} (EST: ${targetDate.toDateString()})`);
+        }
+        return isSame;
       }).length;
       
       data.push({ date: dateString, count });
     }
     
+    console.log('Generated daily data:', data);
     return data;
   }, [jobs]);
 

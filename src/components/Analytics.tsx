@@ -122,19 +122,39 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
     
     for (let i = 5; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const monthKey = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+      const monthKey = date.toLocaleDateString('en-US', { 
+        timeZone: 'America/New_York',
+        year: 'numeric', 
+        month: 'short' 
+      });
       last6Months.push({ month: monthKey, count: 0 });
     }
 
-    // Count actual applications per month
+    // Count actual applications per month using EST timezone
+    console.log('Processing jobs for monthly data:', jobs.map(job => ({
+      dateApplied: job.dateApplied,
+      estMonth: new Date(job.dateApplied).toLocaleDateString('en-US', { 
+        timeZone: 'America/New_York',
+        year: 'numeric', 
+        month: 'short' 
+      })
+    })));
+    
     jobs.forEach(job => {
       const jobDate = new Date(job.dateApplied);
-      const monthKey = jobDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+      const monthKey = jobDate.toLocaleDateString('en-US', { 
+        timeZone: 'America/New_York',
+        year: 'numeric', 
+        month: 'short' 
+      });
       const monthEntry = last6Months.find(m => m.month === monthKey);
       if (monthEntry) {
         monthEntry.count++;
+        console.log(`Added job to month ${monthKey}, count now: ${monthEntry.count}`);
       }
     });
+    
+    console.log('Final monthly data:', last6Months);
 
     const monthlyApplications = last6Months;
 
