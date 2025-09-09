@@ -88,6 +88,36 @@ const JobTracker = () => {
     jobPostingUrl: ''
   });
 
+  // Helper function to get the last selected season from localStorage
+  const getLastSelectedSeason = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('lastSelectedSeason') || '';
+    }
+    return '';
+  }, []);
+
+  // Helper function to create reset form data with preserved season
+  const createResetFormData = useCallback(() => ({
+    role: '',
+    company: '',
+    location: '',
+    experienceRequired: '',
+    skills: '',
+    remote: false,
+    notes: '',
+    folderId: getLastSelectedSeason(),
+    jobPostingUrl: ''
+  }), [getLastSelectedSeason]);
+
+  // Helper function to handle season selection and save to localStorage
+  const handleSeasonChange = useCallback((folderId: string) => {
+    setFormData({...formData, folderId});
+    // Save the selected season to localStorage for future AI parsing
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lastSelectedSeason', folderId);
+    }
+  }, [formData]);
+
   const {
     jobDescription,
     setJobDescription,
@@ -229,23 +259,14 @@ const JobTracker = () => {
 
     // Optimize form reset for sequential parsing operations
     // Use a single object assignment instead of multiple property assignments
-    const resetFormData = {
-      role: '',
-      company: '',
-      location: '',
-      experienceRequired: '',
-      skills: '',
-      remote: false,
-      notes: '',
-      folderId: '',
-      jobPostingUrl: ''
-    };
+    // Preserve the last selected season for better UX
+    const resetFormData = createResetFormData();
     
     // Batch state updates to minimize re-renders
     setFormData(resetFormData);
     setShowAddModal(false);
     setIsFromAIParse(false);
-  }, [formData, addJob, setShowAddModal]);
+  }, [formData, addJob, setShowAddModal, createResetFormData]);
 
   const showJobDetails = useCallback((job: Job) => {
     setSelectedJob(job);
@@ -300,18 +321,8 @@ const JobTracker = () => {
   const handleCloseAddModal = useCallback(() => {
     setShowAddModal(false);
     setIsFromAIParse(false);
-    setFormData({
-      role: '',
-      company: '',
-      location: '',
-      experienceRequired: '',
-      skills: '',
-      remote: false,
-      notes: '',
-      folderId: '',
-      jobPostingUrl: ''
-    });
-  }, [setShowAddModal]);
+    setFormData(createResetFormData());
+  }, [setShowAddModal, createResetFormData]);
 
   const handleEditJob = useCallback(() => {
     setIsEditingJob(true);
@@ -918,7 +929,7 @@ const JobTracker = () => {
                     </label>
                     <select
                       value={formData.folderId}
-                      onChange={(e) => setFormData({...formData, folderId: e.target.value})}
+                      onChange={(e) => handleSeasonChange(e.target.value)}
                       className="w-full bg-slate-800 rounded-lg p-3 text-gray-100 border border-slate-700 focus:border-purple-400 focus:outline-none"
                     >
                       <option value="">

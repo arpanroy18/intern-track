@@ -308,6 +308,11 @@ export function mapResponseToFormData(parsedData: ParsedJobData, folderId: strin
   // Use cached empty string to avoid repeated empty string creation
   const skillsString = parsedData.skills.length > 0 ? parsedData.skills.join(', ') : '';
   
+  // Get the last selected season from localStorage, fallback to provided folderId or empty string
+  const lastSelectedSeason = typeof window !== 'undefined' 
+    ? localStorage.getItem('lastSelectedSeason') || folderId || ''
+    : folderId || '';
+  
   // Direct property assignment for optimal performance
   // Pre-populate folderId to ensure smooth integration with job creation flow
   return {
@@ -318,7 +323,7 @@ export function mapResponseToFormData(parsedData: ParsedJobData, folderId: strin
     skills: skillsString,
     remote: parsedData.remote,
     notes: parsedData.notes,
-    folderId: folderId || '', // Ensure folderId is always a string for form compatibility
+    folderId: lastSelectedSeason, // Use last selected season or fallback to provided folderId
     jobPostingUrl: '' // Initialize jobPostingUrl for complete form data structure
   };
 }
