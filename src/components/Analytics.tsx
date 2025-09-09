@@ -123,34 +123,25 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack, folders }) => {
     for (let i = 5; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const monthKey = date.toLocaleDateString('en-US', { 
-        timeZone: 'America/New_York',
         year: 'numeric', 
         month: 'short' 
       });
       last6Months.push({ month: monthKey, count: 0 });
     }
 
-    // Count actual applications per month using EST timezone
-    console.log('Processing jobs for monthly data:', jobs.map(job => ({
-      dateApplied: job.dateApplied,
-      estMonth: new Date(job.dateApplied).toLocaleDateString('en-US', { 
-        timeZone: 'America/New_York',
-        year: 'numeric', 
-        month: 'short' 
-      })
-    })));
-    
+    // Count actual applications per month
     jobs.forEach(job => {
-      const jobDate = new Date(job.dateApplied);
+      // Parse YYYY-MM-DD format directly to avoid timezone issues
+      const [year, month, day] = job.dateApplied.split('-').map(Number);
+      const jobDate = new Date(year, month - 1, day); // month is 0-indexed
+      
       const monthKey = jobDate.toLocaleDateString('en-US', { 
-        timeZone: 'America/New_York',
         year: 'numeric', 
         month: 'short' 
       });
       const monthEntry = last6Months.find(m => m.month === monthKey);
       if (monthEntry) {
         monthEntry.count++;
-        console.log(`Added job to month ${monthKey}, count now: ${monthEntry.count}`);
       }
     });
     
