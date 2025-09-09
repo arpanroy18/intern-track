@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { Calendar, BarChart3, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BarChart3, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface MonthlyData {
   month: string;
