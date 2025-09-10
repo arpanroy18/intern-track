@@ -29,12 +29,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
+    // Handle email verification callback
+    const handleAuthCallback = async () => {
+      const { data, error } = await supabase.auth.getSession()
+      if (error) {
+        console.error('Error getting session:', error)
+      } else if (data.session) {
+        setSession(data.session)
+        setUser(data.session.user)
+      }
       setLoading(false)
-    })
+    }
+
+    // Check if this is an auth callback
+    const urlParams = new URLSearchParams(window.location.search)
+    const accessToken = urlParams.get('access_token')
+    const refreshToken = urlParams.get('refresh_token')
+    
+    if (accessToken && refreshToken) {
+      // This is an auth callback, set the session
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      }).then(({ data, error }) => {
+        if (error) {
+          console.error('Error setting session:', error)
+        } else {
+          setSession(data.session)
+          setUser(data.session?.user ?? null)
+        }
+        setLoading(false)
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname)
+      })
+    } else {
+      // Normal session check
+      handleAuthCallback()
+    }
 
     // Listen for auth changes
     const {
@@ -52,6 +83,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`
+      }
     })
     return { error }
   }
